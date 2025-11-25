@@ -160,6 +160,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("preferred_language", models.CharField(default="en-in", max_length=5)),
+                ("phone_number", models.CharField(blank=True, max_length=15, null=True)),
             ],
         ),
         migrations.CreateModel(

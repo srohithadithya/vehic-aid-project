@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.users.models import ServiceBooker, ServiceProvider
+from django.db.models import Avg
 
 from .dispatch_logic import trigger_dispatch
 from .models import (
@@ -146,8 +147,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
         """
         serializer = SubscriptionCreateSerializer(data=request.data)
         if serializer.is_valid():
-            # Attach the current user as the subscriber
-            sub = serializer.save(user=request.user.servicebooker)
+            # Attach the current user as the subscriber and set initial status
+            validated = serializer.validated_data
+            validated['user'] = request.user.servicebooker
+            # API-created subscriptions should start as PENDING and inactive
+            validated['status'] = 'PENDING'
+            validated['is_active'] = False
+            sub = UserSubscription.objects.create(**validated)
             out_serializer = UserSubscriptionSerializer(sub)
             return Response(out_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

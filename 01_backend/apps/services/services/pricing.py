@@ -10,7 +10,18 @@ class PricingService:
     """
     
     def __init__(self):
-        self.api_key = settings.GOOGLE_MAPS_API_KEY
+        # Use settings attribute if present, otherwise try repo file, otherwise empty string
+        self.api_key = getattr(settings, "GOOGLE_MAPS_API_KEY", None)
+        if not self.api_key:
+            # try reading a local file (kept in repo for developer convenience)
+            root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+            key_file = os.path.join(root_path, "google maps api key.txt")
+            try:
+                with open(key_file, "r", encoding="utf-8") as f:
+                    self.api_key = f.read().strip()
+            except Exception:
+                # last resort: empty key (distance API calls will fall back to straight-line distance)
+                self.api_key = ""
         self.base_url = "https://maps.googleapis.com/maps/api/distancematrix/json"
         
         # Budget-friendly base pricing per service type (in INR)
@@ -102,7 +113,8 @@ class PricingService:
                     distance_m = element["distance"]["value"]
                     duration_s = element["duration"]["value"]
                     
-                    distance_km = Decimal(str(distance_m / 1000))
+                    # Convert to Decimal safely
+                    distance_km = Decimal(str(distance_m / 1000.0))
                     duration_min = int(duration_s / 60)
                     
                     return distance_km, duration_min

@@ -56,7 +56,7 @@ class SubscriptionPlanSerializer(serializers.ModelSerializer):
             "is_exchange_eligible",
             "description",
             "features",
-            "max_requests_per_month",
+            "max_requests",
         ]
         read_only_fields = ["id"]
 
@@ -83,7 +83,8 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=UserSubscription._meta.get_field('user').related_model.objects.all())
+    # user will be provided by the view (request.user.servicebooker)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     plan = serializers.PrimaryKeyRelatedField(queryset=SubscriptionPlan.objects.all())
 
     class Meta:

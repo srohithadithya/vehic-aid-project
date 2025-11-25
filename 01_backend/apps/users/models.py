@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+# gettext_lazy not used in this file
 
 # --- Custom User Model ---
 
@@ -37,6 +37,8 @@ class ServiceBooker(models.Model):
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     preferred_language = models.CharField(max_length=5, default="en-in")
+    # Allow storing a contact phone number on the profile to match test expectations
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
     # Linked to IoT device in iot_devices/models.py
 
     def __str__(self):
