@@ -1,0 +1,87 @@
+/* ----------------------------------------------------------- */
+/* Login Page Specific Styles */
+/* ----------------------------------------------------------- */
+
+body.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); /* Blue Gradient */
+    font-family: 'Inter', sans-serif;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 1.8rem;
+    color: var(--color-primary-dark);
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.login-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-group .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px 0;
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.login-error {
+    color: var(--color-danger);
+    font-size: 0.9rem;
+    margin-top: 15px;
+}

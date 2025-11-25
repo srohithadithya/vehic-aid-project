@@ -1,0 +1,38 @@
+{
+  "family": "vehicaid-backend-task",
+  "executionRoleArn": "arn:aws:iam::${aws_account_id}:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "containerDefinitions": [
+    {
+      "name": "django-api",
+      "image": "${ecr_repository_url}:${image_tag}",
+      "cpu": 256,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000
+        }
+      ],
+      "environment": [
+        {"name": "DJANGO_SETTINGS_MODULE", "value": "vehic_aid_backend.settings.production"},
+        {"name": "DATABASE_URL", "value": "postgres://${db_username}:${db_password}@${db_host}:${db_port}/${db_name}"},
+        {"name": "CELERY_BROKER_URL", "value": "redis://${redis_host}:6379/0"}
+        // Add all necessary environment variables here, sourced from Terraform/secrets
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/vehicaid-api",
+          "awslogs-region": "${aws_region}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+    // A second container definition for the Celery Worker would typically be added here
+  ]
+}

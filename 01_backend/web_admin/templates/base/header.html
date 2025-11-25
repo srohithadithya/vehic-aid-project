@@ -1,0 +1,14 @@
+<header id="top-header">
+    <div class="header-search">
+        <i class="icon-search"></i>
+        <input type="text" placeholder="Search users, providers, or requests...">
+    </div>
+    
+    <div class="header-controls">
+        <div class="user-info">
+            <span class="user-name">{{ request.user.first_name }} ({{ request.user.get_user_type_display }})</span>
+            <span class="user-role">Platform Admin</span>
+        </div>
+        <a href="{% url 'admin:logout' %}" class="btn-logout"><i class="icon-logout"></i> Logout</a>
+    </div>
+</header>

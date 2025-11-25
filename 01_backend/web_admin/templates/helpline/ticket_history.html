@@ -1,0 +1,53 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Customer History{% endblock %}
+{% block page_heading %}Service History for: {{ booker.user.get_full_name }}{% endblock %}
+
+{% block content %}
+    <div class="customer-summary-panel panel">
+        <h2>Customer Profile Summary</h2>
+        <div class="summary-details">
+            <p><strong>Subscription Plan:</strong> <span class="status-badge status-{{ booker.subscription_status_tag }}">{{ booker.get_subscription_display }}</span></p>
+            <p><strong>Primary Vehicle:</strong> {{ booker.primary_vehicle.make }} {{ booker.primary_vehicle.model }} ({{ booker.primary_vehicle.license_plate }})</p>
+            <p><strong>IoT Device ID:</strong> {{ booker.iot_device.device_id|default:"N/A" }}</p>
+            <p><strong>Total Lifetime Jobs:</strong> {{ total_jobs }}</p>
+            <p><strong>Average Rating Given:</strong> {{ booker.avg_rating_given|default:"N/A" }}</p>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 30px;">Past Service Requests</h2>
+
+    <table class="data-table history-table">
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Service Type</th>
+                <th>Date / Time</th>
+                <th>Location Summary</th>
+                <th>Status</th>
+                <th>Provider / Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in past_requests %}
+            <tr>
+                <td>#{{ request.pk }}</td>
+                <td>{{ request.get_service_type_display }}</td>
+                <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ request.address_summary }}</td>
+                <td><span class="status-badge status-{{ request.status|lower }}">{{ request.get_status_display }}</span></td>
+                <td>
+                    {% if request.provider %}
+                        SP-{{ request.provider.pk }} / {{ request.customer_rating }} ★
+                    {% else %}
+                        (Cancelled)
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">No service request history found for this customer.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

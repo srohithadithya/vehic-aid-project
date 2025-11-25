@@ -1,0 +1,167 @@
+/* ----------------------------------------------------------- */
+/* Helpline UI Overrides (Extends admin_base.css) */
+/* ----------------------------------------------------------- */
+
+/* Layout Grid for Console */
+.helpline-console-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 2fr; /* Info, Request Form, Map */
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.panel {
+    height: 100%;
+    min-height: 550px;
+}
+
+/* Call Status Widget (Urgency Indicator) */
+.call-status-widget {
+    padding: 15px;
+    text-align: center;
+    font-weight: 700;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.status-ringing {
+    background-color: var(--color-danger);
+    color: white;
+    animation: pulse-red 1.5s infinite;
+}
+
+.status-active-call {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+@keyframes pulse-red {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { transform: scale(1.03); box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+/* Caller Info Panel */
+.caller-info-panel input[type="text"] {
+    margin-bottom: 10px;
+}
+
+.details-box {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.details-box h4 {
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.details-box .status-badge {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* Request Queue Panel (Live Map Sidebar) */
+.request-queue-panel {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    overflow-y: auto;
+    max-height: 85vh; /* Limit height for scrollability */
+}
+
+.request-list {
+    list-style: none;
+    padding: 0;
+}
+
+.request-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.request-item:hover {
+    background-color: #f7f7f7;
+    cursor: pointer;
+}
+
+.request-item .request-details {
+    flex-grow: 1;
+    padding-left: 10px;
+}
+
+.request-type {
+    font-weight: 700;
+    color: var(--color-primary-dark);
+}
+
+.request-location {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* High Priority Indicator */
+.request-priority-URGENT {
+    border-left: 5px solid var(--color-danger);
+    padding-left: 10px;
+    background-color: #fef4f4;
+}
+
+.request-item .btn-assign {
+    background-color: var(--color-success);
+    color: white;
+}
+
+/* Live Map Console */
+.map-full-panel {
+    background-color: #e3f2fd; /* Light blue map placeholder */
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+#helpline-map-container, #live-map-container {
+    height: 100%;
+    min-height: 80vh;
+}
+
+.map-loading {
+    text-align: center;
+    padding: 100px;
+    color: #6c757d;
+}
+
+.map-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    font-size: 0.9rem;
+}
+
+.legend-item {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.icon-dot-red {
+    color: var(--color-danger);
+}
+
+.icon-dot-green {
+    color: var(--color-success);
+}

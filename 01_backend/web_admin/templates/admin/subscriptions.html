@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriptions - Vehic-Aid Admin</title>
+    {% load static %}
+    {% load i18n %}
+    <link rel="icon" href="{% static 'img/logo/favicon.ico' %}" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --border: #e5e7eb;
+            --text: #374151;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--light);
+            color: var(--text);
+        }
+
+        .page-header {
+            background: var(--white);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .content {
+            padding: 0 32px 32px;
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 300px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light);
+        }
+
+        th {
+            padding: 16px 24px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: var(--secondary);
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--light);
+        }
+
+        .pagination {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .pagination-buttons button {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination-buttons button:hover {
+            background: var(--light);
+        }
+
+        .pagination-buttons button.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <h1 class="page-title">{% trans "Subscription Management" %}</h1>
+    </div>
+
+    <div class="content">
+        <div class="table-card">
+            <div class="table-header">
+                <input type="text" class="search-box" placeholder="{% trans 'Search subscriptions...' %}">
+                <button class="btn btn-primary">+ {% trans "New Subscription" %}</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% trans "User" %}</th>
+                        <th>{% trans "Plan" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Start Date" %}</th>
+                        <th>{% trans "End Date" %}</th>
+                        <th>{% trans "Auto-Renew" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subscription in subscriptions %}
+                    <tr>
+                        <td>{{ subscription.user.user.username }}</td>
+                        <td><strong>{{ subscription.plan.name }}</strong></td>
+                        <td>
+                            {% if subscription.status == 'ACTIVE' %}
+                            <span class="badge badge-success">{% trans "Active" %}</span>
+                            {% elif subscription.status == 'EXPIRED' %}
+                            <span class="badge badge-danger">{% trans "Expired" %}</span>
+                            {% elif subscription.status == 'CANCELLED' %}
+                            <span class="badge badge-warning">{% trans "Cancelled" %}</span>
+                            {% else %}
+                            <span class="badge badge-info">{% trans "Pending" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ subscription.start_date|date:"M d, Y" }}</td>
+                        <td>{{ subscription.end_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if subscription.auto_renew %}
+                            <span class="badge badge-success">✓ {% trans "Yes" %}</span>
+                            {% else %}
+                            <span class="badge badge-warning">✗ {% trans "No" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="action-btn">{% trans "View" %}</button>
+                            <button class="action-btn">{% trans "Edit" %}</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            {% trans "No subscriptions found" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <div class="pagination-info">
+                    {% trans "Showing" %} 1-10 {% trans "of" %} {{ subscriptions.count }} {% trans "subscriptions" %}
+                </div>
+                <div class="pagination-buttons">
+                    <button>{% trans "Previous" %}</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>{% trans "Next" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

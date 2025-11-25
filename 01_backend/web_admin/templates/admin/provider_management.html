@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Providers & Verification{% endblock %}
+{% block page_heading %}Service Providers & Verification Queue{% endblock %}
+
+{% block content %}
+    <div class="filter-controls">
+        <select name="status-filter">
+            <option value="ALL">All Statuses</option>
+            <option value="PENDING">Pending Verification</option>
+            <option value="APPROVED">Approved / Active</option>
+            <option value="SUSPENDED">Suspended</option>
+        </select>
+        <input type="search" placeholder="Search by name, ID, or vehicle plate...">
+        <button class="btn btn-primary">Apply Filters</button>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name / ID</th>
+                <th>Service Types</th>
+                <th>Vehicle Details</th>
+                <th>Rating</th>
+                <th>Verification Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Django template loop for providers -->
+            {% for provider in providers %}
+            <tr>
+                <td>{{ provider.user.get_full_name }} (#{{ provider.pk }})</td>
+                <td>{{ provider.display_service_types }}</td>
+                <td>{{ provider.vehicle_type }} ({{ provider.license_plate }})</td>
+                <td>{{ provider.average_rating }} ★</td>
+                <td>
+                    <span class="status-badge status-{{ provider.is_verified|yesno:'approved,pending' }}">
+                        {{ provider.is_verified|yesno:"Approved,Pending" }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'admin_provider_profile' provider.pk %}" class="btn btn-sm btn-secondary">View Profile</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">No service providers found based on filters.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

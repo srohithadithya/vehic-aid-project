@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Requests - Vehic-Aid Admin</title>
+    {% load static %}
+    {% load i18n %}
+    <link rel="icon" href="{% static 'img/logo/favicon.ico' %}" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --border: #e5e7eb;
+            --text: #374151;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--text);
+        }
+
+        .page-header {
+            background: var(--white);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .content {
+            padding: 0 32px 32px;
+        }
+
+        .filters {
+            background: var(--white);
+            padding: 20px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--light);
+        }
+
+        th {
+            padding: 16px 24px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: #fed7aa;
+            color: var(--warning);
+        }
+
+        .badge-active {
+            background: #d1fae5;
+            color: var(--secondary);
+        }
+
+        .badge-completed {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .badge-cancelled {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-btn:hover {
+            background: var(--light);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <h1 class="page-title">{% trans "Service Requests" %}</h1>
+    </div>
+
+    <div class="content">
+        <div class="filters">
+            <div class="filter-group">
+                <label>{% trans "Status" %}</label>
+                <select>
+                    <option value="">{% trans "All Statuses" %}</option>
+                    <option value="PENDING_DISPATCH">{% trans "Pending Dispatch" %}</option>
+                    <option value="DISPATCHED">{% trans "Dispatched" %}</option>
+                    <option value="COMPLETED">{% trans "Completed" %}</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>{% trans "Service Type" %}</label>
+                <select>
+                    <option value="">{% trans "All Types" %}</option>
+                    <option value="TOWING">{% trans "Towing" %}</option>
+                    <option value="JUMPSTART">{% trans "Jumpstart" %}</option>
+                    <option value="TIRE_CHANGE">{% trans "Tire Change" %}</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>{% trans "Date Range" %}</label>
+                <input type="date">
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h3>{% trans "All Requests" %}</h3>
+                <button class="btn btn-primary" onclick="openModal('createModal')">+ {% trans "New Request" %}</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% trans "ID" %}</th>
+                        <th>{% trans "Customer" %}</th>
+                        <th>{% trans "Service Type" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Provider" %}</th>
+                        <th>{% trans "Created" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr>
+                        <td><strong>#{{ request.id }}</strong></td>
+                        <td>{{ request.booker.user.username }}</td>
+                        <td>{{ request.service_type }}</td>
+                        <td>
+                            {% if request.status == 'PENDING_DISPATCH' %}
+                            <span class="badge badge-pending">{% trans "Pending" %}</span>
+                            {% elif request.status == 'DISPATCHED' %}
+                            <span class="badge badge-active">{% trans "Dispatched" %}</span>
+                            {% elif request.status == 'COMPLETED' %}
+                            <span class="badge badge-completed">{% trans "Completed" %}</span>
+                            {% else %}
+                            <span class="badge badge-cancelled">{{ request.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ request.provider.user.username|default:"Unassigned" }}</td>
+                        <td>{{ request.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <button class="action-btn" onclick="viewRequest({{ request.id }})">{% trans "View"
+                                %}</button>
+                            <button class="action-btn" onclick="editRequest({{ request.id }})">{% trans "Edit"
+                                %}</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            {% trans "No service requests found" %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Request Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">{% trans "Create Service Request" %}</h2>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label>{% trans "Service Type" %}</label>
+                    <select required>
+                        <option value="">{% trans "Select service type" %}</option>
+                        <option value="TOWING">{% trans "Towing" %}</option>
+                        <option value="JUMPSTART">{% trans "Jumpstart" %}</option>
+                        <option value="TIRE_CHANGE">{% trans "Tire Change" %}</option>
+                        <option value="FUEL_DELIVERY">{% trans "Fuel Delivery" %}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Customer" %}</label>
+                    <select required>
+                        <option value="">{% trans "Select customer" %}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Location (Latitude)" %}</label>
+                    <input type="text" placeholder="28.6139" required>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Location (Longitude)" %}</label>
+                    <input type="text" placeholder="77.2090" required>
+                </div>
+                <div class="form-group">
+                    <label>{% trans "Notes" %}</label>
+                    <textarea placeholder="{% trans 'Additional details...' %}"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')">{% trans
+                        "Cancel" %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans "Create Request" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        function viewRequest(id) {
+            alert('View request #' + id);
+        }
+        function editRequest(id) {
+            alert('Edit request #' + id);
+        }
+    </script>
+</body>
+
+</html>

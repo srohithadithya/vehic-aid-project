@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: vehicaid_db
+    environment:
+      POSTGRES_DB: vehic_aid
+      POSTGRES_USER: vehic_aid
+      POSTGRES_PASSWORD: vehic_aid123
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vehic_aid" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vehicaid_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vehicaid_web
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
+    volumes:
+      - .:/app
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-change-in-production-12345
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
+      - CHANNEL_REDIS_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vehicaid_celery
+    command: celery -A vehic_aid_backend worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=True
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  static_files:
+  media_files:
