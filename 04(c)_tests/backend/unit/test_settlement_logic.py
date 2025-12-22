@@ -33,6 +33,7 @@ def test_payout_split_below_min_transaction():
     with pytest.raises(FinancialError, match="below the minimum required amount"):
         calculate_payout_splits(amount)
 
+@pytest.mark.django_db
 def test_payout_details_ifsc_validation():
     """Tests the validation of India-specific IFSC codes."""
     # Setup a mock provider
