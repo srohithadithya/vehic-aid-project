@@ -2,28 +2,37 @@ import pytest
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
-from unittest.mock import patch
 
-from apps.users.models import CustomUser, ServiceBooker
+from apps.users.models import CustomUser, ServiceBooker, ServiceProvider
 from apps.services.models import ServiceRequest
 
 @pytest.mark.django_db
 class DispatchIntegrationTests(APITestCase):
     
     def setUp(self):
-        """Setup: Create a customer and vehicle for the request."""
-        # Create user account and linked profile
+        """Setup: Create a customer, vehicle, and a provider for the request."""
+        # Create customer
         self.user = CustomUser.objects.create_user(username='booker', email='booker@vehicaid.in', password='testpassword', is_service_booker=True)
         self.booker = ServiceBooker.objects.create(user=self.user)
         self.vehicle = self.user.vehicles.create(license_plate='MH12ABCD', make='Swift', model='Dzire')
+        
+        # Create a provider to ensure dispatch succeeds
+        self.provider_user = CustomUser.objects.create_user(username='provider', email='provider@vehicaid.in', password='testpassword', is_service_provider=True)
+        self.provider = ServiceProvider.objects.create(
+            user=self.provider_user, 
+            is_verified=True, 
+            is_available=True, 
+            service_types=['Towing'],
+            latitude=18.5,
+            longitude=73.8
+        )
         
         # Force authentication for the API client
         self.client.force_authenticate(user=self.user)
         self.url = reverse('service-request-create') # Assumes URL name is set
 
-    @patch('apps.services.dispatch_logic.trigger_dispatch') 
-    def test_01_request_creation_and_dispatch_trigger(self, mock_trigger_dispatch):
-        """Tests that a service request is created and the dispatch function is called."""
+    def test_01_request_creation_and_dispatch_trigger(self):
+        """Tests that a service request is created and the dispatch logic assigns a provider."""
         initial_count = ServiceRequest.objects.count()
         
         data = {
@@ -43,8 +52,9 @@ class DispatchIntegrationTests(APITestCase):
         self.assertEqual(ServiceRequest.objects.count(), initial_count + 1)
         request_obj = ServiceRequest.objects.first()
         
-        # Assertion 3: Verify the dispatch logic was triggered with the new request object
-        mock_trigger_dispatch.assert_called_once_with(request_obj)
+        # Assertion 3: Verify the dispatch logic was triggered and assigned the provider
+        self.assertEqual(request_obj.status, 'PROVIDER_EN_ROUTE')
+        self.assertEqual(request_obj.provider, self.provider_user)
 
     def test_02_invalid_vehicle_ownership(self):
         """Tests that a user cannot submit a request using another user's vehicle."""
