@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_celery_beat",  # New: To manage and schedule periodic tasks (Beat)
     "django_extensions",
     "corsheaders",  # CORS headers for web apps
+    "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
     "apps.services",
@@ -57,12 +58,15 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",  # CORS - must be before CommonMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # Added for Multi-language support
     "django.middleware.common.CommonMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Added for debugging
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 ROOT_URLCONF = "vehic_aid_backend.urls"
@@ -158,6 +162,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 25,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/day",
+        "user": "1000/day",
+        "booking": "20/hour",  # Custom scope for booking security
+    },
 }
 
 # --- Celery & Channels (Real-Time/Asynchronous) ---

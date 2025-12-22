@@ -10,6 +10,7 @@ from .serializers import (
     BookerRegistrationSerializer,
     ProviderProfileUpdateSerializer,
     ProviderRegistrationSerializer,
+    ServiceBookerSerializer
 )
 
 
@@ -83,6 +84,25 @@ class ProviderLocationUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class LanguagePreferenceView(APIView):
+    """Endpoint for users (Bookers) to update their preferred language."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            booker = request.user.servicebooker
+        except ServiceBooker.DoesNotExist:
+            return Response({"error": "Only customers can set language preferences."}, status=status.HTTP_403_FORBIDDEN)
+        
+        lang = request.data.get('language')
+        if not lang:
+            return Response({"error": "Language required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        booker.preferred_language = lang
+        booker.save()
+        return Response({"message": "Language preference updated.", "language": lang})
+
+
 class UserProfileView(APIView):
     """
     Handles fetching the profile data for the currently authenticated user (customer or provider).
@@ -119,13 +139,16 @@ class UserProfileView(APIView):
         # Add customer-specific data
         elif user.is_service_booker:
             booker = ServiceBooker.objects.get(user=user)
-            # NOTE: You need a serializer here for proper data formatting
+            from apps.services.models import UserSubscription
+            sub = UserSubscription.objects.filter(user=booker, is_active=True).first()
+            
             response_data.update(
                 {
-                    "subscription_plan": "PREMIUM",  # Mock/Fetch actual plan
+                    "preferred_language": booker.preferred_language,
+                    "subscription_plan": sub.plan.name if sub else None,
                     "vehicles": [
-                        v.license_plate for v in booker.vehicles.all()
-                    ],  # Assuming related name is correct
+                        v.license_plate for v in user.vehicles.all()
+                    ],
                 }
             )
 

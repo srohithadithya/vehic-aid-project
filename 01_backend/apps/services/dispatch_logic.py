@@ -4,6 +4,10 @@ from django.db import transaction
 from django.db.models import ExpressionWrapper, F, fields
 
 from apps.users.models import ServiceProvider
+from apps.services.models import ServiceQuote, UserSubscription
+from decimal import Decimal
+from datetime import timedelta
+from django.utils import timezone
 
 
 # Haversine formula to calculate great-circle distance between two points on a sphere.
@@ -36,27 +40,67 @@ def find_nearest_available_provider(service_request):
     # 1. Filter: Get only available providers who are verified.
     available_providers = (
         ServiceProvider.objects.filter(
-            is_verified=True,  # Assuming a flag set during admin onboarding
+            is_verified=True,
             is_available=True,
         )
-        .annotate(
-            # 2. Calculate Distance: Annotate the queryset with the calculated distance
-            distance_km=ExpressionWrapper(
-                # Placeholder for complex DB distance calculation
-                F("user_id") * 0.0 + 1.0,
-                output_field=fields.FloatField(),
+    )
+    
+    # In a real setup with PostGIS, we'd use ST_Distance.
+    # Here we'll do a python-side ranking if the list isn't massive, 
+    # or a simplified bounding box check first.
+    
+    ranked_providers = []
+    for provider in available_providers:
+        if provider.latitude and provider.longitude:
+            dist = calculate_distance(
+                request_lat, request_lon, 
+                float(provider.latitude), float(provider.longitude)
             )
-        )
-        .order_by("distance_km")
-    )  # 3. Rank: Sort by nearest first
+            provider.distance_km = dist
+            ranked_providers.append(provider)
+            
+    # Sort by distance
+    ranked_providers.sort(key=lambda x: x.distance_km)
 
-    # In a real Django/PostGIS setup, a complex geographical function (ST_Distance) would replace the distance calculation placeholder.
-
-    if not available_providers.exists():
+    if not ranked_providers:
         return None
 
-    # Return the top 3 nearest providers to try dispatching
-    return available_providers[:3]
+    # Return the top 3 nearest providers
+    return ranked_providers[:3]
+
+def generate_automated_quote(service_request, provider):
+    """
+    Automates the generation of a dynamic price quote.
+    """
+    dist = calculate_distance(
+        service_request.latitude, service_request.longitude,
+        float(provider.latitude), float(provider.longitude)
+    )
+    
+    # Calculate total
+    base_price = Decimal("250.00")
+    price_per_km = Decimal("40.00")
+    total = base_price + (Decimal(str(dist)) * price_per_km)
+
+    # 1. Automation: Apply Subscription Discounts
+    # Check if user has an active subscription
+    sub = UserSubscription.objects.filter(user__user=service_request.booker, is_active=True).first()
+    if sub:
+        if sub.plan.name == 'Gold':
+            total = Decimal("0.00") # Gold users get free service
+        elif sub.plan.name == 'Premium':
+            total *= Decimal("0.5") # Premium users get 50% off
+            
+    quote = ServiceQuote.objects.create(
+        request=service_request,
+        base_price=base_price,
+        distance_km=dist,
+        time_estimate_minutes=int(dist * 5) + 10,
+        dynamic_total=total,
+        status="PENDING",
+        valid_until=timezone.now() + timedelta(minutes=30)
+    )
+    return quote
 
 
 @transaction.atomic
@@ -76,10 +120,18 @@ def trigger_dispatch(service_request):
 
     # Assign provider and update request status
     service_request.provider = best_candidate.user
-    service_request.status = "PROVIDER_EN_ROUTE"
+    service_request.status = "DISPATCHED"
     service_request.save()
 
-    # 3. Notify the Provider App (via Channels)
+    # 3. Automation: Generate dynamic price quote
+    quote = generate_automated_quote(service_request, best_candidate)
+    
+    # 4. Notify the Provider App (via Channels)
     # This notification is handled in the consumers.py file via a real-time event
 
-    return {"status": "DISPATCHED", "provider_id": best_candidate.user_id}
+    return {
+        "status": "DISPATCHED", 
+        "provider_id": best_candidate.user_id,
+        "quote_id": quote.id,
+        "total_amount": quote.dynamic_total
+    }
