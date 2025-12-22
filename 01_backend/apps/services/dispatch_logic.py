@@ -36,20 +36,14 @@ def find_nearest_available_provider(service_request):
     # 1. Filter: Get only available providers who are verified.
     available_providers = (
         ServiceProvider.objects.filter(
-            is_active=True,
             is_verified=True,  # Assuming a flag set during admin onboarding
             is_available=True,
-        )
-        .exclude(
-            # Exclude providers who are not specialized for this service (simplified example)
-            # In production, this checks array fields or ManyToMany fields
-            service_types__contains=service_type
         )
         .annotate(
             # 2. Calculate Distance: Annotate the queryset with the calculated distance
             distance_km=ExpressionWrapper(
                 # Placeholder for complex DB distance calculation
-                F("id") * 0.0 + 1.0,
+                F("user_id") * 0.0 + 1.0,
                 output_field=fields.FloatField(),
             )
         )
@@ -81,11 +75,11 @@ def trigger_dispatch(service_request):
     best_candidate = candidates[0]
 
     # Assign provider and update request status
-    service_request.provider = best_candidate
+    service_request.provider = best_candidate.user
     service_request.status = "PROVIDER_EN_ROUTE"
     service_request.save()
 
     # 3. Notify the Provider App (via Channels)
     # This notification is handled in the consumers.py file via a real-time event
 
-    return {"status": "DISPATCHED", "provider_id": best_candidate.id}
+    return {"status": "DISPATCHED", "provider_id": best_candidate.user_id}

@@ -38,7 +38,7 @@ class ServiceRequestView(APIView):
         if serializer.is_valid():
             # Ensure the vehicle belongs to the authenticated user
             vehicle = serializer.validated_data["vehicle"]
-            if vehicle.owner != request.user.servicebooker:  # Assumes user is a ServiceBooker
+            if vehicle.owner != request.user:
                 return Response(
                     {"error": "Vehicle does not belong to this user."},
                     status=status.HTTP_403_FORBIDDEN,
@@ -47,7 +47,7 @@ class ServiceRequestView(APIView):
             # 1. Save request and link to user
             with transaction.atomic():
                 service_request = serializer.save(
-                    booker=request.user.servicebooker, priority="HIGH"
+                    booker=request.user, priority="HIGH"
                 )
 
                 # 2. Trigger the automated dispatch process
