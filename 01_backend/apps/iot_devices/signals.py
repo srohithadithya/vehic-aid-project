@@ -2,8 +2,7 @@
 
 from celery import shared_task
 
-# FIX: Correctly importing the actual function name (trigger_dispatch)
-from apps.services.dispatch_logic import trigger_dispatch
+from apps.services.agent_logic import BookingAgent
 
 # Assumed imports for external apps
 from apps.services.models import ServiceRequest
@@ -38,26 +37,21 @@ def process_iot_button_press_async(
     # Determine Service Type based on button press (1 or 2)
     if button_id == 1:
         service_type = "COMMON_FIX_IOT"
-        priority = ServiceRequest.PRIORITY_CHOICES.HIGH
+        priority = "HIGH"
     elif button_id == 2:
         service_type = "MAJOR_TOWING_IOT"
-        priority = ServiceRequest.PRIORITY_CHOICES.URGENT
+        priority = "URGENT"
     else:
         return {"status": "error", "message": "Invalid button ID."}
 
-    # 1. Create the Service Request
-    new_request = ServiceRequest.objects.create(
-        booker=user,
-        service_type=service_type,
-        status="PENDING_DISPATCH",
-        priority=priority,
-        latitude=latitude,
-        longitude=longitude,
-        source="IoT Device",
-    )
+    # 1. Use the unified BookingAgent to process the request
+    agent = BookingAgent(user.user) # paired_user is a ServiceBooker, we need CustomUser
+    
+    result = agent.process_booking({
+        'latitude': latitude,
+        'longitude': longitude,
+        'service_type': service_type,
+        'description': f"IoT Emergency: {service_type}"
+    })
 
-    # 2. Trigger the automated dispatch process using the CORRECT function name
-    # We pass the newly created request object to the service logic
-    trigger_dispatch(new_request)
-
-    return {"status": "success", "request_id": new_request.id}
+    return result

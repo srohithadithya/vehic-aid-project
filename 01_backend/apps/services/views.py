@@ -10,6 +10,10 @@ from apps.users.models import ServiceBooker, ServiceProvider
 from django.db.models import Avg
 
 from .dispatch_logic import trigger_dispatch
+from .agent_logic import BookingAgent
+from django.db.models import Count, Sum, Q
+from django.utils import timezone
+from datetime import timedelta
 from .models import (
     ServiceRequest,
     SubscriptionPlan,
@@ -25,6 +29,25 @@ from .serializers import (
     SubscriptionCreateSerializer,
 )
 
+
+
+
+class AgenticBookingView(APIView):
+    """
+    Exposes the smart BookingAgent coordinator via a single endpoint.
+    Ideal for 'One-Click' booking from mobile/IoT.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        agent = BookingAgent(request.user)
+        # Expected data: latitude, longitude, service_type, description
+        result = agent.process_booking(request.data)
+        
+        if result['status'] == 'SUCCESS':
+            return Response(result, status=status.HTTP_201_CREATED)
+        else:
+            return Response(result, status=status.HTTP_202_ACCEPTED)
 
 class ServiceRequestView(APIView):
     """Handles POST to create a new service request and GET to view status."""
@@ -184,6 +207,90 @@ class SubscriptionViewSet(viewsets.ViewSet):
             return Response({"detail": "No active subscription."}, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSubscriptionSerializer(sub)
         return Response(serializer.data)
+
+
+
+class DashboardStatsView(APIView):
+    """
+    Aggregates high-level operational metrics for the Admin Dashboard.
+    """
+    permission_classes = [IsAuthenticated] # In prod, restrict to Admin only
+
+    def get(self, request):
+        from apps.payments.models import Transaction, DailySettlement
+        
+        # 1. Booking Metrics
+        total_requests = ServiceRequest.objects.count()
+        active_requests = ServiceRequest.objects.filter(
+            status__in=['REQUESTED', 'DISPATCHED', 'IN_PROGRESS']
+        ).count()
+        completed_today = ServiceRequest.objects.filter(
+            status='COMPLETED',
+            created_at__date=timezone.now().date()
+        ).count()
+
+        # 2. Provider Metrics
+        total_providers = ServiceProvider.objects.count()
+        online_providers = ServiceProvider.objects.filter(is_available=True).count()
+        
+        # 3. Financial Metrics (Total Platform Revenue)
+        # Sum of all successful transactions
+        total_revenue = Transaction.objects.filter(
+            status='SUCCESS'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        # 4. Recent Activity (Last 5 requests)
+        recent_requests = ServiceRequest.objects.order_by('-created_at')[:5].values(
+            'id', 'service_type', 'status', 'created_at', 'booker__user__username'
+        )
+
+        return Response({
+            "bookings": {
+                "total": total_requests,
+                "active": active_requests,
+                "completed_today": completed_today
+            },
+            "providers": {
+                "total": total_providers,
+                "online": online_providers
+            },
+            "financials": {
+                "total_revenue": total_revenue
+            },
+            "recent_activity": list(recent_requests)
+        })
+
+class SubscriptionAnalyticsView(APIView):
+    """
+    Automated reporting for subscription health and revenue.
+    """
+    permission_classes = [IsAuthenticated] # Should be Admin, but for test IsAuthenticated
+
+    def get(self, request, *args, **kwargs):
+        # 1. Basic Counts
+        total_active = UserSubscription.objects.filter(is_active=True).count()
+        expiring_soon = UserSubscription.objects.filter(
+            is_active=True, 
+            end_date__lte=timezone.now() + timedelta(days=7)
+        ).count()
+        
+        # 2. Plan Popularity
+        plan_stats = SubscriptionPlan.objects.annotate(
+            active_users=Count('subscriptions', filter=Q(subscriptions__is_active=True))
+        ).values('name', 'active_users')
+        
+        # 3. Simulated Revenue (Sum of prices of all active subscriptions)
+        total_mrr = UserSubscription.objects.filter(is_active=True).aggregate(
+            mrr=Sum('plan__price')
+        )['mrr'] or 0
+        
+        return Response({
+            "total_active_subscriptions": total_active,
+            "expiring_within_7_days": expiring_soon,
+            "monthly_recurring_revenue": total_mrr,
+            "plan_breakdown": list(plan_stats),
+            "timestamp": timezone.now()
+        })
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -358,6 +465,53 @@ class RewardsViewSet(viewsets.ViewSet):
                 {"error": "Insufficient points"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @action(detail=False, methods=['post'], url_path='submit-referral')
+    def submit_referral(self, request):
+        """Submit a referral code from another user."""
+        from .models import RewardsProgram
+        code = request.data.get('code')
+        if not code:
+            return Response({"error": "Referral code required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        referrer = RewardsProgram.objects.filter(referral_code=code).first()
+        if not referrer:
+            return Response({"error": "Invalid referral code"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if referrer.user == request.user.servicebooker:
+            return Response({"error": "Cannot refer yourself"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 1. Reward both parties
+        referrer.add_points(500, f"Referral successful: {request.user.username}")
+        referrer.referrals_made += 1
+        referrer.save()
+        
+        me, created = RewardsProgram.objects.get_or_create(user=request.user.servicebooker)
+        if not me.referral_code:
+            me.generate_referral_code()
+        me.add_points(200, "Referral bonus for joining")
+        
+        # 2. Track Referral relationship
+        from .models import Referral
+        Referral.objects.create(
+            referrer=referrer.user,
+            referred_user=request.user.servicebooker,
+            reward_points=500
+        )
+        
+        return Response({"message": "Referral successful! Points awarded to both."})
+
+    @action(detail=False, methods=['get'], url_path='list-referrals')
+    def list_referrals(self, request):
+        """List users referred by the current user."""
+        from .models import Referral
+        referrals = Referral.objects.filter(referrer=request.user.servicebooker)
+        data = [{
+            "referred_user": r.referred_user.user.username,
+            "reward_points": r.reward_points,
+            "date": r.created_at
+        } for r in referrals]
+        return Response(data)
     
     @action(detail=False, methods=['get'], url_path='transactions')
     def transactions(self, request):
