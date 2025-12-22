@@ -180,6 +180,8 @@ class Vehicle(models.Model):
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     fuel_type = models.CharField(max_length=10, choices=FUEL_CHOICES)
+    insurance_expiry = models.DateField(null=True, blank=True)
+    puc_expiry = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.license_plate} ({self.make})"
@@ -595,6 +597,17 @@ class RewardsProgram(models.Model):
     class Meta:
         verbose_name = "Rewards Program"
         verbose_name_plural = "Rewards Programs"
+
+
+class Referral(models.Model):
+    """Tracks user referrals and reward distribution."""
+    referrer = models.ForeignKey("users.ServiceBooker", on_delete=models.CASCADE, related_name='referrals_out')
+    referred_user = models.OneToOneField("users.ServiceBooker", on_delete=models.CASCADE, related_name='referral_in')
+    reward_points = models.IntegerField(default=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.referrer.user.username} referred {self.referred_user.user.username}"
 
 
 class RewardTransaction(models.Model):
