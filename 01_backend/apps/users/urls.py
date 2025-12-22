@@ -7,6 +7,7 @@ from .views import (
     ProviderLocationUpdateView,
     ProviderRegisterView,
     UserProfileView,
+    LanguagePreferenceView
 )
 
 urlpatterns = [
@@ -28,6 +29,7 @@ urlpatterns = [
         ProviderLocationUpdateView.as_view(),
         name="provider-update-location",
     ),
-    # Placeholder for profile management
+    # Profile management
     path("profile/", UserProfileView.as_view(), name="user-profile"),
+    path("profile/language/", LanguagePreferenceView.as_view(), name="user-language-preference"),
 ]

@@ -106,3 +106,9 @@ class ProviderProfileUpdateSerializer(serializers.ModelSerializer):
             "jobs_completed",
         )
         read_only_fields = ("average_rating", "jobs_completed")
+
+class ServiceBookerSerializer(serializers.ModelSerializer):
+    """Serializer for customer (Service Booker) profile."""
+    class Meta:
+        model = ServiceBooker
+        fields = ("preferred_language", "phone_number")

@@ -14,6 +14,7 @@ from apps.users.models import ServiceBooker, ServiceProvider
 from apps.services.models import Vehicle
 from apps.services.models import ServiceRequest, SubscriptionPlan, UserSubscription
 from apps.payments.models import Transaction
+from apps.iot_devices.models import IoTDevice
 from decimal import Decimal
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -41,9 +42,9 @@ else:
 # Create test customers
 print("\nCreating test customers...")
 customers_data = [
-    {'username': 'customer1', 'email': 'customer1@test.com', 'phone': '+919876543211', 'name': 'Rajesh Kumar'},
-    {'username': 'customer2', 'email': 'customer2@test.com', 'phone': '+919876543212', 'name': 'Priya Sharma'},
-    {'username': 'customer3', 'email': 'customer3@test.com', 'phone': '+919876543213', 'name': 'Amit Patel'},
+    {'username': 'customer1', 'email': 'customer1@test.com', 'phone': '+919876543211', 'name': 'Rajesh Kumar', 'lang': 'hi'},
+    {'username': 'customer2', 'email': 'customer2@test.com', 'phone': '+919876543212', 'name': 'Priya Sharma', 'lang': 'ta'},
+    {'username': 'customer3', 'email': 'customer3@test.com', 'phone': '+919876543213', 'name': 'Amit Patel', 'lang': 'gu'},
 ]
 
 customers = []
@@ -57,12 +58,12 @@ for data in customers_data:
             is_service_booker=True,
             is_service_provider=False,
         )
-        booker = ServiceBooker.objects.create(
+        booker, created = ServiceBooker.objects.get_or_create(
             user=user,
-            preferred_language='en-in'
+            defaults={'preferred_language': data.get('lang', 'en')}
         )
         customers.append(booker)
-        print(f"Created customer: {data['username']}")
+        print(f"Created/Fetched customer: {data['username']} (Lang: {booker.preferred_language})")
     else:
         user = User.objects.get(username=data['username'])
         booker = ServiceBooker.objects.get(user=user)
@@ -72,9 +73,9 @@ for data in customers_data:
 # Create test providers
 print("\nCreating test providers...")
 providers_data = [
-    {'username': 'provider1', 'email': 'provider1@test.com', 'phone': '+919876543221', 'name': 'Suresh Mechanic', 'service': 'TOWING'},
-    {'username': 'provider2', 'email': 'provider2@test.com', 'phone': '+919876543222', 'name': 'Ramesh Repairs', 'service': 'FLAT_TIRE'},
-    {'username': 'provider3', 'email': 'provider3@test.com', 'phone': '+919876543223', 'name': 'Vijay Services', 'service': 'BATTERY_JUMP'},
+    {'username': 'provider1', 'email': 'provider1@test.com', 'phone': '+919876543221', 'name': 'Suresh Mechanic', 'service': 'TOWING', 'lat': 19.0760, 'lon': 72.8777},
+    {'username': 'provider2', 'email': 'provider2@test.com', 'phone': '+919876543222', 'name': 'Ramesh Repairs', 'service': 'FLAT_TIRE', 'lat': 19.1000, 'lon': 72.9000},
+    {'username': 'provider3', 'email': 'provider3@test.com', 'phone': '+919876543223', 'name': 'Vijay Services', 'service': 'BATTERY_JUMP', 'lat': 18.9000, 'lon': 72.8000},
 ]
 
 providers = []
@@ -88,15 +89,19 @@ for data in providers_data:
             is_service_booker=False,
             is_service_provider=True,
         )
-        provider = ServiceProvider.objects.create(
+        provider, created = ServiceProvider.objects.get_or_create(
             user=user,
-            service_types=[data['service']],
-            is_verified=True,
-            is_available=True,
-            average_rating=4.5
+            defaults={
+                'service_types': [data['service']],
+                'is_verified': True,
+                'is_available': True,
+                'average_rating': 4.5,
+                'latitude': data.get('lat'),
+                'longitude': data.get('lon')
+            }
         )
         providers.append(provider)
-        print(f"Created provider: {data['username']}")
+        print(f"Created/Fetched provider: {data['username']} at ({data.get('lat')}, {data.get('lon')})")
     else:
         user = User.objects.get(username=data['username'])
         provider = ServiceProvider.objects.get(user=user)
@@ -183,6 +188,9 @@ for idx, data in enumerate(requests_data):
 
 # Create payments
 print("\nCreating payment records...")
+if not service_requests:
+    service_requests = ServiceRequest.objects.all()
+
 for request in service_requests:
     if request.status == 'COMPLETED':
         print(f"DEBUG: Processing request {request.id}")
@@ -193,18 +201,20 @@ for request in service_requests:
             print(f"DEBUG: Error accessing servicebooker: {e}")
 
         if not Transaction.objects.filter(service_request=request).exists():
-            # print("DEBUG: Skipping transaction creation for now")
-            payment = Transaction.objects.create(
-                booker=request.booker.servicebooker,
-                provider=request.provider.serviceprovider,
-                service_request=request,
-                amount=Decimal('500.00'),
-                payment_method='UPI',
-                status='SUCCESS',
-                platform_fee=Decimal('100.00'),
-                provider_payout=Decimal('400.00')
-            )
-            print(f"Created payment for request #{request.id}")
+            try:
+                payment = Transaction.objects.create(
+                    booker=request.booker.servicebooker,
+                    provider=request.provider.serviceprovider,
+                    service_request=request,
+                    amount=Decimal('500.00'),
+                    payment_method='UPI',
+                    status='SUCCESS',
+                    platform_fee=Decimal('100.00'),
+                    provider_payout=Decimal('400.00')
+                )
+                print(f"Created payment for request #{request.id}")
+            except Exception as e:
+                print(f"Error creating payment for request {request.id}: {e}")
 
 # Create user subscriptions
 print("\nCreating user subscriptions...")
@@ -219,8 +229,23 @@ for idx, customer in enumerate(customers[:2]):
             auto_renew=True
         )
         print(f"Created subscription for {customer.user.username}")
-    else:
         print(f"Subscription exists for {customer.user.username}")
+
+# Create IoT Devices
+print("\nCreating IoT devices...")
+for idx, customer in enumerate(customers[:1]):
+    device_id = f"IOT-DEV-{idx+1000}"
+    if not IoTDevice.objects.filter(device_id=device_id).exists():
+        device = IoTDevice.objects.create(
+            device_id=device_id,
+            paired_user=customer,
+            is_active=True,
+            last_known_latitude=19.0760,
+            last_known_longitude=72.8777
+        )
+        print(f"Created IoT device: {device_id} for {customer.user.username}")
+    else:
+        print(f"IoT device exists: {device_id}")
 
 print("\nDatabase seeding completed successfully!")
 print("\nSummary:")
