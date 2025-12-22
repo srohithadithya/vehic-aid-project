@@ -215,6 +215,9 @@ class ServiceRequest(models.Model):
         blank=True,
         related_name="requests_handled",
     )
+    vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.SET_NULL, null=True, related_name="service_requests"
+    )
 
     service_type = models.CharField(max_length=50)
     status = models.CharField(
