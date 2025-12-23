@@ -26,12 +26,13 @@ function Write-CheckResult {
         [string]$Message = ""
     )
     
-    if($Passed) {
+    if ($Passed) {
         Write-Host "✅ $CheckName" -ForegroundColor Green
         $global:checks_passed++
-    } else {
+    }
+    else {
         Write-Host "❌ $CheckName" -ForegroundColor Red
-        if($Message) {
+        if ($Message) {
             Write-Host "   $Message" -ForegroundColor Yellow
         }
         $global:checks_failed++
@@ -44,7 +45,7 @@ Write-Host "   Checking if Docker containers are running..."
 
 try {
     $containers = docker ps --filter "name=vehicaid" --format "table {{.Names}}\t{{.Status}}"
-    if($containers) {
+    if ($containers) {
         $db_running = docker ps | Select-String "vehicaid_db"
         $redis_running = docker ps | Select-String "vehicaid_redis"
         $web_running = docker ps | Select-String "vehicaid_web"
@@ -52,10 +53,12 @@ try {
         Write-CheckResult "PostgreSQL Database" ($null -ne $db_running)
         Write-CheckResult "Redis Cache" ($null -ne $redis_running)
         Write-CheckResult "Django Web Server" ($null -ne $web_running)
-    } else {
+    }
+    else {
         Write-CheckResult "Docker Containers" $false "No vehicaid containers running"
     }
-} catch {
+}
+catch {
     Write-CheckResult "Docker" $false "Docker not installed or not running"
 }
 
@@ -67,7 +70,8 @@ Write-Host "   Testing backend connectivity..."
 try {
     $response = Invoke-WebRequest -Uri "http://localhost:8000/admin/" -UseBasicParsing -ErrorAction SilentlyContinue
     Write-CheckResult "Backend Admin Panel (http://localhost:8000/admin/)" ($response.StatusCode -eq 200)
-} catch {
+}
+catch {
     Write-CheckResult "Backend Admin Panel" $false "Cannot reach http://localhost:8000"
 }
 
@@ -76,7 +80,8 @@ try {
     $response = Invoke-WebRequest -Uri "http://localhost:8000/api/v1/" -UseBasicParsing -ErrorAction SilentlyContinue
     $isResponding = $response.StatusCode -eq 401 -or $response.StatusCode -eq 200
     Write-CheckResult "Backend API (http://localhost:8000/api/v1/)" $isResponding
-} catch {
+}
+catch {
     Write-CheckResult "Backend API" $false "Cannot reach http://localhost:8000/api/v1/"
 }
 
@@ -88,7 +93,8 @@ Write-Host "   Testing frontend connectivity..."
 try {
     $response = Invoke-WebRequest -Uri "http://localhost:3000" -UseBasicParsing -ErrorAction SilentlyContinue
     Write-CheckResult "Frontend Server (http://localhost:3000)" ($response.StatusCode -eq 200)
-} catch {
+}
+catch {
     Write-CheckResult "Frontend Server" $false "Next.js dev server not running on http://localhost:3000"
 }
 
@@ -96,7 +102,7 @@ Write-Host ""
 Write-Host "4. Configuration Files" -ForegroundColor Magenta
 Write-Host "   Checking required configuration files..."
 
-$backend_env = Test-Path "01_backend\.env.dev"
+$backend_env = Test-Path "backend\.env.dev"
 Write-CheckResult "Backend Environment (.env.dev)" $backend_env
 
 $frontend_env = Test-Path "web-admin-panel\admin\.env.local"
@@ -112,10 +118,10 @@ Write-Host ""
 Write-Host "5. Project Structure" -ForegroundColor Magenta
 Write-Host "   Verifying project directories..."
 
-$backend_exists = Test-Path "01_backend"
+$backend_exists = Test-Path "backend"
 Write-CheckResult "Backend Directory" $backend_exists
 
-$frontend_exists = Test-Path "web-admin-panel\admin"
+$frontend_exists = Test-Path "03_03_web-admin-panel\admin"
 Write-CheckResult "Frontend Directory" $frontend_exists
 
 $docs_exists = Test-Path "BACKEND_FRONTEND_INTEGRATION.md"
@@ -129,7 +135,7 @@ Write-Host "✅ Passed: $checks_passed" -ForegroundColor Green
 Write-Host "❌ Failed: $checks_failed" -ForegroundColor Red
 Write-Host ""
 
-if($checks_failed -eq 0) {
+if ($checks_failed -eq 0) {
     Write-Host "🎉 All systems operational!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Access the application:" -ForegroundColor Cyan
@@ -137,7 +143,8 @@ if($checks_failed -eq 0) {
     Write-Host "  • Backend:   http://localhost:8000" -ForegroundColor White
     Write-Host "  • Admin:     http://localhost:8000/admin/" -ForegroundColor White
     Write-Host "  • API:       http://localhost:8000/api/v1/" -ForegroundColor White
-} else {
+}
+else {
     Write-Host "⚠️  Please fix the above issues before deploying" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Troubleshooting:" -ForegroundColor Cyan

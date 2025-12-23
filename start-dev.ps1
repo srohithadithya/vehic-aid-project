@@ -16,9 +16,9 @@ Write-Host "===============================================" -ForegroundColor Cy
 Write-Host ""
 
 Write-Host "Step 1: Starting Backend Services (Docker)" -ForegroundColor Magenta
-Write-Host "Running: cd 01_backend && docker-compose up -d" -ForegroundColor Gray
+Write-Host "Running: cd backend && docker-compose up -d" -ForegroundColor Gray
 
-Set-Location "01_backend"
+Set-Location "backend"
 docker-compose up -d
 
 Write-Host ""

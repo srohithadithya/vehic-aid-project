@@ -251,7 +251,7 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 **Build Next.js:**
 
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm run build
 npm start
 ```
@@ -291,7 +291,7 @@ npm install -g vercel
 vercel login
 
 # Deploy
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 vercel --prod
 
 # Configure environment

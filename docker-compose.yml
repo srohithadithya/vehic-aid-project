@@ -1,37 +1,88 @@
-version: '3.8'
-
 services:
-  # --- 1. PostgreSQL Database Service ---
-  postgres:
+  db:
     image: postgres:14-alpine
-    container_name: vehicaid_postgres
-    # Restart the container if it stops, unless manually stopped
-    restart: always 
+    container_name: vehicaid_db
     environment:
-      # These MUST match the credentials in your backend/.env.dev file
-      POSTGRES_DB: vehicaid_db
-      POSTGRES_USER: dev_user
-      POSTGRES_PASSWORD: dev_password123
-    volumes:
-      # Persists data to a local named volume on your machine
-      - postgres_data:/var/lib/postgresql/data/
+      POSTGRES_DB: vehic_aid
+      POSTGRES_USER: vehic_aid
+      POSTGRES_PASSWORD: vehic_aid123
     ports:
-      # Maps container port 5432 to your local machine's port 5432
       - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vehic_aid" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
-  # --- 2. Redis Message Broker Service (for Celery and Channels) ---
   redis:
     image: redis:7-alpine
     container_name: vehicaid_redis
-    restart: always
     ports:
-      # Maps container port 6379 to your local machine's port 6379
       - "6379:6379"
-    volumes:
-      # Persists Redis data 
-      - redis_data:/data/
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
-# Define the volumes used by the services
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_web
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
+    volumes:
+      - ./backend:/app
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-change-in-production-12345
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
+      - CHANNEL_REDIS_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_celery
+    command: celery -A vehic_aid_backend worker -l info
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+
 volumes:
-  postgres_data:
-  redis_data:
+  db_data:
+  static_files:
+  media_files:

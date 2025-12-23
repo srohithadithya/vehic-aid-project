@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document provides a complete setup and integration guide for connecting the Django backend with the Next.js web-admin-panel.
+This document provides a complete setup and integration guide for connecting the Django backend with the Next.js 03_web-admin-panel.
 
 **Current Status:**
 - ✅ Backend: Django 4.2.14 with DRF 3.14.0 running on http://localhost:8000
 - ✅ Database: PostgreSQL 14 (Docker container)
 - ✅ Cache/Broker: Redis 7 (Docker container)
-- ✅ Frontend: Next.js 16.0.3 web-admin-panel
+- ✅ Frontend: Next.js 16.0.3 03_web-admin-panel
 - ✅ CORS: Configured and enabled for development
 - ✅ API Proxy: Next.js rewrites configured
 
@@ -87,11 +87,11 @@ CORS_ALLOWED_ORIGINS = [
 
 ### Next.js Setup
 
-**Location:** `web-admin-panel/admin/`
+**Location:** `03_web-admin-panel/admin/`
 
 ### Environment Variables
 
-**File:** `web-admin-panel/admin/.env.local`
+**File:** `03_web-admin-panel/admin/.env.local`
 
 ```bash
 # Backend API base URL
@@ -103,7 +103,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### API Client Configuration
 
-**File:** `web-admin-panel/admin/lib/api.ts`
+**File:** `03_web-admin-panel/admin/lib/api.ts`
 
 ```typescript
 import axios from 'axios';
@@ -143,7 +143,7 @@ export default apiClient;
 
 ### Next.js Config
 
-**File:** `web-admin-panel/admin/next.config.ts`
+**File:** `03_web-admin-panel/admin/next.config.ts`
 
 API requests are proxied via Next.js rewrites to avoid CORS issues in browser:
 
@@ -172,7 +172,7 @@ docker-compose up -d
 
 **Start Frontend:**
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm install
 npm run dev
 ```
@@ -210,7 +210,7 @@ python manage.py runserver
 
 **Frontend:**
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm install
 npm run dev
 ```
@@ -533,7 +533,7 @@ cd 01_backend
 docker-compose up -d
 
 # Terminal 2: Start frontend
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm run dev
 
 # Open http://localhost:3000 in browser

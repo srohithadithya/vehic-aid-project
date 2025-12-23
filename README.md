@@ -69,7 +69,7 @@ Get the entire platform running in minutes.
 
 ### 1. Launch Backend & Infrastructure
 ```bash
-cd 01_backend
+cd backend
 docker-compose up -d --build
 ```
 *This starts Django, PostgreSQL, Redis, and Celery Workers.*
@@ -107,7 +107,7 @@ npm run dev
 
 ```text
 vehic-aid-project/
-├── 01_backend/             # Django Agentic Backend
+├── backend/             # Django Agentic Backend
 │   ├── apps/
 │   │   ├── services/       # Dispatch & Booking Logic
 │   │   ├── users/          # Auth & Profiles
