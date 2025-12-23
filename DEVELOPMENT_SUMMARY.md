@@ -244,7 +244,7 @@ export SECRET_KEY=dev-key-12345
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 # In another terminal:
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm run dev  # Next.js dev server on port 3000
 ```
 

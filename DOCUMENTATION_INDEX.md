@@ -33,7 +33,7 @@
 ### Development
 - **BACKEND_FRONTEND_INTEGRATION.md** - API integration details
 - **Backend API** - `01_backend/` folder structure
-- **Frontend** - `web-admin-panel/admin/` structure
+- **Frontend** - `03_web-admin-panel/admin/` structure
 
 ### DevOps & Infrastructure
 - **PRODUCTION_DEPLOYMENT.md** - Production setup
@@ -96,7 +96,7 @@ vehic-aid-project/
 │   │   └── requirements.txt ........... Python dependencies
 │
 ├── 🎨 FRONTEND
-│   └── web-admin-panel/admin/
+│   └── 03_web-admin-panel/admin/
 │       ├── app/ ........................ Pages & routes
 │       ├── components/ ................. React components
 │       ├── lib/ ........................ Utilities & API client
@@ -160,13 +160,13 @@ See [BACKEND_FRONTEND_INTEGRATION.md](BACKEND_FRONTEND_INTEGRATION.md#API-Endpoi
 cd 01_backend && docker-compose up -d
 
 # Terminal 2: Frontend
-cd web-admin-panel/admin && npm run dev
+cd 03_web-admin-panel/admin && npm run dev
 ```
 
 ### Testing
 ```bash
 docker exec vehicaid_web pytest -v
-npm test  # in web-admin-panel/admin
+npm test  # in 03_web-admin-panel/admin
 ```
 
 ### Database
@@ -270,7 +270,7 @@ See [BACKEND_FRONTEND_INTEGRATION.md#Part-8-Deployment-Checklist](BACKEND_FRONTE
 
 ### Code
 - [Backend](./01_backend/) - Django API
-- [Frontend](./web-admin-panel/admin/) - Next.js Admin
+- [Frontend](./03_web-admin-panel/admin/) - Next.js Admin
 
 ---
 

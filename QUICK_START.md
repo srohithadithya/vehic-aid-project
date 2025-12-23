@@ -63,7 +63,7 @@ docker-compose up -d
 
 **Terminal 2 - Frontend:**
 ```powershell
-cd web-admin-panel\admin
+cd 03_web-admin-panel\admin
 npm install  # Only needed on first run
 npm run dev
 ```
@@ -118,7 +118,7 @@ RAZORPAY_KEY_SECRET=your_secret_here
 
 ### Frontend Environment
 
-**File:** `web-admin-panel/admin/.env.local`
+**File:** `03_web-admin-panel/admin/.env.local`
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
@@ -171,7 +171,7 @@ docker exec vehicaid_web pytest --cov=apps
 ### Run Frontend Tests
 
 ```powershell
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm test
 
 # Or with coverage
@@ -302,7 +302,7 @@ vehic-aid-project/
 │   ├── requirements.txt        # Python dependencies
 │   └── docker-compose.yml      # Docker configuration
 │
-├── web-admin-panel/
+├── 03_web-admin-panel/
 │   └── admin/                  # Next.js frontend
 │       ├── app/                # Pages and layouts
 │       ├── components/         # React components
@@ -341,7 +341,7 @@ docker exec vehicaid_web pytest -v
 ### Frontend Commands
 
 ```powershell
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 
 # Install dependencies
 npm install

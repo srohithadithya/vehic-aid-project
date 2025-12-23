@@ -9,7 +9,7 @@ cd 01_backend
 docker-compose up -d
 
 # Terminal 2: Start Frontend
-cd web-admin-panel\admin
+cd 03_web-admin-panel\admin
 npm run dev
 
 # Terminal 3: Check Status
@@ -34,10 +34,10 @@ npm run dev
 | File | Location | Purpose |
 |------|----------|---------|
 | Backend config | `01_backend/.env.dev` | Django settings |
-| Frontend config | `web-admin-panel/admin/.env.local` | Next.js settings |
-| API client | `web-admin-panel/admin/lib/api.ts` | Axios + JWT |
+| Frontend config | `03_web-admin-panel/admin/.env.local` | Next.js settings |
+| API client | `03_web-admin-panel/admin/lib/api.ts` | Axios + JWT |
 | Main routes | `01_backend/vehic_aid_backend/urls.py` | API endpoints |
-| Next config | `web-admin-panel/admin/next.config.ts` | API rewrites |
+| Next config | `03_web-admin-panel/admin/next.config.ts` | API rewrites |
 
 ---
 
@@ -48,7 +48,7 @@ npm run dev
 docker exec vehicaid_web pytest -v
 
 # Frontend tests
-cd web-admin-panel/admin && npm test
+cd 03_web-admin-panel/admin && npm test
 
 # Backend coverage
 docker exec vehicaid_web pytest --cov=apps
@@ -117,7 +117,7 @@ docker logs vehicaid_web --tail 50
 
 ### Frontend
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 
 npm install      # Install deps
 npm run dev      # Start dev server
@@ -204,7 +204,7 @@ Backend: 01_backend/
   │   └── iot_devices/ → IoT tracking
   └── vehic_aid_backend/ → Settings
 
-Frontend: web-admin-panel/admin/
+Frontend: 03_web-admin-panel/admin/
   ├── app/        → Pages (routing)
   ├── components/ → Reusable UI
   ├── lib/        → Utilities & API
@@ -273,7 +273,7 @@ docker exec vehicaid_web pytest -v
 
 ### 3. Frontend Work
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 # Create components → pages → API calls
 npm test
 ```
@@ -302,7 +302,7 @@ git push origin feature/new-feature
 docker build -f Dockerfile -t vehic-aid:latest .
 
 # Frontend
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 npm run build
 npm start
 ```
