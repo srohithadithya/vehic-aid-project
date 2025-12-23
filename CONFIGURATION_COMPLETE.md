@@ -37,13 +37,13 @@ Successfully configured and integrated the Django backend with Next.js web admin
 ### 2. Frontend Configuration (Next.js)
 
 ✅ **Environment Variables**
-- File: `web-admin-panel/admin/.env.local`
+- File: `03_web-admin-panel/admin/.env.local`
 - Variables: 
   - `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`
   - `NEXT_PUBLIC_APP_URL=http://localhost:3000`
 
 ✅ **API Client**
-- File: `web-admin-panel/admin/lib/api.ts`
+- File: `03_web-admin-panel/admin/lib/api.ts`
 - Features:
   - Axios HTTP client
   - JWT authentication
@@ -52,7 +52,7 @@ Successfully configured and integrated the Django backend with Next.js web admin
   - Auto-logout on 401
 
 ✅ **Next.js Configuration**
-- File: `web-admin-panel/admin/next.config.ts`
+- File: `03_web-admin-panel/admin/next.config.ts`
 - Features:
   - API rewrites for backend
   - Remote image patterns (updated from deprecated domains config)
@@ -96,7 +96,7 @@ Successfully configured and integrated the Django backend with Next.js web admin
 
 ### New Files Created
 
-1. **`web-admin-panel/admin/.env.local`** ⭐
+1. **`03_web-admin-panel/admin/.env.local`** ⭐
    - Frontend environment variables
    - API URL configuration
    - Application settings
@@ -141,7 +141,7 @@ Successfully configured and integrated the Django backend with Next.js web admin
 
 ### Modified Files
 
-1. **`web-admin-panel/admin/next.config.ts`**
+1. **`03_web-admin-panel/admin/next.config.ts`**
    - Updated from deprecated `images.domains`
    - Changed to `images.remotePatterns`
    - API rewrite configuration maintained
@@ -334,7 +334,7 @@ cd 01_backend
 docker-compose up -d
 
 # Terminal 2 - Frontend
-cd web-admin-panel\admin
+cd 03_web-admin-panel\admin
 npm run dev
 ```
 
@@ -444,7 +444,7 @@ docker exec vehicaid_web python manage.py collectstatic --noinput
 ### Frontend Commands
 
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 
 # Install dependencies
 npm install

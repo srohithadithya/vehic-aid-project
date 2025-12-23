@@ -61,7 +61,7 @@ vehic-aid-project/
 │   ├── requirements.txt                 # Python dependencies
 │   └── pytest.ini                       # Test configuration
 │
-├── web-admin-panel/
+├── 03_web-admin-panel/
 │   └── admin/                           # Next.js Frontend
 │       ├── app/
 │       │   ├── layout.tsx               # Root layout
@@ -103,7 +103,7 @@ cd 01_backend
 docker-compose up -d
 
 # 2. Start frontend (in new terminal)
-cd web-admin-panel\admin
+cd 03_web-admin-panel\admin
 npm run dev
 
 # 3. Access services
@@ -128,7 +128,7 @@ See `QUICK_START.md` for comprehensive setup instructions.
 
 ### API Client (Frontend)
 
-**File:** `web-admin-panel/admin/lib/api.ts`
+**File:** `03_web-admin-panel/admin/lib/api.ts`
 
 ```typescript
 import axios from 'axios';
@@ -313,7 +313,7 @@ docker exec vehicaid_web pytest --cov=apps --cov-report=html
 ### Frontend Tests
 
 ```bash
-cd web-admin-panel/admin
+cd 03_web-admin-panel/admin
 
 # Run tests
 npm test
@@ -343,7 +343,7 @@ RAZORPAY_KEY_SECRET=your-secret-here
 
 ### Frontend Environment
 
-**File:** `web-admin-panel/admin/.env.local`
+**File:** `03_web-admin-panel/admin/.env.local`
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
