@@ -3,11 +3,12 @@ import hmac
 import json
 from decimal import Decimal
 
+import razorpay
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import AllowAny  # Webhook is usually unauthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -21,6 +22,63 @@ from .serializers import RazorpayWebhookSerializer
 PLATFORM_COMMISSION_RATE = Decimal(
     getattr(settings, "PLATFORM_COMMISSION_RATE", 0.20)
 )  # Default 20%
+
+
+class PaymentInitiationView(APIView):
+    """
+    Endpoint to initiate a payment order with Razorpay.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        amount = request.data.get('amount')
+        currency = request.data.get('currency', 'INR')
+        service_request_id = request.data.get('service_request_id')
+
+        if not amount:
+            return Response({'error': 'Amount is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not service_request_id:
+            return Response({'error': 'Service Request ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            service_request = ServiceRequest.objects.get(id=service_request_id)
+        except ServiceRequest.DoesNotExist:
+            return Response({'error': 'Service Request not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Initialize Razorpay Client
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        
+        try:
+            # Create Order
+            amount_in_paise = int(float(amount) * 100)
+            order_data = {
+                'amount': amount_in_paise,
+                'currency': currency,
+                'payment_capture': 1, # Auto capture
+                'notes': {
+                    'service_request_id': service_request_id,
+                    'user_id': request.user.id
+                }
+            }
+            order = client.order.create(data=order_data)
+
+            # Create Transaction Record
+            Transaction.objects.create(
+                service_request=service_request,
+                booker=request.user.service_booker_profile,
+                provider=service_request.provider, # Assuming provider is assigned
+                amount=Decimal(amount),
+                razorpay_order_id=order['id'],
+                status='PENDING',
+                payment_method='UPI' # Default, will be updated by webhook
+            )
+
+            return Response(order, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Error creating Razorpay order: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RazorpayWebhookView(APIView):

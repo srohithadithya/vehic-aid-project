@@ -1,7 +1,10 @@
 from math import atan2, cos, radians, sin, sqrt
+import requests
+import logging
 
 from django.db import transaction
 from django.db.models import ExpressionWrapper, F, fields
+from django.conf import settings
 
 from apps.users.models import ServiceProvider
 from apps.services.models import ServiceQuote, UserSubscription
@@ -9,10 +12,11 @@ from decimal import Decimal
 from datetime import timedelta
 from django.utils import timezone
 
+logger = logging.getLogger(__name__)
 
 # Haversine formula to calculate great-circle distance between two points on a sphere.
 def calculate_distance(lat1, lon1, lat2, lon2):
-    """Returns distance in kilometers."""
+    """Returns distance in kilometers using Haversine algorithm."""
     R = 6371  # Radius of Earth in kilometers
 
     lat1_rad = radians(lat1)
@@ -28,6 +32,34 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
     return R * c
 
+def get_real_distance(origin_lat, origin_lon, dest_lat, dest_lon):
+    """
+    Calculates distance using Google Maps Distance Matrix API if available,
+    otherwise falls back to Haversine.
+    """
+    api_key = getattr(settings, 'GOOGLE_MAPS_API_KEY', None)
+    
+    if api_key:
+        try:
+            url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+            params = {
+                "origins": f"{origin_lat},{origin_lon}",
+                "destinations": f"{dest_lat},{dest_lon}",
+                "key": api_key,
+                "mode": "driving" # Assumes driving for roadside assistance
+            }
+            response = requests.get(url, params=params, timeout=5)
+            data = response.json()
+            
+            if data['status'] == 'OK' and data['rows'][0]['elements'][0]['status'] == 'OK':
+                # elements[0]['distance']['value'] is in meters
+                meters = data['rows'][0]['elements'][0]['distance']['value']
+                return meters / 1000.0 # Convert to km
+                
+        except Exception as e:
+            logger.error(f"Google Maps API failed: {e}. Falling back to Haversine.")
+            
+    return calculate_distance(origin_lat, origin_lon, dest_lat, dest_lon)
 
 def find_nearest_available_provider(service_request):
     """
@@ -45,13 +77,17 @@ def find_nearest_available_provider(service_request):
         )
     )
     
-    # In a real setup with PostGIS, we'd use ST_Distance.
-    # Here we'll do a python-side ranking if the list isn't massive, 
-    # or a simplified bounding box check first.
-    
     ranked_providers = []
+    
+    # We first do a pass with Haversine to roughly sort, then refine if needed.
+    # For now, to save API calls in 'Day 1', we might stick to Haversine for sorting 
+    # and use Real Matrix for the final quote, OR usage limit logic.
+    # Let's use get_real_distance only for the top candidates if list is long?
+    # Simple approach: Check all (if few) using real distance.
+    
     for provider in available_providers:
         if provider.latitude and provider.longitude:
+            # Use Haversine for initial ranking to avoid 100 API calls
             dist = calculate_distance(
                 request_lat, request_lon, 
                 float(provider.latitude), float(provider.longitude)
@@ -65,14 +101,16 @@ def find_nearest_available_provider(service_request):
     if not ranked_providers:
         return None
 
-    # Return the top 3 nearest providers
+    # Refine top 3 with real distance if API key present? 
+    # For simplicity in this iteration, we keep the order but calculate real distance for the chosen one later.
     return ranked_providers[:3]
 
 def generate_automated_quote(service_request, provider):
     """
     Automates the generation of a dynamic price quote.
     """
-    dist = calculate_distance(
+    # Use Real Distance for accurate pricing
+    dist = get_real_distance(
         service_request.latitude, service_request.longitude,
         float(provider.latitude), float(provider.longitude)
     )
@@ -95,7 +133,7 @@ def generate_automated_quote(service_request, provider):
         request=service_request,
         base_price=base_price,
         distance_km=dist,
-        time_estimate_minutes=int(dist * 5) + 10,
+        time_estimate_minutes=int(dist * 5) + 10, # dynamic time could also come from Google API
         dynamic_total=total,
         status="PENDING",
         valid_until=timezone.now() + timedelta(minutes=30)
