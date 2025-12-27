@@ -1,0 +1,1775 @@
+openapi: 3.0.3
+info:
+  title: Vehic-Aid API
+  version: 1.0.0
+  description: API for Vehic-Aid Vehicle Assistance Platform
+paths:
+  /api/v1/iot/data-ingest/:
+    post:
+      operationId: v1_iot_data_ingest_create
+      description: Public API endpoint to receive data forwarded from the Cloud's
+        MQTT broker.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/payments/create-order/:
+    post:
+      operationId: v1_payments_create_order_create
+      description: Endpoint to initiate a payment order with Razorpay.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/payments/webhook/razorpay/:
+    post:
+      operationId: v1_payments_webhook_razorpay_create
+      description: |-
+        Endpoint that receives asynchronous notifications from Razorpay when a payment is captured.
+        This is the secure way to confirm payment success.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/admin/bookings/:
+    get:
+      operationId: v1_services_admin_bookings_retrieve
+      description: Return a detailed list of all service requests.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/admin/dashboard-stats/:
+    get:
+      operationId: v1_services_admin_dashboard_stats_retrieve
+      description: Aggregates high-level operational metrics for the Admin Dashboard.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/admin/payments/:
+    get:
+      operationId: v1_services_admin_payments_retrieve
+      description: Return a list of all payment transactions.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/admin/users/:
+    get:
+      operationId: v1_services_admin_users_retrieve
+      description: Return a list of all users with basic profile info.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/agentic-booking/:
+    post:
+      operationId: v1_services_agentic_booking_create
+      description: |-
+        Exposes the smart BookingAgent coordinator via a single endpoint.
+        Ideal for 'One-Click' booking from mobile/IoT.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/helpline/:
+    get:
+      operationId: v1_services_helpline_list
+      description: CRUD endpoints for helpline calls.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHelplineCallList'
+          description: ''
+    post:
+      operationId: v1_services_helpline_create
+      description: CRUD endpoints for helpline calls.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelplineCall'
+          description: ''
+  /api/v1/services/helpline/{id}/:
+    get:
+      operationId: v1_services_helpline_retrieve
+      description: CRUD endpoints for helpline calls.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Helpline Call.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelplineCall'
+          description: ''
+    put:
+      operationId: v1_services_helpline_update
+      description: CRUD endpoints for helpline calls.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Helpline Call.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HelplineCall'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelplineCall'
+          description: ''
+    patch:
+      operationId: v1_services_helpline_partial_update
+      description: CRUD endpoints for helpline calls.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Helpline Call.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHelplineCall'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHelplineCall'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHelplineCall'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelplineCall'
+          description: ''
+    delete:
+      operationId: v1_services_helpline_destroy
+      description: CRUD endpoints for helpline calls.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Helpline Call.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/services/provider/update/{request_id}/:
+    post:
+      operationId: v1_services_provider_update_create
+      description: Endpoint for the provider app to update job status (e.g., Arrived,
+        Completed).
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/quotes/:
+    get:
+      operationId: v1_services_quotes_list
+      description: |-
+        Read-only viewset for quotes (Quotes are generated by the system, not users).
+        Users can Accept or Reject them.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedServiceQuoteList'
+          description: ''
+  /api/v1/services/quotes/{id}/:
+    get:
+      operationId: v1_services_quotes_retrieve
+      description: |-
+        Read-only viewset for quotes (Quotes are generated by the system, not users).
+        Users can Accept or Reject them.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Service Quote.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuote'
+          description: ''
+  /api/v1/services/quotes/{id}/accept/:
+    post:
+      operationId: v1_services_quotes_accept_create
+      description: |-
+        Read-only viewset for quotes (Quotes are generated by the system, not users).
+        Users can Accept or Reject them.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Service Quote.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuote'
+          description: ''
+  /api/v1/services/quotes/{id}/reject/:
+    post:
+      operationId: v1_services_quotes_reject_create
+      description: |-
+        Read-only viewset for quotes (Quotes are generated by the system, not users).
+        Users can Accept or Reject them.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Service Quote.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ServiceQuote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceQuote'
+          description: ''
+  /api/v1/services/request/:
+    get:
+      operationId: v1_services_request_retrieve
+      description: Retrieves the real-time status of an ongoing request OR lists recent
+        requests.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_services_request_create
+      description: Creates a new service request from the customer app.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/request/{request_id}/:
+    get:
+      operationId: v1_services_request_retrieve_2
+      description: Retrieves the real-time status of an ongoing request OR lists recent
+        requests.
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_services_request_create_2
+      description: Creates a new service request from the customer app.
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/reviews/:
+    get:
+      operationId: v1_services_reviews_list
+      description: CRUD endpoints for service reviews.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewList'
+          description: ''
+    post:
+      operationId: v1_services_reviews_create
+      description: Create a review for a completed service.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /api/v1/services/reviews/{id}/:
+    get:
+      operationId: v1_services_reviews_retrieve
+      description: CRUD endpoints for service reviews.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    put:
+      operationId: v1_services_reviews_update
+      description: CRUD endpoints for service reviews.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    patch:
+      operationId: v1_services_reviews_partial_update
+      description: CRUD endpoints for service reviews.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Review.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    delete:
+      operationId: v1_services_reviews_destroy
+      description: CRUD endpoints for service reviews.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Review.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/services/rewards/{id}/:
+    get:
+      operationId: v1_services_rewards_retrieve
+      description: Get rewards program details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/rewards/list-referrals/:
+    get:
+      operationId: v1_services_rewards_list_referrals_retrieve
+      description: List users referred by the current user.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/rewards/redeem/:
+    post:
+      operationId: v1_services_rewards_redeem_create
+      description: Redeem reward points for wallet cash.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/rewards/submit-referral/:
+    post:
+      operationId: v1_services_rewards_submit_referral_create
+      description: Submit a referral code from another user.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/rewards/transactions/:
+    get:
+      operationId: v1_services_rewards_transactions_retrieve
+      description: Get reward transaction history.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/subscriptions/:
+    get:
+      operationId: v1_services_subscriptions_retrieve
+      description: List all subscriptions for the authenticated user.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_services_subscriptions_create
+      description: |-
+        Subscribe the user to a plan.
+        Expected payload: {"plan": <plan_id>, "auto_renew": true/false}
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/v1/services/subscriptions/{id}/:
+    get:
+      operationId: v1_services_subscriptions_retrieve_2
+      description: Retrieve a specific subscription by ID.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this User Subscription.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/subscriptions/{id}/cancel/:
+    post:
+      operationId: v1_services_subscriptions_cancel_create
+      description: Cancel an active subscription.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this User Subscription.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/subscriptions/{id}/renew/:
+    post:
+      operationId: v1_services_subscriptions_renew_create
+      description: Renew an expired or cancelled subscription (if auto_renew is enabled).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this User Subscription.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/subscriptions/analytics/:
+    get:
+      operationId: v1_services_subscriptions_analytics_retrieve
+      description: Automated reporting for subscription health and revenue.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/subscriptions/current/:
+    get:
+      operationId: v1_services_subscriptions_current_retrieve
+      description: Return the currently active subscription, if any.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/vehicle-exchange/:
+    get:
+      operationId: v1_services_vehicle_exchange_list
+      description: CRUD endpoints for vehicle exchange requests.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVehicleExchangeList'
+          description: ''
+    post:
+      operationId: v1_services_vehicle_exchange_create
+      description: CRUD endpoints for vehicle exchange requests.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+  /api/v1/services/vehicle-exchange/{id}/:
+    get:
+      operationId: v1_services_vehicle_exchange_retrieve
+      description: CRUD endpoints for vehicle exchange requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+    put:
+      operationId: v1_services_vehicle_exchange_update
+      description: CRUD endpoints for vehicle exchange requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+    patch:
+      operationId: v1_services_vehicle_exchange_partial_update
+      description: CRUD endpoints for vehicle exchange requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicleExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicleExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicleExchange'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+    delete:
+      operationId: v1_services_vehicle_exchange_destroy
+      description: CRUD endpoints for vehicle exchange requests.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/services/vehicle-exchange/{id}/complete/:
+    post:
+      operationId: v1_services_vehicle_exchange_complete_create
+      description: Mark exchange as completed (Rental returned, Original retrieved).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+  /api/v1/services/vehicle-exchange/{id}/provide/:
+    post:
+      operationId: v1_services_vehicle_exchange_provide_create
+      description: Provider marks that the rental vehicle has been handed over.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Vehicle Exchange.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VehicleExchange'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleExchange'
+          description: ''
+  /api/v1/services/vehicles/:
+    get:
+      operationId: v1_services_vehicles_list
+      description: CRUD for user vehicles.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVehicleList'
+          description: ''
+    post:
+      operationId: v1_services_vehicles_create
+      description: CRUD for user vehicles.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+          description: ''
+  /api/v1/services/vehicles/{id}/:
+    get:
+      operationId: v1_services_vehicles_retrieve
+      description: CRUD for user vehicles.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vehicle.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+          description: ''
+    put:
+      operationId: v1_services_vehicles_update
+      description: CRUD for user vehicles.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vehicle.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+          description: ''
+    patch:
+      operationId: v1_services_vehicles_partial_update
+      description: CRUD for user vehicles.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vehicle.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicle'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicle'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVehicle'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+          description: ''
+    delete:
+      operationId: v1_services_vehicles_destroy
+      description: CRUD for user vehicles.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this vehicle.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/services/wallet/{id}/:
+    get:
+      operationId: v1_services_wallet_retrieve
+      description: Get wallet balance and details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/wallet/add-money/:
+    post:
+      operationId: v1_services_wallet_add_money_create
+      description: Add money to wallet.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/services/wallet/transactions/:
+    get:
+      operationId: v1_services_wallet_transactions_retrieve
+      description: Get wallet transaction history.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/profile/:
+    get:
+      operationId: v1_users_profile_retrieve
+      description: |-
+        Handles fetching the profile data for the currently authenticated user (customer or provider).
+        Endpoint used by the mobile app's ProfileScreen.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/profile/language/:
+    post:
+      operationId: v1_users_profile_language_create
+      description: Endpoint for users (Bookers) to update their preferred language.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/provider/update-location/:
+    post:
+      operationId: v1_users_provider_update_location_create
+      description: Endpoint for Service Providers to update their real-time location
+        and availability.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/register/booker/:
+    post:
+      operationId: v1_users_register_booker_create
+      description: Endpoint for new customer (Service Booker) registration.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/register/provider/:
+    post:
+      operationId: v1_users_register_provider_create
+      description: Endpoint for new service provider registration (initial data submission).
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/token/:
+    post:
+      operationId: v1_users_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /api/v1/users/token/refresh/:
+    post:
+      operationId: v1_users_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+components:
+  schemas:
+    CustomTokenObtainPair:
+      type: object
+      description: Customizes JWT payload to include user type and verification status.
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    FuelTypeEnum:
+      enum:
+      - PETROL
+      - DIESEL
+      - EV
+      type: string
+      description: |-
+        * `PETROL` - Petrol
+        * `DIESEL` - Diesel
+        * `EV` - Electric Vehicle
+    HelplineCall:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        caller:
+          type: integer
+        operator:
+          type: integer
+          nullable: true
+        call_start:
+          type: string
+          format: date-time
+        call_end:
+          type: string
+          format: date-time
+          nullable: true
+        recording_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        linked_service_request:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - call_start
+      - caller
+      - created_at
+      - id
+    PaginatedHelplineCallList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HelplineCall'
+    PaginatedReviewList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+    PaginatedServiceQuoteList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceQuote'
+    PaginatedVehicleExchangeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VehicleExchange'
+    PaginatedVehicleList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vehicle'
+    PatchedHelplineCall:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        caller:
+          type: integer
+        operator:
+          type: integer
+          nullable: true
+        call_start:
+          type: string
+          format: date-time
+        call_end:
+          type: string
+          format: date-time
+          nullable: true
+        recording_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+        linked_service_request:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+        booker:
+          type: integer
+        provider:
+          type: integer
+        rating:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Rating 1-5
+        comment:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedVehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        license_plate:
+          type: string
+          maxLength: 20
+        make:
+          type: string
+          maxLength: 50
+        model:
+          type: string
+          maxLength: 50
+        fuel_type:
+          $ref: '#/components/schemas/FuelTypeEnum'
+        owner:
+          type: integer
+          readOnly: true
+    PatchedVehicleExchange:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+        original_vehicle:
+          type: integer
+        rental_vehicle:
+          type: integer
+        pickup_location:
+          type: string
+          maxLength: 255
+        return_location:
+          type: string
+          maxLength: 255
+        rental_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/VehicleExchangeStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+        booker:
+          type: integer
+        provider:
+          type: integer
+        rating:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Rating 1-5
+        comment:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - booker
+      - created_at
+      - id
+      - provider
+      - rating
+      - request
+    ServiceQuote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+        base_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          description: Base price for the service type
+        distance_km:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          description: Distance from provider to location
+        time_estimate_minutes:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Estimated time in minutes
+        dynamic_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Total after applying plan rates and distance
+        status:
+          $ref: '#/components/schemas/ServiceQuoteStatusEnum'
+        valid_until:
+          type: string
+          format: date-time
+          description: Quote expiration time
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - base_price
+      - created_at
+      - distance_km
+      - dynamic_total
+      - id
+      - request
+      - time_estimate_minutes
+      - valid_until
+    ServiceQuoteStatusEnum:
+      enum:
+      - PENDING
+      - ACCEPTED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending user approval
+        * `ACCEPTED` - User accepted the quote
+        * `REJECTED` - User rejected the quote
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        license_plate:
+          type: string
+          maxLength: 20
+        make:
+          type: string
+          maxLength: 50
+        model:
+          type: string
+          maxLength: 50
+        fuel_type:
+          $ref: '#/components/schemas/FuelTypeEnum'
+        owner:
+          type: integer
+          readOnly: true
+      required:
+      - fuel_type
+      - id
+      - license_plate
+      - make
+      - model
+      - owner
+    VehicleExchange:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request:
+          type: integer
+        original_vehicle:
+          type: integer
+        rental_vehicle:
+          type: integer
+        pickup_location:
+          type: string
+          maxLength: 255
+        return_location:
+          type: string
+          maxLength: 255
+        rental_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/VehicleExchangeStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - original_vehicle
+      - pickup_location
+      - rental_fee
+      - rental_vehicle
+      - request
+      - return_location
+      - updated_at
+    VehicleExchangeStatusEnum:
+      enum:
+      - REQUESTED
+      - PROVIDED
+      - COMPLETED
+      - CANCELLED
+      type: string
+      description: |-
+        * `REQUESTED` - User requested exchange
+        * `PROVIDED` - Rental vehicle provided
+        * `COMPLETED` - Exchange completed
+        * `CANCELLED` - Exchange cancelled
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

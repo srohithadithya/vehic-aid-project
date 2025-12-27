@@ -51,8 +51,12 @@ class Transaction(models.Model):
     )
 
     # Corrected field names for commissions/payouts
-    platform_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    provider_payout = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    platform_commission = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    provider_payout_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    # --- Razorpay Details ---
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
 
     # --- Status and Timestamps ---
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")

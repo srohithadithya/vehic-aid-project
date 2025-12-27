@@ -1,0 +1,82 @@
+{% extends 'admin/base_admin.html' %}
+{% load i18n %}
+
+{% block title %}Helpline{% endblock %}
+{% block header %}Support & Helpline{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 style="color: var(--text);">Support Center</h3>
+    </div>
+
+    <div
+        style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); padding: 1.5rem;">
+        <div
+            style="background: rgba(139, 92, 246, 0.1); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📧</div>
+            <h4 style="color: var(--primary);">Email Support</h4>
+            <p>support@vehicaid.com</p>
+            <p>dev.team@vehicaid.com</p>
+        </div>
+        <div
+            style="background: rgba(16, 185, 129, 0.1); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📞</div>
+            <h4 style="color: var(--success);">Emergency Hotline</h4>
+            <p>+91 98765 43210</p>
+            <p>(Available 24/7)</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div
+        style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color: var(--text);">Recent Helpline Calls & Issues</h3>
+        <span class="badge warning">{{ recent_calls.count }} Records</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Caller</th>
+                <th>Operator</th>
+                <th>Call Start</th>
+                <th>Duration</th>
+                <th>Linked Request</th>
+                <th>Notes / Resolution</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for call in recent_calls %}
+            <tr>
+                <td style="font-weight: 500;">{{ call.caller.user.username }}</td>
+                <td>{{ call.operator.user.username|default:"Unassigned" }}</td>
+                <td>{{ call.call_start|date:"M d, H:i" }}</td>
+                <td>
+                    {% if call.duration_seconds %}
+                    {{ call.duration_seconds|floatformat:0 }}s
+                    {% else %}
+                    <span style="color: var(--warning);">Ongoing</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if call.linked_service_request %}
+                    <a href="#" style="color: var(--primary);">#{{ call.linked_service_request.id }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>{{ call.notes|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    No helpline calls recorded yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

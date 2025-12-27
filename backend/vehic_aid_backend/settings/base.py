@@ -16,20 +16,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # CRITICAL FIX: Load environment variables from the .env.dev file
 # This must happen before SECRET_KEY is accessed.
 # ----------------------------------------------------------------------
-DOT_ENV_FILE = BASE_DIR / ".env.dev"
+DOT_ENV_FILE = BASE_DIR / ".env"
 
 if os.path.exists(DOT_ENV_FILE):
     environ.Env.read_env(str(DOT_ENV_FILE))
 else:
-    # Optional: Log an error if the .env.dev file is missing in development
-    print("WARNING: .env.dev file not found. Ensure it is configured.")
+    # Optional: Log an error if the .env file is missing in development
+    print("WARNING: .env file not found. Ensure it is configured.")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")  # This will now successfully load from the .env.dev file
+SECRET_KEY = env("SECRET_KEY")  # This will now successfully load from the .env file
 
 # Core Applications
 INSTALLED_APPS = [
     # Django Defaults
+    "jazzmin",  # Professional Admin UI
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -46,12 +47,16 @@ INSTALLED_APPS = [
     "django_celery_beat",  # New: To manage and schedule periodic tasks (Beat)
     "django_extensions",
     "corsheaders",  # CORS headers for web apps
+    "drf_spectacular", # Swagger API Documentation
+    "parler", # Django Parler (Multi-language)
+    "csp", # Content Security Policy
     "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
     "apps.services",
     "apps.payments",
     "apps.iot_devices",
+    "web_admin", # Admin Dashboard App
 ]
 
 MIDDLEWARE = [
@@ -67,6 +72,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    "csp.middleware.CSPMiddleware", # Added CSP Middleware
 ]
 
 ROOT_URLCONF = "vehic_aid_backend.urls"
@@ -74,7 +80,10 @@ ROOT_URLCONF = "vehic_aid_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "web_admin" / "templates"],  # For Admin/Helpline UI
+        "DIRS": [
+            BASE_DIR / "web_admin" / "templates",
+            BASE_DIR / "vehic_aid_backend" / "templates", # Root templates
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -91,6 +100,9 @@ WSGI_APPLICATION = "vehic_aid_backend.wsgi.application"
 ASGI_APPLICATION = "vehic_aid_backend.asgi.application"  # For Channels/WebSockets
 
 # --- Authentication & Database ---
+LOGIN_URL = "admin:login"
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGOUT_REDIRECT_URL = "/"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
@@ -138,6 +150,23 @@ LANGUAGES = [
     ('kn', 'ಕನ್ನಡ (Kannada)'),
 ]
 
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'en',},
+        {'code': 'hi',},
+        {'code': 'ta',},
+        {'code': 'te',},
+        {'code': 'mr',},
+        {'code': 'bn',},
+        {'code': 'gu',},
+        {'code': 'kn',},
+    ),
+    'default': {
+        'fallback': 'en',
+        'hide_untranslated': False,
+    }
+}
+
 # Path for translation files
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
@@ -172,6 +201,74 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "booking": "20/hour",  # Custom scope for booking security
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Vehic-Aid Operational API',
+    'DESCRIPTION': '''
+    **Vehic-Aid Enterprise System API**
+    
+    This interface provides programmatic access to the Vehic-Aid breakdown assistance platform.
+    Use this console to:
+    *   Manage **Users** and Authentication
+    *   Dispatch **Service Requests**
+    *   Track **Vehicles** and IoT Telemetry
+    *   Process **Payments** and Settlements
+    
+    *Note: All endpoints require JWT Authentication.*
+    ''',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Vehic-Aid Admin",
+    "site_header": "Vehic-Aid",
+    "site_brand": "Vehic-Aid",
+    "login_logo": "img/logo/vehic_aid_logo.png",
+    "site_logo": "img/logo/vehic_aid_logo.png",
+    "welcome_sign": "Welcome to Vehic-Aid Command Center",
+    "copyright": "Vehic-Aid Technologies Ltd",
+    "search_model": "users.CustomUser",
+    "topmenu_links": [
+        {"name": "Command Center",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Web Dashboard", "url": "/dashboard/", "new_window": False},
+        {"name": "API Console", "url": "swagger-ui", "new_window": True},
+        {"name": "Tech Specs", "url": "redoc", "new_window": True},
+        {"name": "Return to Home", "url": "/", "new_window": False},
+    ],
+    "user_avatar": None, 
+    "related_modal_active": True,
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_drawer": True,
+    "mobile_layout": "body-small",
 }
 
 # --- CORS Settings ---
@@ -206,3 +303,10 @@ RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET", default="key_secret_default")
 
 # Configures all models to use a BigAutoField (64-bit) for the primary key by default.
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "fonts.googleapis.com")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "maps.googleapis.com")
+CSP_IMG_SRC = ("'self'", "data:", "maps.gstatic.com", "maps.googleapis.com")
+CSP_FONT_SRC = ("'self'", "fonts.gstatic.com")

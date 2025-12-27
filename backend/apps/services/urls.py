@@ -5,14 +5,17 @@ from .views import (
     ProviderStatusUpdateView, ServiceRequestView, SubscriptionViewSet,
     ReviewViewSet, VehicleExchangeViewSet, WalletViewSet,
     RewardsViewSet, HelplineCallViewSet, AgenticBookingView,
-    SubscriptionAnalyticsView, DashboardStatsView
+    SubscriptionAnalyticsView, DashboardStatsView, VehicleViewSet,
+    ServiceQuoteViewSet
 )
 from .admin_views import user_list, service_request_list, payment_list
 
 router = DefaultRouter()
+router.register(r'vehicles', VehicleViewSet, basename='vehicle')
 router.register(r'subscriptions', SubscriptionViewSet, basename='subscription')
 router.register(r'reviews', ReviewViewSet, basename='review')
 router.register(r'vehicle-exchange', VehicleExchangeViewSet, basename='vehicle-exchange')
+router.register(r'quotes', ServiceQuoteViewSet, basename='service-quote')
 router.register(r'wallet', WalletViewSet, basename='wallet')
 router.register(r'rewards', RewardsViewSet, basename='rewards')
 router.register(r'helpline', HelplineCallViewSet, basename='helpline')

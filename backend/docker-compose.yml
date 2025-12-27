@@ -52,6 +52,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
+    env_file: .env
     depends_on:
       db:
         condition: service_healthy
@@ -76,6 +77,8 @@ services:
       - DB_PORT=5432
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
+    env_file: .env
     depends_on:
       - db
       - redis

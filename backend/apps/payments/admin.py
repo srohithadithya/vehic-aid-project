@@ -12,8 +12,8 @@ class TransactionAdmin(admin.ModelAdmin):
         "id",
         "service_request",  # FIX E108: Changed 'request' to 'service_request'
         "amount",
-        "platform_fee",  # FIX E108: Corrected 'platform_fee'
-        "provider_payout",  # FIX E108: Corrected 'provider_payout'
+        "platform_commission",
+        "provider_payout_amount",
         "status",
         "created_at",
     )

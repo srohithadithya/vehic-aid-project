@@ -1,257 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'admin/base_admin.html' %}
+{% load i18n %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Providers - Vehic-Aid Admin</title>
-    {% load static %}
-    {% load i18n %}
-    <link rel="icon" href="{% static 'img/logo/favicon.ico' %}" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block title %}Service Providers{% endblock %}
+{% block header %}Service Providers{% endblock %}
 
-        :root {
-            --primary: #2563eb;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --dark: #1f2937;
-            --light: #f3f4f6;
-            --white: #ffffff;
-            --border: #e5e7eb;
-            --text: #374151;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--light);
-            color: var(--text);
-        }
-
-        .page-header {
-            background: var(--white);
-            padding: 24px 32px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .content {
-            padding: 0 32px 32px;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 24px;
-        }
-
-        .mini-stat {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .mini-stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .mini-stat-label {
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .table-card {
-            background: var(--white);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .table-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-box {
-            padding: 10px 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            width: 300px;
-            font-size: 14px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--light);
-        }
-
-        th {
-            padding: 16px 24px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge-active {
-            background: #d1fae5;
-            color: var(--secondary);
-        }
-
-        .badge-inactive {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .rating {
-            color: #f59e0b;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            margin: 0 4px;
-            border: 1px solid var(--border);
-            background: var(--white);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="page-header">
-        <h1 class="page-title">{% trans "Provider Management" %}</h1>
-    </div>
-
-    <div class="content">
-        <div class="stats-row">
-            <div class="mini-stat">
-                <div class="mini-stat-value">156</div>
-                <div class="mini-stat-label">{% trans "Total Providers" %}</div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-value">89</div>
-                <div class="mini-stat-label">{% trans "Active Now" %}</div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-value">4.7</div>
-                <div class="mini-stat-label">{% trans "Avg Rating" %}</div>
-            </div>
-            <div class="mini-stat">
-                <div class="mini-stat-value">1,247</div>
-                <div class="mini-stat-label">{% trans "Services Completed" %}</div>
-            </div>
-        </div>
-
-        <div class="table-card">
-            <div class="table-header">
-                <input type="text" class="search-box" placeholder="{% trans 'Search providers...' %}">
-                <button class="btn btn-primary">+ {% trans "Add Provider" %}</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>{% trans "Name" %}</th>
-                        <th>{% trans "Phone" %}</th>
-                        <th>{% trans "Services" %}</th>
-                        <th>{% trans "Rating" %}</th>
-                        <th>{% trans "Completed" %}</th>
-                        <th>{% trans "Status" %}</th>
-                        <th>{% trans "Actions" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Rajesh Kumar</strong></td>
-                        <td>+91-9876543210</td>
-                        <td>Towing, Jumpstart</td>
-                        <td><span class="rating">⭐ 4.8</span></td>
-                        <td>142</td>
-                        <td><span class="badge badge-active">{% trans "Active" %}</span></td>
-                        <td>
-                            <button class="action-btn">{% trans "View" %}</button>
-                            <button class="action-btn">{% trans "Edit" %}</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Amit Sharma</strong></td>
-                        <td>+91-9876543211</td>
-                        <td>All Services</td>
-                        <td><span class="rating">⭐ 4.9</span></td>
-                        <td>198</td>
-                        <td><span class="badge badge-active">{% trans "Active" %}</span></td>
-                        <td>
-                            <button class="action-btn">{% trans "View" %}</button>
-                            <button class="action-btn">{% trans "Edit" %}</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Suresh Patel</strong></td>
-                        <td>+91-9876543212</td>
-                        <td>Towing</td>
-                        <td><span class="rating">⭐ 4.6</span></td>
-                        <td>87</td>
-                        <td><span class="badge badge-inactive">{% trans "Offline" %}</span></td>
-                        <td>
-                            <button class="action-btn">{% trans "View" %}</button>
-                            <button class="action-btn">{% trans "Edit" %}</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
-
-</html>
+{% block content %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Status</th>
+                <th>Service Type</th>
+                <th>Rating</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for provider in providers %}
+            <tr>
+                <td style="font-weight: 500;">{{ provider.user.username }}</td>
+                <td>
+                    <span class="badge {% if provider.is_available %}success{% else %}warning{% endif %}">
+                        {% if provider.is_available %}ONLINE{% else %}OFFLINE{% endif %}
+                    </span>
+                </td>
+                <td>
+                    {% for type in provider.service_types.all %}
+                    <span
+                        style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">{{
+                        type }}</span>
+                    {% endfor %}
+                </td>
+                <td style="color: var(--warning);">{{ provider.average_rating }} ⭐</td>
+                <td>{{ provider.user.phone_number }}</td>
+                <td>
+                    <a href="/admin/users/serviceprovider/{{ provider.id }}/change/"
+                        style="color: var(--primary);">Manage</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem;">No providers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
