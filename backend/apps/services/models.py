@@ -232,6 +232,10 @@ class ServiceRequest(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=8)
     longitude = models.DecimalField(max_digits=10, decimal_places=8)
     customer_notes = models.TextField(blank=True, null=True)
+    placement_details = models.JSONField(
+        default=dict, blank=True, null=True, 
+        help_text="Privacy-safe location details for vehicle placement"
+    )
 
     source = models.CharField(
         max_length=20, default="APP", help_text="Source: APP, IoT Device, or HELPLINE"

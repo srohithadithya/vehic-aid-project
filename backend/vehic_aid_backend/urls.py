@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     # Django Admin Panel (Access to the Management UI)
@@ -13,6 +14,10 @@ urlpatterns = [
     path("api/v1/iot/", include("apps.iot_devices.urls")),
     # Web Admin Dashboard
     path('dashboard/', include('web_admin.urls')),
+    # API Documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
 # Serving Static and Media Files in Development

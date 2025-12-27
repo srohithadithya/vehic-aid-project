@@ -23,6 +23,10 @@ INSTALLED_APPS += [
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 # Debug Toolbar setup
+MIDDLEWARE += [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+]
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]

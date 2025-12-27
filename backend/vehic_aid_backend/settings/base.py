@@ -16,16 +16,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # CRITICAL FIX: Load environment variables from the .env.dev file
 # This must happen before SECRET_KEY is accessed.
 # ----------------------------------------------------------------------
-DOT_ENV_FILE = BASE_DIR / ".env.dev"
+DOT_ENV_FILE = BASE_DIR / ".env"
 
 if os.path.exists(DOT_ENV_FILE):
     environ.Env.read_env(str(DOT_ENV_FILE))
 else:
-    # Optional: Log an error if the .env.dev file is missing in development
-    print("WARNING: .env.dev file not found. Ensure it is configured.")
+    # Optional: Log an error if the .env file is missing in development
+    print("WARNING: .env file not found. Ensure it is configured.")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")  # This will now successfully load from the .env.dev file
+SECRET_KEY = env("SECRET_KEY")  # This will now successfully load from the .env file
 
 # Core Applications
 INSTALLED_APPS = [
@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     "django_celery_beat",  # New: To manage and schedule periodic tasks (Beat)
     "django_extensions",
     "corsheaders",  # CORS headers for web apps
+    "drf_spectacular", # Swagger API Documentation
+    "parler", # Django Parler (Multi-language)
+    "csp", # Content Security Policy
     "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
@@ -67,6 +70,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    "csp.middleware.CSPMiddleware", # Added CSP Middleware
 ]
 
 ROOT_URLCONF = "vehic_aid_backend.urls"
@@ -138,6 +142,23 @@ LANGUAGES = [
     ('kn', 'ಕನ್ನಡ (Kannada)'),
 ]
 
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'en',},
+        {'code': 'hi',},
+        {'code': 'ta',},
+        {'code': 'te',},
+        {'code': 'mr',},
+        {'code': 'bn',},
+        {'code': 'gu',},
+        {'code': 'kn',},
+    ),
+    'default': {
+        'fallback': 'en',
+        'hide_untranslated': False,
+    }
+}
+
 # Path for translation files
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
@@ -172,6 +193,14 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "booking": "20/hour",  # Custom scope for booking security
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Vehic-Aid API',
+    'DESCRIPTION': 'API for Vehic-Aid Vehicle Assistance Platform',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # --- CORS Settings ---
@@ -206,3 +235,10 @@ RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET", default="key_secret_default")
 
 # Configures all models to use a BigAutoField (64-bit) for the primary key by default.
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "fonts.googleapis.com")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "maps.googleapis.com")
+CSP_IMG_SRC = ("'self'", "data:", "maps.gstatic.com", "maps.googleapis.com")
+CSP_FONT_SRC = ("'self'", "fonts.gstatic.com")
