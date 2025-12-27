@@ -32,29 +32,82 @@ def dashboard(request):
     ).count()
     
     # Revenue calculation (from completed requests)
-    # This is a placeholder - actual revenue would come from payments app
-    total_revenue = 240000  # ₹2.4L placeholder
+    from apps.payments.models import Transaction
+    total_revenue = Transaction.objects.filter(status='SUCCESS').aggregate(
+        total=Sum('amount')
+    )['total'] or 0
     
     # Average rating
-    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 4.8
+    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0.0
     
     # Recent requests
     recent_requests = ServiceRequest.objects.select_related(
         'booker', 'provider'
-    ).order_by('-created_at')[:10]
+    ).order_by('-created_at')[:5]
     
-    # Service type distribution
-    service_distribution = ServiceRequest.objects.values(
-        'service_type'
-    ).annotate(count=Count('id')).order_by('-count')
+    # --- Charts Data Preparation ---
+    from django.db.models.functions import TruncDay
+    import json
+    from django.core.serializers.json import DjangoJSONEncoder
+
+    # 1. Service Trends (Last 30 Days Daily) - Zero Filled
+    trends_queryset = ServiceRequest.objects.filter(
+        created_at__gte=last_month
+    ).annotate(
+        day=TruncDay('created_at')
+    ).values('day').annotate(
+        count=Count('id')
+    ).order_by('day')
     
+    # Convert queryset to dict for easy lookup
+    trends_dict = {}
+    for entry in trends_queryset:
+        if entry['day']:
+            # Normalize to date object for comparison if needed, or keep as datetime
+            # TruncDay returns datetime
+            trends_dict[entry['day'].date()] = entry['count']
+
+    months_labels = []
+    trends_data = []
+    
+    # Generate all days for last 30 days
+    current_date = last_month.date()
+    end_date = today.date()
+    
+    while current_date <= end_date:
+        months_labels.append(current_date.strftime('%d %b'))
+        # Get count from dict or 0
+        count = trends_dict.get(current_date, 0)
+        trends_data.append(count)
+        current_date += timedelta(days=1)
+            
+    # 2. Service Distribution
+    dist_queryset = ServiceRequest.objects.values('service_type').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    dist_labels = [item['service_type'] for item in dist_queryset]
+    dist_data = [item['count'] for item in dist_queryset]
+
+    # Package all into a JSON-serializable context
+    chart_data = {
+        'trends': {
+            'labels': months_labels,
+            'data': trends_data
+        },
+        'distribution': {
+            'labels': dist_labels,
+            'data': dist_data
+        }
+    }
+
     context = {
         'total_requests': total_requests,
         'active_subscriptions': active_subscriptions,
         'total_revenue': total_revenue,
         'avg_rating': round(avg_rating, 1),
         'recent_requests': recent_requests,
-        'service_distribution': service_distribution,
+        'chart_data': json.dumps(chart_data, cls=DjangoJSONEncoder),
     }
     
     return render(request, 'admin/dashboard.html', context)
@@ -133,3 +186,36 @@ def providers_view(request):
     }
     
     return render(request, 'admin/providers.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def reviews_view(request):
+    """View all system reviews."""
+    reviews = Review.objects.select_related(
+        'booker', 'provider', 'request'
+    ).order_by('-created_at')
+    
+    context = {
+        'reviews': reviews,
+    }
+    
+    return render(request, 'admin/reviews.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def helpline_view(request):
+    """View helpline calls and issue tracking."""
+    from apps.services.models import HelplineCall
+    
+    # Fetch recent helpline calls
+    recent_calls = HelplineCall.objects.select_related(
+        'caller', 'operator', 'linked_service_request'
+    ).order_by('-call_start')[:50]
+    
+    context = {
+        'recent_calls': recent_calls,
+    }
+    
+    return render(request, 'admin/helpline.html', context)
