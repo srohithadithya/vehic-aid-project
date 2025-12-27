@@ -97,9 +97,13 @@ def service_request_list(request):
             'provider': sr.provider.username if sr.provider else 'Unassigned',
             'service_type': sr.service_type,
             'status': sr.status,
-            'location': sr.location or 'Not specified',
+            'location': f"{sr.latitude}, {sr.longitude}",
+            'latitude': float(sr.latitude) if sr.latitude else 0.0,
+            'longitude': float(sr.longitude) if sr.longitude else 0.0,
+            'customer_notes': sr.customer_notes or '',
+            'priority': sr.priority,
             'created_at': sr.created_at.isoformat(),
-            'description': sr.description or '',
+            'description': sr.customer_notes or '',
         })
     return Response(data)
 

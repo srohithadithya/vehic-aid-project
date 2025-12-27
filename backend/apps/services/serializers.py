@@ -19,9 +19,12 @@ from .models import (
 
 
 class VehicleSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Vehicle
-        fields = ["id", "license_plate", "make", "model", "fuel_type"]
+        fields = ["id", "license_plate", "make", "model", "fuel_type", "owner"]
+        read_only_fields = ["id", "owner"]
 
 
 class ServiceRequestSerializer(serializers.ModelSerializer):
