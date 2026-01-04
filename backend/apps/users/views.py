@@ -109,7 +109,7 @@ class UserProfileView(APIView):
     Endpoint used by the mobile app's ProfileScreen.
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Sum
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny  # Open for testing; switch to IsAdminUser in production
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 # Local app imports
@@ -12,8 +12,7 @@ from apps.users.models import ServiceProvider
 User = get_user_model()
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUser])
 def dashboard_stats(request):
     """Return high‑level statistics for the admin dashboard."""
     # Users
@@ -46,8 +45,7 @@ def dashboard_stats(request):
     })
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUser])
 def recent_activity(request):
     """Return the most recent service requests for the admin dashboard."""
     recent = ServiceRequest.objects.select_related('booker', 'provider').order_by('-created_at')[:10]
@@ -64,8 +62,7 @@ def recent_activity(request):
     return Response(activity)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUser])
 def user_list(request):
     """Return a list of all users with basic profile info."""
     users = User.objects.all().order_by('-date_joined')
@@ -84,8 +81,7 @@ def user_list(request):
     return Response(data)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUser])
 def service_request_list(request):
     """Return a detailed list of all service requests."""
     qs = ServiceRequest.objects.select_related('booker', 'provider', 'vehicle').order_by('-created_at')
@@ -108,8 +104,7 @@ def service_request_list(request):
     return Response(data)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUser])
 def payment_list(request):
     """Return a list of all payment transactions."""
     qs = Payment.objects.select_related('booker', 'provider', 'service_request').order_by('-created_at')

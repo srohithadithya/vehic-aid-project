@@ -11,9 +11,7 @@ export default function ProviderHome() {
       <header className="border-b border-gray-800">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold">V</span>
-            </div>
+            <img src="/logo.png" alt="VehicAid Logo" className="w-10 h-10 object-contain" />
             <span className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
               VehicAid Partner
             </span>

@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "apps.services",
     "apps.payments",
     "apps.iot_devices",
-    "web_admin", # Admin Dashboard App
 ]
 
 MIDDLEWARE = [
@@ -115,7 +114,7 @@ AUTH_USER_MODEL = "users.CustomUser"
 DATABASES = {
     "default": env.db_url(
         "DATABASE_URL",
-        default="sqlite:///db.sqlite3",
+        # Explicitly requiring DATABASE_URL for Phase 1 production-ready state
     )
 }
 # --- Password Validation ---

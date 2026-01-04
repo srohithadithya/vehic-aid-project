@@ -14,8 +14,8 @@ urlpatterns = [
     path("api/v1/payments/", include("apps.payments.urls")),
     path("api/v1/iot/", include("apps.iot_devices.urls")),
     # Web Admin Dashboard
-    # Web Admin Dashboard
-    path('dashboard/', include('web_admin.urls')),
+    # Web Admin Dashboard (Now handled by Next.js apps)
+
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

@@ -49,12 +49,16 @@ export interface LoginResponse {
     user: User;
 }
 
-export type ServiceType = 'TOWING' | 'FUEL' | 'JUMPSTART' | 'LOCKOUT' | 'FLAT_TYRE';
+export type ServiceType = 'basic_tow' | 'flatbed_tow' | 'mechanic' | 'fuel_delivery' | 'battery_jump' | 'lockout' | 'tire_change' | 'TOWING' | 'FUEL' | 'JUMPSTART' | 'LOCKOUT' | 'FLAT_TYRE';
 
 export interface LocationState {
-    latitude: number;
-    longitude: number;
-    address: string;
+    pickup: string;
+    dropoff?: string;
+    coordinates?: {
+        lat: number;
+        lng: number;
+    };
+    address?: string;
 }
 
 export interface VehicleState {
@@ -67,9 +71,10 @@ export interface VehicleState {
 }
 
 export interface ContactState {
+    name: string;
     phone: string;
-    email: string;
-    notes: string;
+    email?: string;
+    notes?: string;
 }
 
 export interface BookingState {

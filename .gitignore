@@ -13,6 +13,7 @@
 **/mobile-*/.vercel/
 **/mobile-*/node_modules/
 *.log
+!requirements.txt
 *.txt
 *.bak
 *.tmp
