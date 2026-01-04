@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "VehicAid | Premium Roadside Assistance",
   description: "Fast, reliable, and professional roadside assistance. Book a tow, mechanic, or fuel delivery in seconds.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { MapPin, Wrench, Truck, CreditCard, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
@@ -15,7 +15,7 @@ const steps = [
     { id: 4, title: 'Review', icon: CreditCard },
 ];
 
-export default function ServiceRequestWizard() {
+function ServiceRequestWizardContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user } = useAuth();
@@ -41,11 +41,7 @@ export default function ServiceRequestWizard() {
                 latitude: formData.latitude,
                 longitude: formData.longitude,
                 customer_notes: formData.notes,
-                // vehicle_id: formData.vehicleId 
-                // For MVP we might need to create a vehicle first or pick one. 
-                // Omitting complexity for this snippet.
             });
-            // Show success state
             router.push('/dashboard');
         } catch (error) {
             console.error("Booking failed", error);
@@ -58,7 +54,6 @@ export default function ServiceRequestWizard() {
     return (
         <div className="min-h-screen bg-neutral-50 p-6 flex flex-col items-center justify-center">
             <div className="w-full max-w-2xl">
-                {/* Progress Bar */}
                 <div className="flex justify-between mb-8 relative">
                     <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 transform -translate-y-1/2 rounded-full"></div>
                     <div
@@ -80,7 +75,6 @@ export default function ServiceRequestWizard() {
                     })}
                 </div>
 
-                {/* Wizard Content */}
                 <motion.div
                     key={currentStep}
                     initial={{ opacity: 0, x: 20 }}
@@ -158,7 +152,6 @@ export default function ServiceRequestWizard() {
                         )}
                     </div>
 
-                    {/* Navigation Buttons */}
                     <div className="flex justify-between pt-8 border-t mt-8">
                         <button
                             onClick={handleBack}
@@ -188,5 +181,13 @@ export default function ServiceRequestWizard() {
                 </motion.div>
             </div>
         </div>
+    );
+}
+
+export default function ServiceRequestWizard() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <ServiceRequestWizardContent />
+        </Suspense>
     );
 }
