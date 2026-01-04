@@ -1,34 +1,76 @@
-# Vehic-Aid Project Map (Runmap)
+# 🗺️ Vehic-Aid Master Project Map (Runmap)
 
-## 🗺️ Project Architecture
-The project is organized into logical layers for clarity and scalability.
+Comprehensive guide for architecture, setup, and execution of the Vehic-Aid ecosystem.
 
-### 🏛️ 1. Core Services (Backend)
-- **`backend/`**: Django REST API, WebSockets (Daphne), Celery Workers.
-- **`iot-firmware/`**: Embedded logic for vehicle telemetry ingestion.
+---
 
-### 🌐 2. Web Interfaces (Next.js)
-- **`web-booker/`**: Customer interface for requesting assistance.
-- **`web-provider/`**: Provider dashboard for receiving/managing jobs.
-- **`web-admin-panel/`**: Centralized management and monitoring console.
+## 🏛️ 1. Architecture Overview
+The project is a multi-tier, AI-powered roadside assistance platform.
 
-### 📱 3. Mobile Applications (Expo)
-- **`mobile-booker/`**: Cross-platform customer app (Phase 2).
-- **`mobile-provider/`**: Cross-platform provider app (Phase 2).
+### **Core Services (Backend)**
+- **`backend/`**: Django 5.0 REST API. Contains the `BookingAgent` (AI Dispatch), `SubscriptionEngine`, and `PaymentGateway` (Razorpay).
+- **`iot-firmware/`**: Simulation logic for vehicle telemetry and emergency button heartbeats.
 
-### 🛠️ 4. Support & Infrastructure
-- **`(a)_infrastructure/`**: Production deployment configs (AWS/Docker/Render).
-- **`(b)_scripts/`**: Development automation, setup, and sync scripts.
-- **`(c)_tests/`**: Integration and unit tests for backend and mobile.
-- **`docs/`**: Comprehensive guides (Deployment, Developer, Integration).
+### **Web Interfaces (Next.js)**
+- **`web-booker/`**: Customer-facing portal for requesting assistance in seconds.
+- **`web-provider/`**: Real-time dashboard for service providers to manage jobs.
+- **`web-admin-panel/`**: "Cosmic Glass" management console for full platform control.
 
-## 🚀 Execution Streams
-- **Development**: Use `(b)_scripts/start-dev.ps1` to launch local stack.
-- **Orchestration**: `(a)_infrastructure/docker-compose.yml` manages the full local containerized ecosystem.
-- **Verification**: `docs/verification_report.md` tracks the latest health checks.
+### **Mobile Applications (Expo)**
+- **`mobile-booker/`**: Phase 2 customer app (React Native).
+- **`mobile-provider/`**: Phase 2 provider app (React Native).
 
-## 🏁 Roadmap
-Refer to **`ROADMAP.md`** for Phase-specific progress tracking.
+### **Support Layers**
+- **`infrastructure/`**: Docker Compose, Render configs, and AWS deployment manifests.
+- **`scripts/`**: Automation for setup, repository syncing, and health checks.
+- **`tests/`**: Suite of unit and integration tests for backend and mobile logic.
+- **`docs/`**: Detailed guides for developers and deployment.
+
+---
+
+## 🚀 2. Server Execution Commands
+
+### **Full Stack (Dockerized)**
+To launch the entire backend ecosystem including DB, Redis, and Workers:
+```bash
+cd infrastructure
+docker-compose up -d --build
+```
+
+### **Manual Backend Execution**
+1. **Migrations**: `python manage.py migrate`
+2. **Server**: `python manage.py runserver`
+3. **Workers**: `celery -A core worker -l info`
+4. **WebSocket**: `daphne -b 0.0.0.0 -p 8001 core.asgi:application`
+
+### **Frontend Apps (Next.js)**
+*Requires `npm install` in each directory.*
+- **Booker**: `cd web-booker && npm run dev` (Port 3001)
+- **Provider**: `cd web-provider && npm run dev` (Port 3002)
+- **Admin**: `cd web-admin-panel/admin && npm run dev` (Port 3000)
+
+---
+
+## 🛠️ 3. Setup & Maintenance
+
+### **Automated Setup**
+Run the health check and setup script to verify environment variables and dependencies:
+```powershell
+./scripts/check-setup.ps1
+```
+
+### **Repository Sync**
+Pull latest changes and clean local environment:
+```powershell
+./scripts/sync-repo.ps1
+```
+
+---
+
+## 🏁 4. Roadmap & Progress
+Refer to **`ROADMAP.md`** for detailed feature tracking.
+- **Phase 1**: Full-Stack Foundation & Web Interfaces (**COMPLETED**)
+- **Phase 2**: Mobile App Development & Auth Integration (**IN PROGRESS**)
 
 ---
 *Last Updated: 2026-01-04*
