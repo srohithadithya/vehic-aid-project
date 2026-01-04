@@ -24,11 +24,11 @@ The project is organized into logical layers for clarity and scalability.
 
 ## 🚀 Execution Streams
 - **Development**: Use `(b)_scripts/start-dev.ps1` to launch local stack.
-- **Orchestration**: `docker-compose.yml` manages the full local containerized ecosystem.
+- **Orchestration**: `(a)_infrastructure/docker-compose.yml` manages the full local containerized ecosystem.
 - **Verification**: `docs/verification_report.md` tracks the latest health checks.
 
 ## 🏁 Roadmap
 Refer to **`ROADMAP.md`** for Phase-specific progress tracking.
 
 ---
-*Generated: 2026-01-04*
+*Last Updated: 2026-01-04*
