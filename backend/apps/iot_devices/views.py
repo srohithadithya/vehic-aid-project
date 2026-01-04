@@ -17,7 +17,8 @@ class IoTDataIngestionView(APIView):
     Public API endpoint to receive data forwarded from the Cloud's MQTT broker.
     """
 
-    permission_classes = []
+    # TODO: In production, secure this with an API Key or Token header from the Cloud Broker
+    permission_classes = [AllowAny]
 
     @transaction.atomic
     def post(self, request, format=None):

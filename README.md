@@ -1,17 +1,16 @@
 # 🚗 Vehic-Aid: AI-Powered Roadside Assistance Platform
 
 **A next-generation, agentic platform connecting stranded motorists with nearby service providers.**
-<<<<<<< HEAD
 
 ![Logo](web-admin-panel/admin/public/logo.png)
 
-## 📚 Documentation
+---
 
 ## 🌟 Executive Summary
 
-Vehic-Aid is not just a booking app; it's an intelligent **Command Center** for roadside assistance. It leverages **Agentic AI** to coordinate service requests, ensuring the fastest possible response time by dynamically ranking providers based on real-time location.
+Vehic-Aid is an intelligent **Command Center** for roadside assistance. It leverages **Agentic AI** to coordinate service requests, ensuring the fastest possible response time by dynamically ranking providers based on real-time location and availability.
 
-The platform comes with a **High-End "Cosmic Glass" Admin Panel** for operators to monitor the entire ecosystem with subscription intelligence and live revenue tracking.
+The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to monitor the entire ecosystem with subscription intelligence, automated dispatching, and live revenue tracking.
 
 ---
 
@@ -29,7 +28,7 @@ The platform comes with a **High-End "Cosmic Glass" Admin Panel** for operators 
 
 ### 🇮🇳 Indian Market Localization
 - **Compliance**: Automated SMS reminders for **Insurance** and **PUC** expiry.
-- **Languages**: Backend support for 7+ Indian languages (Hindi, Tamil, Telugu, etc.).
+- **Languages**: Multilingual support for 8+ Indian languages (Hindi, Tamil, Telugu, etc.).
 - **Payments**: Integrated **Razorpay** for seamless UPI and Card transactions.
 
 ### 📱 IoT & Real-Time Tracking
@@ -42,186 +41,56 @@ The platform comes with a **High-End "Cosmic Glass" Admin Panel** for operators 
 
 ### Backend (The Core)
 - **Framework**: Django 5.0 (Python) with Django REST Framework.
-- **Database**: PostgreSQL 14.
+- **Database**: PostgreSQL 14 (Strictly Enforced).
 - **Async**: Daphne + Channels (WebSockets).
 - **Task Queue**: Celery + Redis.
-- **API Documentation**: Swagger/OpenAPI.
+- **Security**: Full API permission audit (IsAdminUser/IsAuthenticated).
 
 ### Frontend (The Face)
-- **Framework**: Next.js 16 (App Router).
-- **Styling**: Tailwind CSS v4 + Framer Motion.
-- **Components**: Shadcn/UI + Lucide Icons.
+- **Framework**: Next.js 15 (App Router).
+- **Styling**: Tailwind CSS + shadcn/ui.
+- **Components**: Lucide Icons + Framer Motion.
 - **Charts**: Recharts.
 
 ### Integrations
 - **Payments**: Razorpay.
 - **SMS**: Fast2SMS (simulated wrapper).
-- **Maps**: Haversine Logic (Backend) / OpenStreetMap ready.
+- **Maps**: OpenStreetMap / Google Maps integration.
 
 ---
 
-## ⚡ Quick Start (Docker)
-
-Get the entire platform running in minutes.
-
-### 🔄 Automated Updates
-To keep your repository in sync with the latest changes, run:
-```powershell
-./sync-repo.ps1
-```
-
-### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+ (for local frontend dev)
+## ⚡ Quick Start
 
 ### 1. Launch Backend & Infrastructure
 ```bash
-cd backend
+cd infrastructure
 docker-compose up -d --build
 ```
 *This starts Django, PostgreSQL, Redis, and Celery Workers.*
 
-### 2. Launch Admin Panel
-```bash
-cd web-admin-panel/admin
-npm install
-npm run dev
-```
+### 2. Launch Web Apps
+Each web app requires `npm install` before running.
+- **Admin Panel**: `cd web-admin-panel/admin && npm run dev`
+- **Booker App**: `cd web-booker && npm run dev`
+- **Provider App**: `cd web-provider && npm run dev`
 
-### 3. Access the Platform
+### 3. Access
 - **Admin Panel**: [http://localhost:3000](http://localhost:3000)
+- **Booker App**: [http://localhost:3001](http://localhost:3001)
+- **Provider App**: [http://localhost:3002](http://localhost:3002)
 - **Backend API**: [http://localhost:8000/api/v1/](http://localhost:8000/api/v1/)
-- **Django Admin**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
-
----
-
-=======
-
-![Logo](backend/web_admin/static/img/logo/vehic_aid_logo.png)
-
----
-
-## 🌟 Executive Summary
-
-Vehic-Aid is not just a booking app; it's an intelligent **Command Center** for roadside assistance. It leverages **Agentic AI** to coordinate service requests, ensuring the fastest possible response time by dynamically ranking providers based on real-time location.
-
-The platform comes with a **High-End "Cosmic Glass" Admin Panel** for operators to monitor the entire ecosystem with subscription intelligence and live revenue tracking.
-
----
-
-## 🚀 Key Features
-
-### 🧠 Smart Agentic Dispatch
-- **Intelligent Ranking**: Uses **Haversine Distance** algorithms to find the nearest valid provider.
-- **Automated Coordination**: `BookingAgent` manages the lifecycle from request -> dispatch -> confirmation.
-- **Auto-Escalation**: Background tasks monitor stuck requests and re-dispatch automatically.
-
-### 🎨 Cosmic Glass Admin Panel
-- **Premium UI**: Deep midnight blue theme with neon accents and frosted glass effects.
-- **Live Dashboard**: Interactive visualizations (Recharts) for Revenue Velocity and Active Users.
-- **Subscription Analytics**: Dedicated insights page for MRR (Monthly Recurring Revenue) and plan churn.
-
-### 🇮🇳 Indian Market Localization
-- **Compliance**: Automated SMS reminders for **Insurance** and **PUC** expiry.
-- **Languages**: Backend support for 7+ Indian languages (Hindi, Tamil, Telugu, etc.).
-- **Payments**: Integrated **Razorpay** for seamless UPI and Card transactions.
-
-### 📱 IoT & Real-Time Tracking
-- **Connected Vehicle**: Simulates IoT device heartbeats for vehicle health monitoring.
-- **Live Updates**: WebSocket integration for real-time status changes.
-
----
-
-## 🛠️ Technology Stack
-
-### Backend (The Core)
-- **Framework**: Django 5.0 (Python) with Django REST Framework.
-- **Database**: PostgreSQL 14.
-- **Async**: Daphne + Channels (WebSockets).
-- **Task Queue**: Celery + Redis.
-- **API Documentation**: Swagger/OpenAPI.
-
-### Frontend (The Face)
-- **Framework**: Next.js 16 (App Router).
-- **Styling**: Tailwind CSS v4 + Framer Motion.
-- **Components**: Shadcn/UI + Lucide Icons.
-- **Charts**: Recharts.
-
-### Integrations
-- **Payments**: Razorpay.
-- **SMS**: Fast2SMS (simulated wrapper).
-- **Maps**: Haversine Logic (Backend) / OpenStreetMap ready.
-
----
-
-## ⚡ Quick Start (Docker)
-
-Get the entire platform running in minutes.
-
-### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+ (for local frontend dev)
-
-### 1. Launch Backend & Infrastructure
-```bash
-cd backend
-docker-compose up -d --build
-```
-*This starts Django, PostgreSQL, Redis, and Celery Workers.*
-
-### 2. Launch Admin Panel
-```bash
-cd web-admin-panel/admin
-npm install
-npm run dev
-```
-
-### 3. Access the Platform
-- **Admin Panel**: [http://localhost:3000](http://localhost:3000)
-- **Backend API**: [http://localhost:8000/api/v1/](http://localhost:8000/api/v1/)
-- **Django Admin**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
-
----
-
->>>>>>> origin/main
-## 🔌 API Reference
-
-### Authentication
-- `POST /api/v1/users/token/`: Get JWT Access/Refresh tokens.
-- `POST /api/v1/users/register/`: Create new user account.
-
-### Services
-- `POST /api/v1/services/book/`: **Agentic Booking** (Smart Dispatch).
-- `GET /api/v1/services/subscriptions/analytics/`: **Business Intelligence** data.
-
-### Payments
-- `POST /api/v1/payments/create_order/`: Initialize Razorpay order.
 
 ---
 
 ## 📂 Project Structure
-
-```text
-vehic-aid-project/
-├── backend/             # Django Agentic Backend
-│   ├── apps/
-│   │   ├── services/       # Dispatch & Booking Logic
-│   │   ├── users/          # Auth & Profiles
-│   │   └── payments/       # Razorpay Integration
-│   └── docker-compose.yml
-├── web-admin-panel/        # Next.js "Cosmic Glass" Frontend
-│   └── admin/
-│       ├── app/            # App Router Pages (Dashboard, Login)
-│       └── components/     # UI Components (Sidebar, Charts)
-└── README.md               # You are here
-```
+Refer to **`PROJECT_MAP.md`** for a detailed architectural breakdown.
 
 ---
 
 ## 🔒 Security & Privacy
-- **Audit Logging**: Tracks all critical admin actions (`django-auditlog`).
-- **PII Masking**: Logs mask phone numbers and sensitive info.
-- **Throttling**: Rate limiting on all auth & booking endpoints.
+- **Permission Audit**: Strict IsAuthenticated/IsAdminUser checks on all sensitive endpoints.
+- **Audit Logging**: Tracks all critical admin actions.
+- **Data Privacy**: PII masking in logs and secure user profile abstractions.
 
 ---
 

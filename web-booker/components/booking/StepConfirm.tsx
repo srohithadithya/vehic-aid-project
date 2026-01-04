@@ -26,7 +26,7 @@ export default function StepConfirm() {
                     license_plate: state.vehicle.licensePlate,
                     make: state.vehicle.make,
                     model: state.vehicle.model,
-                    fuel_type: 'PETROL' // Defaulting for now as we didn't add dropdown
+                    fuel_type: 'PETROL' // Defaulting for now
                 });
                 vehicleId = vehicleRes.data.id;
             }
@@ -34,11 +34,12 @@ export default function StepConfirm() {
             // 2. Create Service Request
             const requestRes = await apiClient.post('/services/request/', {
                 vehicle_id: vehicleId,
-                service_type: state.serviceType?.toUpperCase(), // Backend expects uppercase
-                latitude: state.location.coordinates?.lat || 19.0760, // Fallback dummy
+                service_type: state.serviceType?.toUpperCase(),
+                latitude: state.location.coordinates?.lat || 19.0760,
                 longitude: state.location.coordinates?.lng || 72.8777,
-                customer_notes: `Pickup: ${state.location.pickup}. Dropoff: ${state.location.dropoff || 'N/A'}. Contact: ${state.contact.name} (${state.contact.phone})`
+                customer_notes: `Location: ${state.location.pickup}. Contact: ${state.contact.phone}`
             });
+
 
             // Success
             dispatch({ type: 'RESET' });

@@ -24,17 +24,38 @@ interface LiveMapProps {
 const DEFAULT_CENTER = { lat: 19.0760, lng: 72.8777 }; // Mumbai
 const DEFAULT_ZOOM = 12;
 
-export default function LiveMap({ 
-    vehicles = [], 
-    center = DEFAULT_CENTER, 
-    zoom = DEFAULT_ZOOM 
+export default function LiveMap({
+    vehicles = [],
+    center = DEFAULT_CENTER,
+    zoom = DEFAULT_ZOOM
 }: LiveMapProps) {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const markersRef = useRef<google.maps.Marker[]>([]);
 
-    // 1. Load Google Maps Script
+    // 1. Initialize and Load Google Maps
     useEffect(() => {
+        const initMap = () => {
+            if (!mapRef.current) return;
+
+            const mapInstance = new google.maps.Map(mapRef.current, {
+                center: center,
+                zoom: zoom,
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }],
+                    },
+                ],
+                mapTypeControl: false,
+                fullscreenControl: false,
+                streetViewControl: false,
+            });
+
+            setMap(mapInstance);
+        };
+
         const loadGoogleMaps = () => {
             if (window.google?.maps) {
                 initMap();
@@ -42,11 +63,6 @@ export default function LiveMap({
             }
 
             const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-            if (!apiKey) {
-                console.warn("Google Maps API Key missing!");
-                // Continue anyway to show the error/watermark on map
-            }
-
             const script = document.createElement('script');
             script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey || ''}`;
             script.async = true;
@@ -56,29 +72,8 @@ export default function LiveMap({
         };
 
         loadGoogleMaps();
-    }, []);
+    }, [center, zoom]);
 
-    // 2. Initialize Map
-    const initMap = () => {
-        if (!mapRef.current) return;
-
-        const mapInstance = new google.maps.Map(mapRef.current, {
-            center: center,
-            zoom: zoom,
-            styles: [
-                {
-                    featureType: "poi",
-                    elementType: "labels",
-                    stylers: [{ visibility: "off" }],
-                },
-            ],
-            mapTypeControl: false,
-            fullscreenControl: false,
-            streetViewControl: false,
-        });
-
-        setMap(mapInstance);
-    };
 
     // 3. Update Markers when vehicles change
     useEffect(() => {
@@ -113,9 +108,9 @@ export default function LiveMap({
     return (
         <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg border border-gray-200">
             <div ref={mapRef} className="w-full h-full min-h-[400px] bg-gray-100" />
-            
+
             {/* Overlay for Stats */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100 max-w-xs"

@@ -11,9 +11,7 @@ export default function Home() {
       <header className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">V</span>
-            </div>
+            <img src="/logo.png" alt="VehicAid Logo" className="w-10 h-10 object-contain" />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
               VehicAid
             </span>
