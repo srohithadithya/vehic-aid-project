@@ -3,7 +3,7 @@
 **A next-generation, agentic platform connecting stranded motorists with nearby service providers.**
 <<<<<<< HEAD
 
-![Logo](backend/web_admin/static/img/logo/vehic_aid_logo.png)
+![Logo](web-admin-panel/public/logo.png)
 
 ## 📚 Documentation
 
