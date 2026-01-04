@@ -3,7 +3,7 @@
 **A next-generation, agentic platform connecting stranded motorists with nearby service providers.**
 <<<<<<< HEAD
 
-![Logo](web-admin-panel/public/logo.png)
+![Logo](web-admin-panel/admin/public/logo.png)
 
 ## 📚 Documentation
 
