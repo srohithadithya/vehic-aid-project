@@ -2,6 +2,7 @@ import os
 import requests
 from django.conf import settings
 from decimal import Decimal
+from datetime import datetime
 
 class PricingService:
     """
@@ -81,7 +82,6 @@ class PricingService:
         Determine surge multiplier based on current time.
         Peak hours: 8-10 AM, 6-9 PM on weekdays
         """
-        from datetime import datetime
         now = datetime.now()
         hour = now.hour
         is_weekday = now.weekday() < 5
