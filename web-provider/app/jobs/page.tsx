@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -6,20 +5,46 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Navigation, Clock, Check, X } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 
-// Mock Job Data
-const initialJobs = [
-    { id: 1, type: 'TOWING', location: 'Indiranagar, Bangalore', distance: '2.5 km', earnings: '₹450', urgency: 'HIGH' },
-    { id: 2, type: 'FUEL', location: 'Koramangala, Bangalore', distance: '4.1 km', earnings: '₹150', urgency: 'MEDIUM' },
-];
+// Interface for Job
+interface Job {
+    id: number;
+    service_type: string;
+    status: string;
+    created_at: string;
+    // Add other fields as per ServiceRequestSerializer
+}
 
 export default function JobBoard() {
-    const [jobs, setJobs] = useState(initialJobs);
+    const [jobs, setJobs] = useState<Job[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchJobs = async () => {
+        try {
+            const response = await apiClient.get('/services/provider/jobs/');
+            setJobs(response.data);
+        } catch (error) {
+            console.error("Failed to fetch jobs", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchJobs();
+        // Poll for new jobs every 10 seconds
+        const interval = setInterval(fetchJobs, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleAccept = async (id: number) => {
-        // Implementation: Call API using apiClient
-        // await apiClient.post(`/services/accept/${id}/`);
-        setJobs(jobs.filter(j => j.id !== id));
-        alert("Job Accepted! Redirecting to navigation...");
+        try {
+            await apiClient.post(`/services/provider/jobs/${id}/accept/`);
+            setJobs(jobs.filter(j => j.id !== id));
+            alert("Job Accepted! Redirecting to navigation...");
+        } catch (error) {
+            alert("Failed to accept job. It may be taken.");
+            fetchJobs();
+        }
     };
 
     const handleReject = (id: number) => {
@@ -51,30 +76,19 @@ export default function JobBoard() {
                             exit={{ opacity: 0, x: -100 }}
                             className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 relative overflow-hidden"
                         >
-                            {job.urgency === 'HIGH' && (
-                                <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold">
-                                    URGENT
-                                </div>
-                            )}
+                            <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 rounded-bl-lg font-bold">
+                                HIGH PRIORITY
+                            </div>
 
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h2 className="text-xl font-bold text-white mb-1">{job.type}</h2>
+                                    <h2 className="text-xl font-bold text-white mb-1">{job.service_type}</h2>
                                     <p className="text-gray-400 text-sm flex items-center gap-1">
-                                        <MapPin size={14} /> {job.location}
+                                        <Clock size={14} /> {new Date(job.created_at).toLocaleTimeString()}
                                     </p>
                                 </div>
                                 <div className="bg-gray-700 px-3 py-1 rounded-lg">
-                                    <span className="font-bold text-green-400">{job.earnings}</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4 text-sm text-gray-400 mb-6">
-                                <div className="flex items-center gap-1">
-                                    <Navigation size={14} /> {job.distance} away
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Clock size={14} /> 5 min ETA
+                                    <span className="font-bold text-green-400">Est. ₹500</span>
                                 </div>
                             </div>
 
@@ -96,10 +110,16 @@ export default function JobBoard() {
                     ))}
                 </AnimatePresence>
 
-                {jobs.length === 0 && (
+                {loading && (
                     <div className="text-center py-20 text-gray-500">
                         <div className="animate-spin w-8 h-8 border-4 border-gray-600 border-t-green-500 rounded-full mx-auto mb-4"></div>
-                        <p>Searching for nearby requests...</p>
+                        <p>Loading jobs...</p>
+                    </div>
+                )}
+
+                {!loading && jobs.length === 0 && (
+                    <div className="text-center py-20 text-gray-500">
+                        <p>No active requests nearby.</p>
                     </div>
                 )}
             </div>

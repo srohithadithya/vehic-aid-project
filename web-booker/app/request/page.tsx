@@ -36,7 +36,7 @@ export default function ServiceRequestWizard() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            await apiClient.post('/services/requests/', {
+            await apiClient.post('/services/request/', {
                 service_type: formData.serviceType,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
