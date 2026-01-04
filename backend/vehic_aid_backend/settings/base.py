@@ -301,6 +301,28 @@ VEHIC_AID_COMMISSION_RATE = 0.20  # 20% commission rate
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID", default="key_id_default")
 RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET", default="key_secret_default")
 
+# --- Celery Beat Schedule ---
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "check_subscription_expiry_daily": {
+        "task": "apps.services.tasks.check_subscription_expiry",
+        "schedule": crontab(hour=0, minute=0),  # Midnight every day
+    },
+    "auto_renew_subscriptions_daily": {
+        "task": "apps.services.tasks.auto_renew_subscriptions",
+        "schedule": crontab(hour=1, minute=0),  # 1 AM every day
+    },
+    "send_compliance_reminders_daily": {
+        "task": "apps.services.tasks.send_compliance_reminders",
+        "schedule": crontab(hour=9, minute=0),  # 9 AM every day
+    },
+    "escalate_stuck_requests_every_15_mins": {
+        "task": "apps.services.tasks.auto_escalate_stuck_requests",
+        "schedule": crontab(minute="*/15"),  # Every 15 minutes
+    },
+}
+
 # Configures all models to use a BigAutoField (64-bit) for the primary key by default.
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
