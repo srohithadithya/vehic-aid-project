@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Vehic-Aid Admin Panel",
   description: "Admin dashboard for Vehic-Aid vehicle assistance platform",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
