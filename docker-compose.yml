@@ -31,11 +31,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-<<<<<<< HEAD
-    env_file:
-      - ./backend/.env
-=======
->>>>>>> origin/main
     container_name: vehicaid_web
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
     volumes:
@@ -44,7 +39,7 @@ services:
       - media_files:/app/media
     ports:
       - "8000:8000"
-    environment:
+    environment: &backend_env
       - DEBUG=True
       - SECRET_KEY=dev-secret-key-change-in-production-12345
       - DB_NAME=vehic_aid
@@ -68,27 +63,55 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-<<<<<<< HEAD
-    env_file:
-      - ./backend/.env
-=======
->>>>>>> origin/main
     container_name: vehicaid_celery
     command: celery -A vehic_aid_backend worker -l info
     volumes:
       - ./backend:/app
-    environment:
-      - DEBUG=True
-      - DB_NAME=vehic_aid
-      - DB_USER=vehic_aid
-      - DB_PASSWORD=vehic_aid123
-      - DB_HOST=db
-      - DB_PORT=5432
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    environment: *backend_env
     depends_on:
       - db
       - redis
+      - web
+    restart: unless-stopped
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_beat
+    command: celery -A vehic_aid_backend beat -l info
+    volumes:
+      - ./backend:/app
+    environment: *backend_env
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+
+  web-booker:
+    build:
+      context: ./web-booker
+      dockerfile: Dockerfile
+    container_name: vehicaid_booker
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  web-provider:
+    build:
+      context: ./web-provider
+      dockerfile: Dockerfile
+    container_name: vehicaid_provider
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    depends_on:
       - web
     restart: unless-stopped
 

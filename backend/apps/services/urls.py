@@ -6,7 +6,7 @@ from .views import (
     ReviewViewSet, VehicleExchangeViewSet, WalletViewSet,
     RewardsViewSet, HelplineCallViewSet, AgenticBookingView,
     SubscriptionAnalyticsView, DashboardStatsView, VehicleViewSet,
-    ServiceQuoteViewSet
+    ServiceQuoteViewSet, ProviderJobView
 )
 from .admin_views import user_list, service_request_list, payment_list
 
@@ -19,6 +19,7 @@ router.register(r'quotes', ServiceQuoteViewSet, basename='service-quote')
 router.register(r'wallet', WalletViewSet, basename='wallet')
 router.register(r'rewards', RewardsViewSet, basename='rewards')
 router.register(r'helpline', HelplineCallViewSet, basename='helpline')
+router.register(r'provider/jobs', ProviderJobView, basename='provider-jobs')
 
 urlpatterns = [
     # Admin endpoints
