@@ -9,5 +9,6 @@ class ServicesConfig(AppConfig):
     def ready(self):
         from auditlog.registry import auditlog
         from .models import ServiceRequest, UserSubscription
+        from . import signals  # Register notifications
         auditlog.register(ServiceRequest)
         auditlog.register(UserSubscription)

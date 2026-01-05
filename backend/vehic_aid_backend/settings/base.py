@@ -50,12 +50,12 @@ INSTALLED_APPS = [
     "django_cleanup.apps.CleanupConfig",  # Cleans old files on model delete
     "django_celery_results",  # New: To store and view task results
     "django_celery_beat",  # New: To manage and schedule periodic tasks (Beat)
-    "django_extensions",
+    # "django_extensions",
     "corsheaders",  # CORS headers for web apps
     "drf_spectacular", # Swagger API Documentation
     "parler", # Django Parler (Multi-language)
-    "csp", # Content Security Policy
-    "auditlog",  # New: For detailed audit logging
+    # "csp", # Content Security Policy
+    # "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
     "apps.services",
@@ -69,14 +69,14 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",  # Added for Multi-language support
     "django.middleware.common.CommonMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Added for debugging
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",  # Added for debugging
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
-    "auditlog.middleware.AuditlogMiddleware",
-    "csp.middleware.CSPMiddleware", # Added CSP Middleware
+    # "auditlog.middleware.AuditlogMiddleware",
+    # "csp.middleware.CSPMiddleware", # Added CSP Middleware
 ]
 
 ROOT_URLCONF = "vehic_aid_backend.urls"

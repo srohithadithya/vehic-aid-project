@@ -1,8 +1,9 @@
+import logging
 from django.db import transaction
 from apps.services.models import ServiceRequest, UserSubscription
 from apps.services.dispatch_logic import trigger_dispatch
 from apps.services.services.sms import SMSService
-import logging
+from apps.services.ai_triage import AITriageService
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class BookingAgent:
     def __init__(self, user):
         self.user = user
         self.sms_service = SMSService()
+        self.ai_triage = AITriageService()
 
     @transaction.atomic
     def process_booking(self, service_data):

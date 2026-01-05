@@ -3,19 +3,24 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Wrench, DollarSign, Settings, LogOut, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Users, Wrench, DollarSign, Settings, LogOut, TrendingUp, Activity, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const sidebarItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-    { icon: Users, label: 'Users', href: '/users' },
-    { icon: Wrench, label: 'Bookings', href: '/bookings' },
-    { icon: DollarSign, label: 'Payments', href: '/payments' },
-    { icon: TrendingUp, label: 'Analytics', href: '/analytics' },
-];
+import { useLanguage } from '@/context/LanguageContext';
 
 export function AdminSidebar() {
     const pathname = usePathname();
+    const { t } = useLanguage();
+
+    const sidebarItems = [
+        { icon: LayoutDashboard, label: t('nav.dashboard'), href: '/dashboard' },
+        { icon: Users, label: t('nav.users'), href: '/users' },
+        { icon: Wrench, label: t('nav.bookings'), href: '/bookings' },
+        { icon: DollarSign, label: t('nav.payments'), href: '/payments' },
+        { icon: Activity, label: t('nav.iot'), href: '/iot-fleet' },
+        { icon: Bot, label: t('nav.ai'), href: '/ai-monitor' },
+        { icon: TrendingUp, label: t('nav.analytics'), href: '/analytics' },
+    ];
 
     return (
         <div className="pb-12 w-64 min-h-screen hidden md:block relative">

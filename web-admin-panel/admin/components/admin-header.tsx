@@ -14,8 +14,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AdminSidebar } from './admin-sidebar';
+import { useLanguage } from '@/context/LanguageContext';
+import { Globe } from 'lucide-react';
 
 export function AdminHeader() {
+    const { language, setLanguage } = useLanguage();
+
+    const toggleLanguage = () => {
+        setLanguage(language === 'en' ? 'hi' : 'en');
+    };
+
     return (
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-14 items-center px-4 gap-4">
@@ -32,6 +40,11 @@ export function AdminHeader() {
                 </Sheet>
 
                 <div className="flex-1" />
+
+                <Button variant="ghost" size="sm" className="gap-2" onClick={toggleLanguage}>
+                    <Globe className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase">{language}</span>
+                </Button>
 
                 <Button variant="ghost" size="icon">
                     <Bell className="h-5 w-5" />
