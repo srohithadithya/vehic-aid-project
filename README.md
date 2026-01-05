@@ -63,7 +63,7 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 
 ### 1. Launch Backend & Infrastructure
 ```bash
-cd infrastructure
+cd backend
 docker-compose up -d --build
 ```
 *This starts Django, PostgreSQL, Redis, and Celery Workers.*
@@ -74,7 +74,11 @@ Each web app requires `npm install` before running.
 - **Booker App**: `cd web-booker && npm run dev`
 - **Provider App**: `cd web-provider && npm run dev`
 
-### 3. Access
+### 3. Launch Mobile Apps (Expo)
+- **Mobile Booker**: `cd mobile-booker && npx expo start`
+- **Mobile Provider**: `cd mobile-provider && npx expo start`
+
+### 4. Access
 - **Admin Panel**: [http://localhost:3000](http://localhost:3000)
 - **Booker App**: [http://localhost:3001](http://localhost:3001)
 - **Provider App**: [http://localhost:3002](http://localhost:3002)
