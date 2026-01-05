@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import { MapPin, Clock, ArrowRight, CheckCircle, Smartphone, User } from 'lucide-react';
 import { clsx } from 'clsx';
+import { Navbar } from '@/components/Navbar';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ServiceRequest {
     id: number;
@@ -19,6 +21,7 @@ interface ServiceRequest {
 
 export default function ProviderDashboard() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [activeJobs, setActiveJobs] = useState<ServiceRequest[]>([]);
     const [availableJobs, setAvailableJobs] = useState<ServiceRequest[]>([]);
     const [isAvailable, setIsAvailable] = useState(true);
@@ -34,29 +37,10 @@ export default function ProviderDashboard() {
 
     const fetchJobs = async () => {
         try {
-            // NOTE: As per views.py logic we updated, /request/ returns requests for the 'booker'.
-            // We need an endpoint for providers to see "Open" requests and "Assigned" requests.
-            // Currently `ServiceRequestView` filters by `booker=request.user`.
-            // We might need to use the admin endpoint or a specific provider endpoint.
-            // For now, let's use the admin list endpoint as a proxy for "Marketplace" if accessible, 
-            // OR assuming we need to update backend to allow providers to list requests.
-
-            // Checking admin_views.py: `service_request_list` is mapped to `/admin/bookings/` and AllowAny?
-            // Let's try fetching from that for the "Marketplace" view for now.
-
             const response = await apiClient.get('/admin/bookings/');
             const allRequests: ServiceRequest[] = response.data;
-
-            // Filter locally for demo purposes (Backend should handle this securely in prod)
             setAvailableJobs(allRequests.filter(r => r.status === 'PENDING'));
-
-            // For "My Jobs", we would filter by provider_id if the API returned it properly associated with 'me'
-            // Since `service_request_list` returns provider username string, it's tricky.
-            // Ideally we implemented a proper ProviderView.
-
-            // Workaround: We will use a mock filter or assuming we pick tasks up.
             setActiveJobs(allRequests.filter(r => r.status === 'DISPATCHED' || r.status === 'IN_PROGRESS'));
-
         } catch (error) {
             console.error('Failed to fetch jobs', error);
         } finally {
@@ -66,12 +50,9 @@ export default function ProviderDashboard() {
 
     const acceptJob = async (id: number) => {
         try {
-            // Provider "Accepts" by updating status to DISPATCHED
-            // Endpoint: path('provider/update/<int:request_id>/', ProviderStatusUpdateView...
             await apiClient.post(`/provider/update/${id}/`, {
                 status: 'DISPATCHED'
             });
-            // Refresh
             fetchJobs();
         } catch (err) {
             console.error("Failed to accept job", err);
@@ -80,18 +61,19 @@ export default function ProviderDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-6xl mx-auto space-y-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+            <Navbar />
+            <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Provider Portal</h1>
-                        <p className="text-gray-500 dark:text-gray-400">Manage your service requests</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('portal.title')}</h1>
+                        <p className="text-gray-500 dark:text-gray-400">{t('portal.subtitle')}</p>
                     </div>
                     <div className="flex items-center space-x-4">
                         <span className={clsx("text-sm font-medium", isAvailable ? "text-green-600" : "text-gray-500")}>
-                            {isAvailable ? "You are Online" : "You are Offline"}
+                            {isAvailable ? t('portal.online') : t('portal.offline')}
                         </span>
                         <button
                             onClick={() => setIsAvailable(!isAvailable)}
@@ -111,7 +93,7 @@ export default function ProviderDashboard() {
                 {/* Active Jobs */}
                 {activeJobs.length > 0 && (
                     <div className="space-y-4">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Active Jobs</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('portal.active_jobs')}</h2>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {activeJobs.map(job => (
                                 <div key={job.id} className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-l-4 border-l-purple-500 border-gray-200 dark:border-zinc-800 p-4">
@@ -129,7 +111,7 @@ export default function ProviderDashboard() {
                                         href={`/job/${job.id}`}
                                         className="block w-full text-center rounded-md bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600"
                                     >
-                                        Manage Job
+                                        {t('portal.manage')}
                                     </Link>
                                 </div>
                             ))}
@@ -140,7 +122,7 @@ export default function ProviderDashboard() {
                 {/* Available Requests */}
                 <div className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 rounded-xl overflow-hidden">
                     <div className="border-b border-gray-200 dark:border-white/10 px-4 py-4 sm:px-6 flex justify-between items-center">
-                        <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">New Requests</h3>
+                        <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">{t('portal.new_requests')}</h3>
                         <span className="bg-gray-100 text-gray-600 py-0.5 px-2.5 rounded-full text-xs font-medium">{availableJobs.length} available</span>
                     </div>
 
@@ -148,7 +130,7 @@ export default function ProviderDashboard() {
                         <div className="p-8 text-center text-gray-500">Loading jobs...</div>
                     ) : availableJobs.length === 0 ? (
                         <div className="p-12 text-center text-gray-500">
-                            No new requests available nearby.
+                            {t('portal.no_jobs')}
                         </div>
                     ) : (
                         <ul role="list" className="divide-y divide-gray-100 dark:divide-white/5">
@@ -172,7 +154,7 @@ export default function ProviderDashboard() {
                                             onClick={() => acceptJob(job.id)}
                                             className="rounded-md bg-white dark:bg-zinc-800 px-3 py-1.5 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 hover:text-green-600 hover:ring-green-600 transition-all"
                                         >
-                                            Accept Job
+                                            {t('portal.accept')}
                                         </button>
                                     </div>
                                 </li>

@@ -8,10 +8,8 @@ export function LanguageToggle() {
     const { language, setLanguage } = useLanguage();
 
     const toggle = () => {
-        const langs: ('en' | 'es' | 'fr' | 'de')[] = ['en', 'es', 'fr', 'de'];
-        const currentIndex = langs.indexOf(language);
-        const nextIndex = (currentIndex + 1) % langs.length;
-        setLanguage(langs[nextIndex]);
+        const nextLang = language === 'en' ? 'hi' : 'en';
+        setLanguage(nextLang);
     };
 
     return (

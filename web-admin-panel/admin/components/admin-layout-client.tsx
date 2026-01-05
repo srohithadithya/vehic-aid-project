@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { AdminHeader } from "@/components/admin-header";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export function AdminLayoutClient({
   children,
@@ -27,12 +28,14 @@ export function AdminLayoutClient({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100/40">
-      <AdminSidebar />
-      <div className="flex-1 flex flex-col">
-        <AdminHeader />
-        <main className="flex-1">{children}</main>
+    <LanguageProvider>
+      <div className="flex min-h-screen bg-gray-100/40">
+        <AdminSidebar />
+        <div className="flex-1 flex flex-col">
+          <AdminHeader />
+          <main className="flex-1">{children}</main>
+        </div>
       </div>
-    </div>
+    </LanguageProvider>
   );
 }

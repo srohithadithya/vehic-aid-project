@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
-import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ProviderLoginPage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -23,14 +24,8 @@ export default function ProviderLoginPage() {
                 password: password,
             });
 
-            // Store tokens
             localStorage.setItem('provider_access_token', response.data.access);
             localStorage.setItem('provider_refresh_token', response.data.refresh);
-
-            // Additional check: Verify user is actually a provider? 
-            // Ideally backend token claim or separate endpoint would confirm.
-            // For now, assume if login works, they are authorized (though backend restricts specific endpoints).
-
             router.push('/dashboard');
         } catch (err: any) {
             console.error('Login failed', err);
@@ -50,18 +45,15 @@ export default function ProviderLoginPage() {
                         </svg>
                     </div>
                     <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        Provider Portal
+                        {t('login.title')}
                     </h2>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Sign in to manage service requests
+                        {t('login.subtitle')}
                     </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleLogin}>
                     <div className="-space-y-px rounded-md shadow-sm">
                         <div>
-                            <label htmlFor="email-address" className="sr-only">
-                                Username / Email
-                            </label>
                             <input
                                 id="email-address"
                                 name="email"
@@ -69,15 +61,12 @@ export default function ProviderLoginPage() {
                                 autoComplete="email"
                                 required
                                 className="relative block w-full rounded-t-md border-0 py-3 px-3 text-gray-900 dark:text-white dark:bg-zinc-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6"
-                                placeholder="Username"
+                                placeholder={t('login.username')}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="sr-only">
-                                Password
-                            </label>
                             <input
                                 id="password"
                                 name="password"
@@ -85,7 +74,7 @@ export default function ProviderLoginPage() {
                                 autoComplete="current-password"
                                 required
                                 className="relative block w-full rounded-b-md border-0 py-3 px-3 text-gray-900 dark:text-white dark:bg-zinc-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-purple-600 sm:text-sm sm:leading-6"
-                                placeholder="Password"
+                                placeholder={t('login.password')}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -105,9 +94,9 @@ export default function ProviderLoginPage() {
                             className="group relative flex w-full justify-center rounded-md bg-purple-600 py-3 px-3 text-sm font-semibold text-white hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 disabled:opacity-70 transition-all"
                         >
                             {isLoading ? (
-                                <span className="animate-pulse">Signing in...</span>
+                                <span className="animate-pulse">{t('login.signing_in')}</span>
                             ) : (
-                                'Portal Login'
+                                t('login.button')
                             )}
                         </button>
                     </div>

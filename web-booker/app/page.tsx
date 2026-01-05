@@ -1,37 +1,16 @@
+'use client';
+
 import { BookingProvider } from "@/context/BookingContext";
 import BookingWizard from "@/components/booking/BookingWizard";
-import { Button } from "@/components/ui/button";
-import { LanguageToggle } from "@/components/LanguageToggle";
-import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Home() {
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen bg-background">
-      {/* Header / Nav */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="VehicAid Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
-              VehicAid
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">Book Service</Link>
-            <Link href="/subscription" className="text-sm font-medium hover:text-primary transition-colors">Subscriptions</Link>
-            <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">Dashboard</Link>
-          </nav>
-          <div className="flex items-center space-x-4">
-            <LanguageToggle />
-            <Link href="/auth/login">
-              <Button variant="ghost" size="sm">Log In</Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button size="sm">Sign Up</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section with Wizard */}
       <section className="relative py-12 md:py-20 lg:py-24 overflow-hidden">
@@ -40,12 +19,11 @@ export default function Home() {
 
         <div className="container mx-auto px-4 text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl mb-6">
-            Roadside Assistance <br className="hidden md:block" />
-            <span className="text-primary">Reimagined.</span>
+            {t('hero.title').split('.')[0]} <br className="hidden md:block" />
+            <span className="text-primary">{t('hero.title').split('.')[1] || 'Reimagined.'}</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Fast, reliable, and professional help when you need it most.
-            Book a tow, mechanic, or fuel delivery in seconds.
+            {t('hero.subtitle')}
           </p>
         </div>
 
