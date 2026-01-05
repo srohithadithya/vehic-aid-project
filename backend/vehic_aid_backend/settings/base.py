@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     "drf_spectacular", # Swagger API Documentation
     "parler", # Django Parler (Multi-language)
     # "csp", # Content Security Policy
-    # "auditlog",  # New: For detailed audit logging
+    "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
     "apps.services",
@@ -75,7 +75,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
-    # "auditlog.middleware.AuditlogMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
     # "csp.middleware.CSPMiddleware", # Added CSP Middleware
 ]
 
