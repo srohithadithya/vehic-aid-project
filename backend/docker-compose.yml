@@ -28,11 +28,12 @@ services:
       retries: 5
 
   web:
+    image: vehicaid_backend:py3.12_v1
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vehicaid_web
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
+    entrypoint: [ "/bin/sh", "/app/entrypoint.sh" ]
     volumes:
       - .:/app
       - static_files:/app/staticfiles
@@ -41,6 +42,7 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=vehic_aid_backend.settings.development
       - SECRET_KEY=dev-secret-key-change-in-production-12345
       - DB_NAME=vehic_aid
       - DB_USER=vehic_aid
@@ -61,15 +63,18 @@ services:
     restart: unless-stopped
 
   celery:
+    image: vehicaid_backend:py3.12_v1
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vehicaid_celery
+    entrypoint: [ "/bin/sh", "/app/entrypoint.sh" ]
     command: celery -A vehic_aid_backend worker -l info
     volumes:
       - .:/app
     environment:
       - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=vehic_aid_backend.settings.development
       - DB_NAME=vehic_aid
       - DB_USER=vehic_aid
       - DB_PASSWORD=vehic_aid123
