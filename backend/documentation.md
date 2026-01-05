@@ -22,16 +22,19 @@ Loyalty Rewards: Bronze/Silver/Gold tiers
 Multilingual: 8 Indian languages
 Real-time Tracking: GPS-based provider dispatch
 24/7 Helpline: Premium subscriber support
+Last Updated: January 5, 2026
+...
 Technology Stack
-Backend: Django 4.2.14 + Django REST Framework
-Database: PostgreSQL
-Cache: Redis
-Task Queue: Celery
-WebSockets: Django Channels
+Backend: Django 5.0.1 + Django REST Framework
+Database: PostgreSQL 14
+Cache: Redis 7
+Task Queue: Celery 5.3 + Redis
+WebSockets: Django Channels 4.0
 Authentication: JWT (Simple JWT)
 Payment: Razorpay integration
 Maps: Google Maps Distance Matrix API
-SMS: Fast2SMS gateway
+Notifications: Expo Push API & Simulated SMS
+AI: Custom Rule-Based Triage & Chatbot Logic
 2. Architecture
 System Architecture
 ┌─────────────────────────────────────────────────────────────┐
@@ -403,13 +406,13 @@ class Wallet(models.Model):
 7. Deployment Guide
 Production Setup
 1. Server Requirements
-OS: Ubuntu 22.04 LTS
+OS: Ubuntu 22.04 LTS (or Windows with Docker Desktop)
 RAM: 4GB minimum, 8GB recommended
 CPU: 2 cores minimum
 Storage: 50GB SSD
-Python: 3.11+
-PostgreSQL: 14+
-Redis: 7+
+Python: 3.10+ (Dockerized)
+PostgreSQL: 14+ (Dockerized)
+Redis: 7+ (Dockerized)
 2. Installation Steps
 # Update system
 sudo apt update && sudo apt upgrade -y
