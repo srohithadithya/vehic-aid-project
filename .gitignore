@@ -14,7 +14,8 @@
 **/mobile-*/.vercel/
 **/mobile-*/node_modules/
 *.log
-!requirements.txt
+!**/requirements.txt
+!**/requirements*.txt
 *.txt
 *.bak
 *.tmp
