@@ -260,12 +260,23 @@ NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
-**Build Next.js:**
+**Build Next.js Apps:**
 
 ```bash
-cd 03_web-admin-panel/admin
+# Admin Panel (Port 3000)
+cd web-admin-panel/admin
 npm run build
 npm start
+
+# Provider App (Port 3001)
+cd web-provider
+npm run build
+npm start -- -p 3001
+
+# Booker App (Port 3003)
+cd web-booker
+npm run build
+npm start -- -p 3003
 ```
 
 ### 2.2 Docker for Frontend

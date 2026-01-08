@@ -45,9 +45,9 @@ docker-compose up -d --build
 
 ### **Frontend Apps (Next.js)**
 *Requires `npm install` in each directory.*
-- **Booker**: `cd web-booker && npm run dev` (Port 3001)
-- **Provider**: `cd web-provider && npm run dev` (Port 3002)
 - **Admin**: `cd web-admin-panel/admin && npm run dev` (Port 3000)
+- **Provider**: `cd web-provider && npm run dev` (Port 3001)
+- **Booker**: `cd web-booker && npm run dev` (Port 3003)
 
 ---
 
