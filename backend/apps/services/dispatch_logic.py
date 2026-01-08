@@ -11,6 +11,7 @@ from apps.services.models import ServiceQuote, UserSubscription
 from decimal import Decimal
 from datetime import timedelta
 from django.utils import timezone
+from apps.common.notifications import PushNotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -164,8 +165,16 @@ def trigger_dispatch(service_request):
     # 3. Automation: Generate dynamic price quote
     quote = generate_automated_quote(service_request, best_candidate)
     
-    # 4. Notify the Provider App (via Channels)
+    # 4. Notify the Provider App (via Channels + FCM)
     # This notification is handled in the consumers.py file via a real-time event
+    
+    # Send Push Notification
+    PushNotificationService.send_to_user(
+        user=best_candidate.user,
+        title="Valid Service Request",
+        body=f"New {service_request.service_type} request nearby!",
+        data={"request_id": str(service_request.id)}
+    )
 
     return {
         "status": "DISPATCHED", 

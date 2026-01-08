@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
     """
 
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
+    fcm_device_token = models.TextField(null=True, blank=True, help_text="Firebase Cloud Messaging Token for Push Notifications")
 
     # We will use 'username' only for the admin panel, primarily using phone for login
     USERNAME_FIELD = "username"

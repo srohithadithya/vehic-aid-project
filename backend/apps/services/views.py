@@ -256,9 +256,21 @@ class DashboardStatsView(APIView):
         ).aggregate(total=Sum('amount'))['total'] or 0
 
         # 4. Recent Activity (Last 5 requests)
-        recent_requests = ServiceRequest.objects.order_by('-created_at')[:5].values(
-            'id', 'service_type', 'status', 'created_at', 'booker__user__username'
+        # 4. Recent Activity (Last 5 requests)
+        recent_requests_qs = ServiceRequest.objects.order_by('-created_at')[:5].values(
+            'id', 'service_type', 'status', 'created_at', 'booker__username'
         )
+        
+        recent_activity_data = []
+        for r in recent_requests_qs:
+            recent_activity_data.append({
+                "id": r['id'],
+                "type": r['service_type'],
+                "description": f"New {r['service_type']} request",
+                "customer": r['booker__username'],
+                "status": r['status'],
+                "created_at": r['created_at']
+            })
 
         return Response({
             "bookings": {
@@ -273,7 +285,7 @@ class DashboardStatsView(APIView):
             "financials": {
                 "total_revenue": total_revenue
             },
-            "recent_activity": list(recent_requests)
+            "recent_activity": recent_activity_data
         })
 
 class SubscriptionAnalyticsView(APIView):
@@ -688,4 +700,44 @@ class ProviderJobView(viewsets.ViewSet):
         job.save()
         
         return Response({"status": "Job accepted", "job_id": job.id})
+
+
+class AIStatsView(APIView):
+    """
+    Endpoint for AI Monitor analytics.
+    Aggregates conversational triage stats and machine learning health.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # In a real system, these would be aggregated from a ConversationLog model
+        # For MVP, we simulate dynamic data based on recent ServiceRequests
+        
+        total_requests = ServiceRequest.objects.count()
+        auto_booked = ServiceRequest.objects.filter(customer_notes__icontains="auto").count()
+        
+        # Simulate accuracy fluctuation
+        base_accuracy = 96.0
+        
+        return Response({
+            "total_sessions": total_requests * 5 + 120, # Mock: 5 interactions per request + browsing
+            "auto_booking_rate": round((auto_booked / (total_requests or 1)) * 100, 1) or 64.2,
+            "triage_accuracy": base_accuracy,
+            "triage_data": [
+                 { "name": 'Mechanical', "count": 450, "accuracy": 94 },
+                 { "name": 'Towing', "count": 320, "accuracy": 98 },
+                 { "name": 'Battery', "count": 280, "accuracy": 92 },
+                 { "name": 'Fuel', "count": 120, "accuracy": 100 },
+            ],
+            "load_data": [
+                { "time": '08:00', "requests": 12 },
+                { "time": '10:00', "requests": 45 },
+                { "time": '12:00', "requests": 68 },
+                { "time": '14:00', "requests": 52 },
+                { "time": '16:00', "requests": 89 },
+                { "time": '18:00', "requests": 74 },
+                { "time": '20:00', "requests": 31 },
+                { "time": '22:00', "requests": 15 },
+            ]
+        })
 

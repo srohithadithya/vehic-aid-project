@@ -7,7 +7,8 @@ from .views import (
     ProviderLocationUpdateView,
     ProviderRegisterView,
     UserProfileView,
-    LanguagePreferenceView
+    LanguagePreferenceView,
+    DeviceTokenView
 )
 
 urlpatterns = [
@@ -32,4 +33,5 @@ urlpatterns = [
     # Profile management
     path("profile/", UserProfileView.as_view(), name="user-profile"),
     path("profile/language/", LanguagePreferenceView.as_view(), name="user-language-preference"),
+    path("device/register/", DeviceTokenView.as_view(), name="register-device-token"),
 ]

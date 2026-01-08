@@ -183,6 +183,9 @@ MIDDLEWARE.insert(2, 'django.middleware.locale.LocaleMiddleware')
 # --- Static and Media Files ---
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    BASE_DIR / "vehic_aid_backend" / "static",
+]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
@@ -243,7 +246,7 @@ JAZZMIN_SETTINGS = {
     "search_model": "users.CustomUser",
     "topmenu_links": [
         {"name": "Command Center",  "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Web Dashboard", "url": "/dashboard/", "new_window": False},
+        {"name": "Web Dashboard", "url": "http://localhost:3000/dashboard", "new_window": False},
         {"name": "API Console", "url": "swagger-ui", "new_window": True},
         {"name": "Tech Specs", "url": "redoc", "new_window": True},
         {"name": "Return to Home", "url": "/", "new_window": False},

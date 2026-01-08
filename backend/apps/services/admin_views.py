@@ -12,6 +12,7 @@ from apps.users.models import ServiceProvider
 User = get_user_model()
 
 
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def dashboard_stats(request):
     """Return high‑level statistics for the admin dashboard."""
@@ -45,6 +46,7 @@ def dashboard_stats(request):
     })
 
 
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def recent_activity(request):
     """Return the most recent service requests for the admin dashboard."""
@@ -62,6 +64,7 @@ def recent_activity(request):
     return Response(activity)
 
 
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def user_list(request):
     """Return a list of all users with basic profile info."""
@@ -81,16 +84,32 @@ def user_list(request):
     return Response(data)
 
 
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def service_request_list(request):
     """Return a detailed list of all service requests."""
     qs = ServiceRequest.objects.select_related('booker', 'provider', 'vehicle').order_by('-created_at')
     data = []
     for sr in qs:
+        # Robust check for customer/provider name
+        customer = 'Unknown'
+        if sr.booker:
+            if hasattr(sr.booker, 'username'):
+                customer = sr.booker.username
+            elif hasattr(sr.booker, 'user'):
+                customer = sr.booker.user.username
+        
+        provider = 'Unassigned'
+        if sr.provider:
+            if hasattr(sr.provider, 'username'):
+                provider = sr.provider.username
+            elif hasattr(sr.provider, 'user'):
+                provider = sr.provider.user.username
+
         data.append({
             'id': sr.id,
-            'customer': sr.booker.username if sr.booker else 'Unknown',
-            'provider': sr.provider.username if sr.provider else 'Unassigned',
+            'customer': customer,
+            'provider': provider,
             'service_type': sr.service_type,
             'status': sr.status,
             'location': f"{sr.latitude}, {sr.longitude}",
@@ -104,15 +123,24 @@ def service_request_list(request):
     return Response(data)
 
 
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def payment_list(request):
     """Return a list of all payment transactions."""
     qs = Payment.objects.select_related('booker', 'provider', 'service_request').order_by('-created_at')
     data = []
     for p in qs:
+        # Payment -> Booker (Profile) -> User -> Username
+        user_name = 'Unknown'
+        if p.booker:
+            if hasattr(p.booker, 'user'):
+                user_name = p.booker.user.username
+            elif hasattr(p.booker, 'username'):
+                user_name = p.booker.username
+
         data.append({
             'id': p.id,
-            'user': p.booker.username if p.booker else 'Unknown',
+            'user': user_name,
             'amount': float(p.amount),
             'status': p.status,
             'payment_method': p.payment_method or 'RAZORPAY',

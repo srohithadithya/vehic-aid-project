@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import apiClient from '@/lib/api';
 import { Activity, Battery, User as UserIcon, Wifi, AlertCircle, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,19 +13,12 @@ export default function IoTFleetPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
 
+
     useEffect(() => {
         const fetchFleet = async () => {
             try {
-                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-                const res = await fetch(`${API_URL}/iot/fleet-status/`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('admin_access_token')}`
-                    }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setDevices(data);
-                }
+                const res = await apiClient.get('/iot/fleet-status/');
+                setDevices(res.data);
             } catch (err) {
                 console.error("Fleet fetch error", err);
             } finally {

@@ -9,6 +9,7 @@
 **/build/
 **/.venv/
 **/.venv2/
+**/.venv_fix/
 **/mobile-*/.expo/
 **/mobile-*/.vercel/
 **/mobile-*/node_modules/
@@ -23,3 +24,8 @@ docker_build.log
 backend_error.txt
 check_error.txt
 backend_logs*.txt
+*_log.md
+backend_error.md
+debug_logs.md
+
+backend/firebase-adminsdk.json

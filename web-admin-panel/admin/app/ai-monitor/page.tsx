@@ -1,28 +1,42 @@
 'use client';
 
-import { Bot, Sparkles, TrendingUp, ThumbsUp, MessageSquare, Brain } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import apiClient from '@/lib/api';
+import { Bot, Sparkles, TrendingUp, ThumbsUp, MessageSquare, Brain, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
-const triageData = [
-    { name: 'Mechanical', count: 450, accuracy: 94 },
-    { name: 'Towing', count: 320, accuracy: 98 },
-    { name: 'Battery', count: 280, accuracy: 92 },
-    { name: 'Fuel', count: 120, accuracy: 100 },
-];
-
-const loadData = [
-    { time: '08:00', requests: 12 },
-    { time: '10:00', requests: 45 },
-    { time: '12:00', requests: 68 },
-    { time: '14:00', requests: 52 },
-    { time: '16:00', requests: 89 },
-    { time: '18:00', requests: 74 },
-    { time: '20:00', requests: 31 },
-];
+interface AIStats {
+    total_sessions: number;
+    auto_booking_rate: number;
+    triage_accuracy: number;
+    triage_data: any[];
+    load_data: any[];
+}
 
 export default function AIMonitorPage() {
+    const [stats, setStats] = useState<AIStats | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await apiClient.get('/services/admin/ai-stats/');
+                setStats(res.data);
+            } catch (err) {
+                console.error("AI Stats fetch failed", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    if (loading) return <div className="p-8 text-primary">Loading Neural Networks...</div>;
+    if (!stats) return <div className="p-8 text-destructive">Failed to load AI systems.</div>;
+
     return (
         <div className="p-8 space-y-8">
             <div className="flex justify-between items-center">
@@ -50,7 +64,7 @@ export default function AIMonitorPage() {
                         <MessageSquare className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">1,284</div>
+                        <div className="text-3xl font-bold">{stats.total_sessions.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground mt-1">+18% from yesterday</p>
                     </CardContent>
                 </Card>
@@ -60,7 +74,7 @@ export default function AIMonitorPage() {
                         <TrendingUp className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">64.2%</div>
+                        <div className="text-3xl font-bold">{stats.auto_booking_rate}%</div>
                         <p className="text-xs text-muted-foreground mt-1">Users following AI suggestions</p>
                     </CardContent>
                 </Card>
@@ -70,7 +84,7 @@ export default function AIMonitorPage() {
                         <ThumbsUp className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">96.8%</div>
+                        <div className="text-3xl font-bold">{stats.triage_accuracy}%</div>
                         <p className="text-xs text-muted-foreground mt-1">Validated by human dispatchers</p>
                     </CardContent>
                 </Card>
@@ -89,7 +103,7 @@ export default function AIMonitorPage() {
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={triageData}>
+                                <BarChart data={stats.triage_data}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                     <XAxis dataKey="name" stroke="#888888" />
                                     <YAxis stroke="#888888" />
@@ -116,7 +130,7 @@ export default function AIMonitorPage() {
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={loadData}>
+                                <LineChart data={stats.load_data}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                     <XAxis dataKey="time" stroke="#888888" />
                                     <YAxis stroke="#888888" />
@@ -135,8 +149,3 @@ export default function AIMonitorPage() {
     );
 }
 
-function Activity({ size, className }: { size: number, className: string }) {
-    return <TrendingUp size={size} className={className} />;
-}
-
-import { Badge } from '@/components/ui/badge';

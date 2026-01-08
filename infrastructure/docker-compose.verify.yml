@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: vehicaid_db_verify
+    environment:
+      POSTGRES_DB: vehic_aid
+      POSTGRES_USER: vehic_aid
+      POSTGRES_PASSWORD: vehic_aid123
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data_verify:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vehic_aid" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vehicaid_redis_verify
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_web_verify
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
+    volumes:
+      - ../backend:/app
+      - static_files_verify:/app/staticfiles
+      - media_files_verify:/app/media
+    ports:
+      - "8001:8000"
+    environment: &backend_env
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-change-in-production-verify
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
+      - CHANNEL_REDIS_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_celery_verify
+    command: celery -A vehic_aid_backend worker -l info
+    volumes:
+      - ../backend:/app
+    environment: *backend_env
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+
+  celery-beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_beat_verify
+    command: celery -A vehic_aid_backend beat -l info
+    volumes:
+      - ../backend:/app
+    environment: *backend_env
+    depends_on:
+      - db
+      - redis
+      - web
+    restart: unless-stopped
+
+  web-admin:
+    build:
+      context: ../web-admin-panel/admin
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+    container_name: vehicaid_admin_verify
+    ports:
+      - "3002:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - API_URL=http://web:8000/api
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  db_data_verify:
+  static_files_verify:
+  media_files_verify:

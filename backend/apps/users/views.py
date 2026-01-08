@@ -152,4 +152,21 @@ class UserProfileView(APIView):
                 }
             )
 
-        return Response(response_data, status=status.HTTP_200_OK)
+
+class DeviceTokenView(APIView):
+    """
+    Endpoint for mobile apps to register their FCM device token.
+    Used for push notifications.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        user.fcm_device_token = token
+        user.save()
+        
+        return Response({"message": "Device token updated successfully"}, status=status.HTTP_200_OK)

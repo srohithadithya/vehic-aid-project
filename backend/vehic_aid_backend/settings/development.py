@@ -37,6 +37,20 @@ CHANNEL_LAYERS["default"]["CONFIG"]["hosts"] = [
     env("CHANNEL_REDIS_URL", default="redis://localhost:6379/1")
 ]
 
+
 # Static files configuration for development
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Fix for "Unable to configure handler 'mail_admins'"
+ADMINS = [("Admin", "admin@localhost")]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Use SQLite for local debugging
+
+# Use the env helper to read the database URL
+# ensuring local settings are read from the .env file.
+# DATABASES = {
+#     "default": env.db_url("DATABASE_URL")
+# }
 

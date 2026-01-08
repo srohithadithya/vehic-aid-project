@@ -29,12 +29,12 @@ services:
 
   web:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: vehicaid_web
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
     volumes:
-      - ./backend:/app
+      - ../backend:/app
       - static_files:/app/staticfiles
       - media_files:/app/media
     ports:
@@ -61,12 +61,12 @@ services:
 
   celery:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: vehicaid_celery
     command: celery -A vehic_aid_backend worker -l info
     volumes:
-      - ./backend:/app
+      - ../backend:/app
     environment: *backend_env
     depends_on:
       - db
@@ -76,12 +76,12 @@ services:
 
   celery-beat:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: vehicaid_beat
     command: celery -A vehic_aid_backend beat -l info
     volumes:
-      - ./backend:/app
+      - ../backend:/app
     environment: *backend_env
     depends_on:
       - db
@@ -91,7 +91,7 @@ services:
 
   web-booker:
     build:
-      context: ./web-booker
+      context: ../web-booker
       dockerfile: Dockerfile
     container_name: vehicaid_booker
     ports:
@@ -104,13 +104,27 @@ services:
 
   web-provider:
     build:
-      context: ./web-provider
+      context: ../web-provider
       dockerfile: Dockerfile
     container_name: vehicaid_provider
     ports:
       - "3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  web-admin:
+    build:
+      context: ../web-admin-panel/admin
+      dockerfile: Dockerfile
+    container_name: vehicaid_admin
+    ports:
+      - "3002:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - API_URL=http://web:8000/api
     depends_on:
       - web
     restart: unless-stopped

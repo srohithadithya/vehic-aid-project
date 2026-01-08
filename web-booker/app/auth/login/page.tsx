@@ -1,36 +1,151 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LoginPage() {
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const response = await apiClient.post('/users/token/', {
+                username: email,
+                password: password,
+            });
+
+            // Store tokens
+            localStorage.setItem('customer_access_token', response.data.access);
+            localStorage.setItem('customer_refresh_token', response.data.refresh);
+
+            // Redirect to dashboard
+            router.push('/dashboard');
+        } catch (err: any) {
+            console.error('Login failed', err);
+            setError('Invalid credentials. Please double-check your email and password.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-            <Card className="w-full max-w-sm shadow-lg">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Welcome Back</CardTitle>
-                    <CardDescription>Enter your email to sign in to your account</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Email</label>
-                        <Input type="email" placeholder="m@example.com" />
+        <Card className="border-t-4 border-t-primary shadow-2xl bg-background/60 backdrop-blur-xl">
+            <CardHeader className="text-center space-y-2">
+                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                    Welcome Back
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                    Sign in to your account
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email Address</Label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password">Password</Label>
+                                <Link
+                                    href="/auth/reset-password"
+                                    className="text-xs text-primary hover:underline"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    className="pl-10 pr-10 transition-all focus:ring-2 focus:ring-primary/20"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-5 w-5" />
+                                    ) : (
+                                        <Eye className="h-5 w-5" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Password</label>
-                        <Input type="password" />
-                    </div>
-                    <Button className="w-full">Sign In</Button>
-                </CardContent>
-                <CardFooter className="justify-center">
-                    <p className="text-sm text-muted-foreground">
-                        Don't have an account?{" "}
-                        <Link href="/auth/signup" className="text-primary hover:underline font-medium">
-                            Sign up
-                        </Link>
-                    </p>
-                </CardFooter>
-            </Card>
-        </div>
+
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-center gap-2 border border-destructive/20"
+                            >
+                                <AlertCircle className="h-4 w-4" />
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <Button
+                        type="submit"
+                        className="w-full h-11 text-base font-medium shadow-lg shadow-primary/20"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Signing in...
+                            </>
+                        ) : (
+                            "Sign In"
+                        )}
+                    </Button>
+                </form>
+            </CardContent>
+            <CardFooter className="justify-center border-t pt-6">
+                <p className="text-sm text-muted-foreground">
+                    Don&apos;t have an account?{" "}
+                    <Link href="/auth/signup" className="text-primary hover:underline font-medium transition-colors">
+                        Create Access
+                    </Link>
+                </p>
+            </CardFooter>
+        </Card>
     );
 }
