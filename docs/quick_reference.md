@@ -119,7 +119,7 @@ docker logs vehicaid_web --tail 50
 
 ### Frontend
 ```bash
-cd 03_web-admin-panel/admin
+cd web/admin
 
 npm install      # Install deps
 npm run dev      # Start dev server
@@ -206,7 +206,7 @@ Backend: 01_backend/
   │   └── iot_devices/ → IoT tracking
   └── vehic_aid_backend/ → Settings
 
-Frontend: 03_web-admin-panel/admin/
+Frontend: web/admin/
   ├── app/        → Pages (routing)
   ├── components/ → Reusable UI
   ├── lib/        → Utilities & API
@@ -275,7 +275,7 @@ docker exec vehicaid_web pytest -v
 
 ### 3. Frontend Work
 ```bash
-cd 03_web-admin-panel/admin
+cd web/admin
 # Create components → pages → API calls
 npm test
 ```
@@ -304,7 +304,7 @@ git push origin feature/new-feature
 docker build -f Dockerfile -t vehic-aid:latest .
 
 # Frontend
-cd 03_web-admin-panel/admin
+cd web/admin
 npm run build
 npm start
 ```
