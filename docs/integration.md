@@ -88,8 +88,8 @@ CORS_ALLOWED_ORIGINS = [
 ### Next.js Setup
 
 - **Frontend (Web):**
-    - `03_01_web-provider` -> `web/provider`
-    - `03_02_web-booker` -> `web/booker`
+    - `web/provider` (Provider Portal)
+    - `web/booker` (Customer App)
     - `web/admin` (Admin Panel)
 
 ### Environment Variables
