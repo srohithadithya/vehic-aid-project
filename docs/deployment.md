@@ -251,7 +251,7 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 **Build Next.js:**
 
 ```bash
-cd 03_web-admin-panel/admin
+cd web/admin
 npm run build
 npm start
 ```

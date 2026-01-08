@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document provides a complete setup and integration guide for connecting the Django backend with the Next.js 03_web-admin-panel.
+This document provides a complete setup and integration guide for connecting the Django backend with the Next.js web/admin.
 
 **Current Status:**
 - ✅ Backend: Django 4.2.14 with DRF 3.14.0 running on http://localhost:8000
 - ✅ Database: PostgreSQL 14 (Docker container)
 - ✅ Cache/Broker: Redis 7 (Docker container)
-- ✅ Frontend: Next.js 16.0.3 03_web-admin-panel
+- ✅ Frontend: Next.js 16.0.3 web/admin
 - ✅ CORS: Configured and enabled for development
 - ✅ API Proxy: Next.js rewrites configured
 

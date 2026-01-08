@@ -99,7 +99,7 @@ The Vehic-Aid platform consists of **three web applications** and **one backend 
 
 **Purpose:** Customer service booking
 
-**Location:** `web-admin-panel/customer-app/`
+**Location:** `web/booker/`
 
 **Features:**
 - 📋 Customer authentication (planned)

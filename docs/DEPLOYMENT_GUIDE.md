@@ -264,17 +264,17 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
 ```bash
 # Admin Panel (Port 3000)
-cd web-admin-panel/admin
+cd web/admin
 npm run build
 npm start
 
 # Provider App (Port 3001)
-cd web-provider
+cd web/provider
 npm run build
 npm start -- -p 3001
 
 # Booker App (Port 3003)
-cd web-booker
+cd web/booker
 npm run build
 npm start -- -p 3003
 ```

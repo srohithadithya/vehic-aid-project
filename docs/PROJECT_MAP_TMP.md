@@ -8,9 +8,9 @@ The project is organized into logical layers for clarity and scalability.
 - **`iot-firmware/`**: Embedded logic for vehicle telemetry ingestion.
 
 ### 🌐 2. Web Interfaces (Next.js)
-- **`web-booker/`**: Customer interface for requesting assistance.
-- **`web-provider/`**: Provider dashboard for receiving/managing jobs.
-- **`web-admin-panel/`**: Centralized management and monitoring console.
+- **`web/booker/`**: Customer interface for requesting assistance.
+- **`web/provider/`**: Provider dashboard for receiving/managing jobs.
+- **`web/admin/`**: Centralized management and monitoring console.
 
 ### 📱 3. Mobile Applications (Expo)
 - **`mobile-booker/`**: Cross-platform customer app (Phase 2).

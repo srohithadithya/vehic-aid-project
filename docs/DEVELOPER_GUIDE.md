@@ -67,7 +67,7 @@ docker exec vehicaid_web_verify pytest
 
 **Run Frontend Tests:**
 ```powershell
-cd web-admin-panel/admin
+cd web/admin
 npm test
 ```
 

@@ -37,12 +37,12 @@ To avoid Render's payment requirements for Blueprints, verify the following **Ma
 1. Go to [Vercel.com](https://vercel.com) and Sign Up.
 2. **Deploy Booker App**:
    - "Add New" -> Project -> Select Repo.
-   - **Root Directory**: `web-booker`
+   - **Root Directory**: `web/booker`
    - Environment Variable: `NEXT_PUBLIC_API_URL` = `https://<YOUR-RENDER-BACKEND-URL>.onrender.com/api/v1`
    - Click **Deploy**.
 3. **Deploy Provider App**:
    - "Add New" -> Project -> Select Repo.
-   - **Root Directory**: `web-provider`
+   - **Root Directory**: `web/provider`
    - Environment Variable: `NEXT_PUBLIC_API_URL` = `https://<YOUR-RENDER-BACKEND-URL>.onrender.com/api/v1`
    - Click **Deploy**.
 

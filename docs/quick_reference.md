@@ -9,7 +9,7 @@ cd 01_backend
 docker-compose up -d
 
 # Terminal 2: Start Frontend
-cd 03_web-admin-panel\admin
+cd web/admin
 npm run dev
 
 # Terminal 3: Check Status
