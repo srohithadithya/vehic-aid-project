@@ -27,16 +27,20 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 ## Services & Credentials
 
 ### **Web Admin Panel**
-- **URL**: [http://localhost:3002/login](http://localhost:3002/login)
+- **URL**: [http://localhost:3000/login](http://localhost:3000/login)
 - **Username**: `admin`
 - **Password**: `admin123`
 
-### **Web Booker App (New!)**
+### **Web Provider App (Mission Control)**
+- **URL**: [http://localhost:3001](http://localhost:3001)
+- **Features**: Real-time Dispatch, Earnings Tracker, "Cosmic Glass" UI.
+
+### **Web Booker App (Customer)**
 - **URL**: [http://localhost:3003](http://localhost:3003)
 - **Features**: Premium Auth, Subscription Plans (INR), Service Requests.
 
 ### **Command Center (Backend Admin)**
-- **URL**: [http://localhost:8001/admin/](http://localhost:8001/admin/)
+- **URL**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 - **Username**: `admin`
 - **Password**: `admin123`
 
