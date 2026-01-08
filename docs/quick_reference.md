@@ -25,6 +25,8 @@ npm run dev
 | **Frontend** | http://localhost:3000 | Admin panel |
 | **API** | http://localhost:8000/api/v1/ | Backend API |
 | **Admin** | http://localhost:8000/admin/ | Django admin |
+| **API** | http://localhost:8001/api/v1/ | Backend API |
+| **Admin** | http://localhost:8001/admin/ | Django admin |
 | **Docs** | Root directory | README.md, guides |
 
 ---
@@ -34,10 +36,10 @@ npm run dev
 | File | Location | Purpose |
 |------|----------|---------|
 | Backend config | `01_backend/.env.dev` | Django settings |
-| Frontend config | `03_web-admin-panel/admin/.env.local` | Next.js settings |
-| API client | `03_web-admin-panel/admin/lib/api.ts` | Axios + JWT |
+| Frontend config | `web/admin/.env.local` | Next.js settings |
+| API client | `web/admin/lib/api.ts` | Axios + JWT |
 | Main routes | `01_backend/vehic_aid_backend/urls.py` | API endpoints |
-| Next config | `03_web-admin-panel/admin/next.config.ts` | API rewrites |
+| Next config | `web/admin/next.config.ts` | API rewrites |
 
 ---
 
@@ -48,7 +50,7 @@ npm run dev
 docker exec vehicaid_web pytest -v
 
 # Frontend tests
-cd 03_web-admin-panel/admin && npm test
+cd web/admin && npm test
 
 # Backend coverage
 docker exec vehicaid_web pytest --cov=apps

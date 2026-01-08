@@ -38,7 +38,7 @@ services:
       - static_files:/app/staticfiles
       - media_files:/app/media
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment: &backend_env
       - DEBUG=True
       - SECRET_KEY=dev-secret-key-change-in-production-12345
@@ -91,39 +91,39 @@ services:
 
   web-booker:
     build:
-      context: ../web-booker
+      context: ../web/booker
       dockerfile: Dockerfile
     container_name: vehicaid_booker
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
     depends_on:
       - web
     restart: unless-stopped
 
   web-provider:
     build:
-      context: ../web-provider
+      context: ../web/provider
       dockerfile: Dockerfile
     container_name: vehicaid_provider
     ports:
       - "3001:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
     depends_on:
       - web
     restart: unless-stopped
 
   web-admin:
     build:
-      context: ../web-admin-panel/admin
+      context: ../web/admin
       dockerfile: Dockerfile
     container_name: vehicaid_admin
     ports:
       - "3002:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
       - API_URL=http://web:8000/api
     depends_on:
       - web

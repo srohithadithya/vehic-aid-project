@@ -77,12 +77,12 @@ catch {
 
 # Test backend API
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8000/api/v1/" -UseBasicParsing -ErrorAction SilentlyContinue
+    $response = Invoke-WebRequest -Uri "http://localhost:8001/api/v1/" -UseBasicParsing -ErrorAction SilentlyContinue
     $isResponding = $response.StatusCode -eq 401 -or $response.StatusCode -eq 200
-    Write-CheckResult "Backend API (http://localhost:8000/api/v1/)" $isResponding
+    Write-CheckResult "Backend API (http://localhost:8001/api/v1/)" $isResponding
 }
 catch {
-    Write-CheckResult "Backend API" $false "Cannot reach http://localhost:8000/api/v1/"
+    Write-CheckResult "Backend API" $false "Cannot reach http://localhost:8001/api/v1/"
 }
 
 Write-Host ""
@@ -105,13 +105,13 @@ Write-Host "   Checking required configuration files..."
 $backend_env = Test-Path "backend\.env.dev"
 Write-CheckResult "Backend Environment (.env.dev)" $backend_env
 
-$frontend_env = Test-Path "web-admin-panel\admin\.env.local"
+$frontend_env = Test-Path "web\admin\.env.local"
 Write-CheckResult "Frontend Environment (.env.local)" $frontend_env
 
-$next_config = Test-Path "web-admin-panel\admin\next.config.ts"
+$next_config = Test-Path "web\admin\next.config.ts"
 Write-CheckResult "Next.js Config" $next_config
 
-$api_client = Test-Path "web-admin-panel\admin\lib\api.ts"
+$api_client = Test-Path "web\admin\lib\api.ts"
 Write-CheckResult "API Client Library" $api_client
 
 Write-Host ""
@@ -121,10 +121,10 @@ Write-Host "   Verifying project directories..."
 $backend_exists = Test-Path "backend"
 Write-CheckResult "Backend Directory" $backend_exists
 
-$frontend_exists = Test-Path "03_03_web-admin-panel\admin"
+$frontend_exists = Test-Path "web\admin"
 Write-CheckResult "Frontend Directory" $frontend_exists
 
-$docs_exists = Test-Path "BACKEND_FRONTEND_INTEGRATION.md"
+$docs_exists = Test-Path "docs\integration.md"
 Write-CheckResult "Integration Documentation" $docs_exists
 
 Write-Host ""
@@ -140,16 +140,16 @@ if ($checks_failed -eq 0) {
     Write-Host ""
     Write-Host "Access the application:" -ForegroundColor Cyan
     Write-Host "  • Frontend:  http://localhost:3000" -ForegroundColor White
-    Write-Host "  • Backend:   http://localhost:8000" -ForegroundColor White
-    Write-Host "  • Admin:     http://localhost:8000/admin/" -ForegroundColor White
-    Write-Host "  • API:       http://localhost:8000/api/v1/" -ForegroundColor White
+    Write-Host "  • Backend:   http://localhost:8001" -ForegroundColor White
+    Write-Host "  • Admin:     http://localhost:8001/admin/" -ForegroundColor White
+    Write-Host "  • API:       http://localhost:8001/api/v1/" -ForegroundColor White
 }
 else {
     Write-Host "⚠️  Please fix the above issues before deploying" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Troubleshooting:" -ForegroundColor Cyan
     Write-Host "  1. Start backend: cd 01_backend && docker-compose up -d" -ForegroundColor White
-    Write-Host "  2. Start frontend: cd web-admin-panel\admin && npm run dev" -ForegroundColor White
+    Write-Host "  2. Start frontend: cd web\admin && npm run dev" -ForegroundColor White
     Write-Host "  3. Check status: ./check-setup.ps1" -ForegroundColor White
 }
 
