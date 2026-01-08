@@ -27,14 +27,14 @@ Start-Sleep -Seconds 3
 
 Write-Host ""
 Write-Host "Step 2: Starting Frontend (Next.js)" -ForegroundColor Magenta
-Write-Host "Running: cd ../web-admin-panel/admin && npm run dev" -ForegroundColor Gray
+Write-Host "Running: cd ../web/admin && npm run dev" -ForegroundColor Gray
 
-Set-Location "..\web-admin-panel\admin"
+Set-Location "..\web\admin"
 npm run dev
 
 Write-Host ""
 Write-Host "Services will be available at:" -ForegroundColor Green
 Write-Host "  • Frontend:     http://localhost:3000" -ForegroundColor White
-Write-Host "  • Backend API:  http://localhost:8000/api/v1/" -ForegroundColor White
-Write-Host "  • Admin Panel:  http://localhost:8000/admin/" -ForegroundColor White
+Write-Host "  • Backend API:  http://localhost:8001/api/v1/" -ForegroundColor White
+Write-Host "  • Admin Panel:  http://localhost:8001/admin/" -ForegroundColor White
 Write-Host ""

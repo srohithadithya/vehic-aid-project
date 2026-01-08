@@ -35,23 +35,24 @@ docker-compose -f docker-compose.verify.yml up --build
    pip install -r requirements.txt
    python manage.py migrate
    python manage.py runserver 8000
+   python manage.py runserver 8001
    ```
 
 3. **Frontend (Next.js) Setup:**
    ```powershell
-   cd web-admin-panel/admin
+   cd web/admin
    npm install
    npm run dev
    ```
 
-   *Ensure `.env.local` points to `http://localhost:8000/api/v1`*
+   *Ensure `.env.local` points to `http://localhost:8001/api/v1`*
 
 ---
 
 ## 📂 Project Structure
 
 - `backend/`: Django REST Framework API
-- `web-admin-panel/`: Next.js Admin Dashboard
+- `web/admin/`: Next.js Admin Dashboard
 - `infrastructure/`: Docker configurations
 - `docs/`: Project documentation
 

@@ -91,7 +91,7 @@ services:
 
   web-admin:
     build:
-      context: ../web-admin-panel/admin
+      context: ../web/admin
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1

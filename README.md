@@ -40,9 +40,10 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Features**: Premium Auth, Subscription Plans (INR), Service Requests.
 
 ### **Command Center (Backend Admin)**
-- **URL**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
-- **Username**: `admin`
-- **Password**: `admin123`
+- **Backend**: `http://localhost:8001`
+- **Admin Panel**: `http://localhost:3000`
+- **Provider App**: `http://localhost:3001`
+- **Booker App**: `http://localhost:3003`
 
 ### **API Documentation**
 - **Swagger/OpenAPI**: [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
@@ -96,9 +97,12 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 ---
 
 ## 📂 Project Structure
-- `backend/`: Django REST Framework API
-- `web-admin-panel/`: Next.js Admin Dashboard
-- `infrastructure/`: Docker & Deployment configurations
+- **Frontend**: Next.js apps in `web/`
+  - `web/admin`: Admin Panel
+  - `web/booker`: Booking App
+  - `web/provider`: Provider App
+- **Backend**: Django in `backend/`
+- **Infrastructure**: Docker & Deployment configurations in `infrastructure/`
 
 ## 🔒 Security & Privacy
 - **Permission Audit**: Strict IsAuthenticated/IsAdminUser checks on all sensitive endpoints.

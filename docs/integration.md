@@ -87,7 +87,10 @@ CORS_ALLOWED_ORIGINS = [
 
 ### Next.js Setup
 
-**Location:** `03_web-admin-panel/admin/`
+- **Frontend (Web):**
+    - `03_01_web-provider` -> `web/provider`
+    - `03_02_web-booker` -> `web/booker`
+    - `03_03_web-admin-panel/admin` -> `web/admin`
 
 ### Environment Variables
 
@@ -216,8 +219,8 @@ npm run dev
 ```
 
 **Access:**
-- Backend Admin: http://localhost:8000/admin
-- API: http://localhost:8000/api/v1/
+- Backend Admin: http://localhost:8001/admin
+- API: http://localhost:8001/api/v1/
 - Frontend: http://localhost:3000
 
 ---

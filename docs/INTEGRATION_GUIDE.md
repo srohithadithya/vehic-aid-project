@@ -337,19 +337,19 @@ All three applications share:
 
 ### Admin Panel (.env.local)
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Provider Portal (.env.local)
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
 NEXT_PUBLIC_APP_URL=http://localhost:3001
 ```
 
 ### Customer App (.env.local)
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
 NEXT_PUBLIC_APP_URL=http://localhost:3002
 ```
 

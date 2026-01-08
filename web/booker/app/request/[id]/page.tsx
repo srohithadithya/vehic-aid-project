@@ -30,8 +30,8 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
 
         // Setup WebSocket
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // Backend runs on 8000 by default for standard HTTP, assuming Channels is also on 8000 or daphne
-        const wsUrl = `${wsProtocol}//localhost:8000/ws/service/${id}/`;
+        // Backend runs on 8001 by default
+        const wsUrl = `${wsProtocol}//localhost:8001/ws/service/${id}/`;
 
         const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
