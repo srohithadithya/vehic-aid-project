@@ -43,7 +43,7 @@ The Vehic-Aid platform consists of **three web applications** and **one backend 
 
 **Purpose:** Platform management and monitoring
 
-**Location:** `web-admin-panel/admin/`
+**Location:** `web/admin/`
 
 **Features:**
 - ✅ Dashboard with platform statistics
@@ -70,7 +70,7 @@ The Vehic-Aid platform consists of **three web applications** and **one backend 
 
 **Purpose:** Service provider dashboard
 
-**Location:** `web-admin-panel/provider-app/`
+**Location:** `web/provider/`
 
 **Features:**
 - ✅ Provider authentication
@@ -203,7 +203,7 @@ docker-compose up -d
 ### Start Admin Panel
 
 ```bash
-cd web-admin-panel/admin
+cd web/admin
 npm run dev
 ```
 
@@ -212,7 +212,7 @@ Access at: http://localhost:3000
 ### Start Provider Portal
 
 ```bash
-cd web-admin-panel/provider-app
+cd web/provider
 npm run dev
 ```
 
@@ -221,7 +221,7 @@ Access at: http://localhost:3001
 ### Start Customer App (When Ready)
 
 ```bash
-cd web-admin-panel/customer-app
+cd web/booker
 npm run dev
 ```
 

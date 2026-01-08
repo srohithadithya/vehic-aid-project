@@ -90,11 +90,11 @@ CORS_ALLOWED_ORIGINS = [
 - **Frontend (Web):**
     - `03_01_web-provider` -> `web/provider`
     - `03_02_web-booker` -> `web/booker`
-    - `03_03_web-admin-panel/admin` -> `web/admin`
+    - `web/admin` (Admin Panel)
 
 ### Environment Variables
 
-**File:** `03_web-admin-panel/admin/.env.local`
+**File:** `web/admin/.env.local`
 
 ```bash
 # Backend API base URL
@@ -106,7 +106,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### API Client Configuration
 
-**File:** `03_web-admin-panel/admin/lib/api.ts`
+**File:** `web/admin/lib/api.ts`
 
 ```typescript
 import axios from 'axios';
@@ -146,7 +146,7 @@ export default apiClient;
 
 ### Next.js Config
 
-**File:** `03_web-admin-panel/admin/next.config.ts`
+**File:** `web/admin/next.config.ts`
 
 API requests are proxied via Next.js rewrites to avoid CORS issues in browser:
 
@@ -175,7 +175,7 @@ docker-compose up -d
 
 **Start Frontend:**
 ```bash
-cd 03_web-admin-panel/admin
+cd web/admin
 npm install
 npm run dev
 ```
@@ -213,7 +213,7 @@ python manage.py runserver
 
 **Frontend:**
 ```bash
-cd 03_web-admin-panel/admin
+cd web/admin
 npm install
 npm run dev
 ```
@@ -536,7 +536,7 @@ cd 01_backend
 docker-compose up -d
 
 # Terminal 2: Start frontend
-cd 03_web-admin-panel/admin
+cd web/admin
 npm run dev
 
 # Open http://localhost:3000 in browser

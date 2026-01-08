@@ -291,7 +291,7 @@ npm install -g vercel
 vercel login
 
 # Deploy
-cd 03_web-admin-panel/admin
+cd web/admin
 vercel --prod
 
 # Configure environment
