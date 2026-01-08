@@ -4,13 +4,44 @@
 
 ![Logo](web-admin-panel/admin/public/logo.png)
 
----
-
 ## 🌟 Executive Summary
 
 Vehic-Aid is an intelligent **Command Center** for roadside assistance. It leverages **Agentic AI** to coordinate service requests, ensuring the fastest possible response time by dynamically ranking providers based on real-time location and availability.
 
 The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to monitor the entire ecosystem with subscription intelligence, automated dispatching, and live revenue tracking.
+
+---
+
+## ⚡ Quick Start (Docker Verification)
+
+1. Navigate to the infrastructure directory:
+   ```powershell
+   cd infrastructure
+   ```
+
+2. Start the verification environment:
+   ```powershell
+   docker-compose -f docker-compose.verify.yml up --build -d
+   ```
+
+## Services & Credentials
+
+### **Web Admin Panel**
+- **URL**: [http://localhost:3002/login](http://localhost:3002/login)
+- **Username**: `admin`
+- **Password**: `admin123`
+
+### **Web Booker App (New!)**
+- **URL**: [http://localhost:3003](http://localhost:3003)
+- **Features**: Premium Auth, Subscription Plans (INR), Service Requests.
+
+### **Command Center (Backend Admin)**
+- **URL**: [http://localhost:8001/admin/](http://localhost:8001/admin/)
+- **Username**: `admin`
+- **Password**: `admin123`
+
+### **API Documentation**
+- **Swagger/OpenAPI**: [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
 
 ---
 
@@ -21,14 +52,15 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Automated Coordination**: `BookingAgent` manages the lifecycle from request -> dispatch -> confirmation.
 - **Auto-Escalation**: Background tasks monitor stuck requests and re-dispatch automatically.
 
-### 🎨 Cosmic Glass Admin Panel
+### 🎨 Cosmic Glass Admin Panel & Booker
 - **Premium UI**: Deep midnight blue theme with neon accents and frosted glass effects.
-- **Live Dashboard**: Interactive visualizations (Recharts) for Revenue Velocity and Active Users.
-- **Subscription Analytics**: Dedicated insights page for MRR (Monthly Recurring Revenue) and plan churn.
+- **High-Security Auth**: Multi-step registration with identity verification and password strength analysis.
+- **Live Dashboard**: Interactive visualizations for Revenue and Active Users.
 
 ### 🇮🇳 Indian Market Localization
+- **Currency**: All pricing in INR (₹) with affordable tiers (Free, Basic, Premium).
 - **Compliance**: Automated SMS reminders for **Insurance** and **PUC** expiry.
-- **Languages**: Multilingual support for 8+ Indian languages (Hindi, Tamil, Telugu, etc.).
+- **Languages**: Multilingual support for 8+ Indian languages.
 - **Payments**: Integrated **Razorpay** for seamless UPI and Card transactions.
 
 ### 📱 IoT & Real-Time Tracking
@@ -59,37 +91,10 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 
 ---
 
-## ⚡ Quick Start
-
-### 1. Launch Backend & Infrastructure
-```bash
-cd backend
-docker-compose up -d --build
-```
-*This starts Django, PostgreSQL, Redis, and Celery Workers.*
-
-### 2. Launch Web Apps
-Each web app requires `npm install` before running.
-- **Admin Panel**: `cd web-admin-panel/admin && npm run dev`
-- **Booker App**: `cd web-booker && npm run dev`
-- **Provider App**: `cd web-provider && npm run dev`
-
-### 3. Launch Mobile Apps (Expo)
-- **Mobile Booker**: `cd mobile-booker && npx expo start`
-- **Mobile Provider**: `cd mobile-provider && npx expo start`
-
-### 4. Access
-- **Admin Panel**: [http://localhost:3000](http://localhost:3000)
-- **Booker App**: [http://localhost:3001](http://localhost:3001)
-- **Provider App**: [http://localhost:3002](http://localhost:3002)
-- **Backend API**: [http://localhost:8000/api/v1/](http://localhost:8000/api/v1/)
-
----
-
 ## 📂 Project Structure
-Refer to **`PROJECT_MAP.md`** for a detailed architectural breakdown.
-
----
+- `backend/`: Django REST Framework API
+- `web-admin-panel/`: Next.js Admin Dashboard
+- `infrastructure/`: Docker & Deployment configurations
 
 ## 🔒 Security & Privacy
 - **Permission Audit**: Strict IsAuthenticated/IsAdminUser checks on all sensitive endpoints.

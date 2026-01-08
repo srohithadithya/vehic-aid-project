@@ -32,6 +32,8 @@ export default function AnalyticsPage() {
         };
 
         fetchData();
+        const interval = setInterval(fetchData, 60000);
+        return () => clearInterval(interval);
     }, []);
 
     if (loading) return <div className="p-8 text-primary">Loading Insights...</div>;

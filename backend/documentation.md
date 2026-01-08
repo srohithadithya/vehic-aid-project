@@ -22,7 +22,7 @@ Loyalty Rewards: Bronze/Silver/Gold tiers
 Multilingual: 8 Indian languages
 Real-time Tracking: GPS-based provider dispatch
 24/7 Helpline: Premium subscriber support
-Last Updated: January 5, 2026
+Last Updated: January 6, 2026
 ...
 Technology Stack
 Backend: Django 5.0.1 + Django REST Framework
@@ -405,6 +405,10 @@ class Wallet(models.Model):
         return False
 7. Deployment Guide
 Production Setup
+**Recommended Method: Docker Deployment**
+For the most reliable and consistent deployment, please refer to the `infrastructure/` directory and the `README.md` file for Docker-based startup instructions.
+
+**Legacy Manual Deployment (Reference Only)**
 1. Server Requirements
 OS: Ubuntu 22.04 LTS (or Windows with Docker Desktop)
 RAM: 4GB minimum, 8GB recommended
@@ -578,5 +582,5 @@ pytest apps/services/tests/
 python manage.py dbshell
 python manage.py dumpdata > backup.json
 python manage.py loaddata backup.json
-Document Version: 1.0
-Last Updated: November 24, 2025
+Document Version: 1.1
+Last Updated: January 6, 2026

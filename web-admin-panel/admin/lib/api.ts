@@ -25,9 +25,13 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
+        console.error("API Call Failed:", error.config?.url, error.response?.status, error.response?.data);
         if (error.response?.status === 401) {
             localStorage.removeItem('access_token');
-            window.location.href = '/login';
+            // Redirect to login only if not already there
+            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

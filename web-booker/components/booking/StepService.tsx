@@ -9,13 +9,13 @@ import { ServiceType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const services: { id: ServiceType; title: string; icon: React.ComponentType<{ className?: string }>; desc: string; price: string }[] = [
-    { id: 'basic_tow', title: 'Basic Towing', icon: Car, desc: 'For standard sedans and hatchbacks.', price: '$50+' },
-    { id: 'flatbed_tow', title: 'Flatbed Towing', icon: Car, desc: 'Secure transport for luxury/AWD vehicles.', price: '$80+' },
-    { id: 'mechanic', title: 'Mobile Mechanic', icon: Wrench, desc: 'On-site minor repairs & diagnostics.', price: '$40+' },
-    { id: 'fuel_delivery', title: 'Fuel Delivery', icon: Fuel, desc: 'Running on empty? We bring the fuel.', price: '$20 + Fuel' },
-    { id: 'battery_jump', title: 'Battery Jump', icon: Battery, desc: 'Dead battery? We will get you started.', price: '$30' },
-    { id: 'lockout', title: 'Lockout Service', icon: Lock, desc: 'Keys locked inside? We can open it.', price: '$35' },
-    { id: 'tire_change', title: 'Tire Change', icon: Disc, desc: 'Flat tire replacement with your spare.', price: '$35' },
+    { id: 'basic_tow', title: 'Basic Towing', icon: Car, desc: 'For standard sedans and hatchbacks.', price: '₹499+' },
+    { id: 'flatbed_tow', title: 'Flatbed Towing', icon: Car, desc: 'Secure transport for luxury/AWD vehicles.', price: '₹999+' },
+    { id: 'mechanic', title: 'Mobile Mechanic', icon: Wrench, desc: 'On-site minor repairs & diagnostics.', price: '₹299+' },
+    { id: 'fuel_delivery', title: 'Fuel Delivery', icon: Fuel, desc: 'Running on empty? We bring the fuel.', price: '₹149 + Fuel' },
+    { id: 'battery_jump', title: 'Battery Jump', icon: Battery, desc: 'Dead battery? We will get you started.', price: '₹199' },
+    { id: 'lockout', title: 'Lockout Service', icon: Lock, desc: 'Keys locked inside? We can open it.', price: '₹249' },
+    { id: 'tire_change', title: 'Tire Change', icon: Disc, desc: 'Flat tire replacement with your spare.', price: '₹199' },
 ];
 
 export default function StepService() {

@@ -24,30 +24,31 @@ export function AdminSidebar() {
 
     return (
         <div className="pb-12 w-64 min-h-screen hidden md:block relative">
-            {/* Glass Background Panel */}
-            <div className="fixed inset-y-0 w-64 glass border-r-0 z-10 transition-all duration-300">
+            {/* Sidebar Background */}
+            <div className="fixed inset-y-0 w-64 bg-slate-900 border-r border-slate-800 z-10 transition-all duration-300">
                 <div className="space-y-4 py-6">
                     <div className="px-3 py-2">
-                        <div className="flex items-center gap-3 mb-6 px-4">
-                            <Image
-                                src="/logo.png"
-                                alt="Vehic-Aid Logo"
-                                width={40}
-                                height={40}
-                                className="object-contain"
-                            />
-                            <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                        <div className="flex items-center gap-3 mb-6 px-6">
+                            <div className="relative h-10 w-10">
+                                <Image
+                                    src="/logo.png"
+                                    alt="Vehic-Aid Logo"
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
+                            <h2 className="text-xl font-bold tracking-tight text-white">
                                 Vehic-Aid
                             </h2>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             {sidebarItems.map((item) => (
                                 <Button
                                     key={item.href}
                                     variant="ghost"
                                     className={`w-full justify-start transition-all duration-200 ${pathname.startsWith(item.href)
-                                        ? 'bg-primary/20 text-primary hover:bg-primary/30 border-r-2 border-primary'
-                                        : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                                        ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md'
+                                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
                                         }`}
                                     asChild
                                 >

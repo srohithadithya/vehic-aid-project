@@ -6,7 +6,19 @@ This guide covers deploying the Vehic-Aid backend and frontend to production env
 
 ---
 
-## Part 1: Backend Deployment
+## ⚡ Recommended Method: Docker Deployment
+
+For the most reliable and consistent deployment, please refer to the `infrastructure/` directory and the `README.md` file (Docker Verification). This ensures all services (Django, Postgres, Redis, Celery) are orchestrated correctly.
+
+**Quick Start with Docker:**
+```bash
+cd infrastructure
+docker-compose -f docker-compose.verify.yml up --build -d
+```
+
+---
+
+## Part 1: Backend Deployment (Legacy / Manual)
 
 ### 1.1 Production Environment Setup
 
@@ -505,5 +517,4 @@ python manage.py migrate services 0005
 
 ---
 
-**Last updated:** November 25, 2025
-
+**Last updated:** January 6, 2026

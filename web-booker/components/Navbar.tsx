@@ -47,7 +47,7 @@ export function Navbar() {
                         </div>
                     ) : (
                         <>
-                            <Link href="/login">
+                            <Link href="/auth/login">
                                 <Button variant="ghost" size="sm">Log In</Button>
                             </Link>
                             <Link href="/auth/signup">

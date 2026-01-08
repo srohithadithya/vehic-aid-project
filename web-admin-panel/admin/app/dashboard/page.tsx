@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Users, Wrench, DollarSign, TrendingUp, Clock, CheckCircle, Activity as ActivityIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import apiClient from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -52,21 +53,19 @@ export default function DashboardPage() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-                // Fetch dashboard stats from backend
-                const statsResponse = await fetch(`${API_URL}/services/admin/dashboard-stats/`);
-                if (!statsResponse.ok) throw new Error('Failed to fetch stats');
-                const statsData = await statsResponse.json();
+                // Use apiClient to ensure Auth headers are sent
+                const response = await apiClient.get('/services/admin/dashboard-stats/');
+                const statsData = response.data;
 
                 // Map backend response structure to DashboardStats interface
                 // The backend returns nested objects: bookings, providers, financials
                 const flatStats = {
-                    total_users: statsData.bookings.total + statsData.providers.total, // approx
-                    total_customers: statsData.bookings.total, // using bookings as proxy for now or 0
+                    total_users: statsData.bookings.total + statsData.providers.total,
+                    total_customers: statsData.bookings.total, // using bookings as proxy
                     total_providers: statsData.providers.total,
                     total_bookings: statsData.bookings.total,
                     pending_bookings: statsData.bookings.active,
-                    completed_bookings: statsData.bookings.completed_today, // Showing today's completions
+                    completed_bookings: statsData.bookings.completed_today,
                     total_revenue: statsData.financials.total_revenue,
                     active_providers: statsData.providers.online
                 };
@@ -76,7 +75,8 @@ export default function DashboardPage() {
                 setError(null);
             } catch (err) {
                 console.error('Error fetching dashboard data:', err);
-                setError('Unable to connect to backend.');
+                // Don't show error to user immediately on interval fetches to avoid flickering
+                if (loading) setError('Unable to connect to live system.');
             } finally {
                 setLoading(false);
             }

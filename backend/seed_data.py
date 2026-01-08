@@ -64,11 +64,18 @@ for data in customers_data:
         )
         customers.append(booker)
         print(f"Created/Fetched customer: {data['username']} (Lang: {booker.preferred_language})")
+        print(f"DEBUG: Appended customer type: {type(booker)}")
     else:
         user = User.objects.get(username=data['username'])
-        booker = ServiceBooker.objects.get(user=user)
-        customers.append(booker)
-        print(f"Customer exists: {data['username']}")
+        try:
+            booker = ServiceBooker.objects.get(user=user)
+            customers.append(booker)
+            print(f"Customer exists: {data['username']}")
+            print(f"DEBUG: Appended customer type: {type(booker)}")
+        except ServiceBooker.DoesNotExist:
+            print(f"WARNING: ServiceBooker missing for {data['username']}. Creating...")
+            booker = ServiceBooker.objects.create(user=user)
+            customers.append(booker)
 
 # Create test providers
 print("\nCreating test providers...")
@@ -187,32 +194,38 @@ for idx, data in enumerate(requests_data):
         print(f"Service requests exist for {data['booker'].user.username}")
 
 # Create payments
+# Create payments
 print("\nCreating payment records...")
 if not service_requests:
     service_requests = ServiceRequest.objects.all()
 
 for request in service_requests:
-    if request.status == 'COMPLETED':
-        print(f"DEBUG: Processing request {request.id}")
-        print(f"DEBUG: request.booker: {request.booker} (type: {type(request.booker)})")
-        try:
-            print(f"DEBUG: request.booker.servicebooker: {request.booker.servicebooker} (type: {type(request.booker.servicebooker)})")
-        except Exception as e:
-            print(f"DEBUG: Error accessing servicebooker: {e}")
+    # Force some requests to be COMPLETED for stats
+    if request.status != 'COMPLETED' and request.id % 2 == 0:
+        request.status = 'COMPLETED'
+        request.save()
+        print(f"Updated request #{request.id} to COMPLETED")
 
+    if request.status == 'COMPLETED':
         if not Transaction.objects.filter(service_request=request).exists():
             try:
+                # Ensure booker and provider have service profiles
+                if not hasattr(request.booker, 'servicebooker'):
+                     ServiceBooker.objects.create(user=request.booker)
+                if not hasattr(request.provider, 'serviceprovider'):
+                     ServiceProvider.objects.create(user=request.provider, is_verified=True, service_types=['TOWING'])
+
                 payment = Transaction.objects.create(
                     booker=request.booker.servicebooker,
                     provider=request.provider.serviceprovider,
                     service_request=request,
                     amount=Decimal('500.00'),
                     payment_method='UPI',
-                    status='SUCCESS',
-                    platform_fee=Decimal('100.00'),
-                    provider_payout=Decimal('400.00')
+                    status='SUCCESS',  # valid status for revenue calc
+                    platform_commission=Decimal('100.00'),
+                    provider_payout_amount=Decimal('400.00')
                 )
-                print(f"Created payment for request #{request.id}")
+                print(f"Created payment for request #{request.id} - Amount: 500.00")
             except Exception as e:
                 print(f"Error creating payment for request {request.id}: {e}")
 

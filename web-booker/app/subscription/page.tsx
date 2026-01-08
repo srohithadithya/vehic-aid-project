@@ -2,13 +2,21 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Shield, Star, Zap } from 'lucide-react';
+import { Check, Shield, Star, Zap, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const plans = [
     {
+        name: "Free Access",
+        price: "₹0/mo",
+        description: "Pay only when you need help.",
+        features: ["Pay-per-use Access", "App Features", "Community Support"],
+        popular: false,
+        icon: User
+    },
+    {
         name: "Basic",
-        price: "$9.99/mo",
+        price: "₹99/mo",
         description: "Essential coverage for peace of mind.",
         features: ["3 Towing Requests / yr (5 miles)", "Battery Jump Start", "Flat Tire Change", "Lockout Service"],
         popular: false,
@@ -16,7 +24,7 @@ const plans = [
     },
     {
         name: "Premium",
-        price: "$19.99/mo",
+        price: "₹199/mo",
         description: "Comprehensive protection for daily drivers.",
         features: ["Unlimited Towing (25 miles)", "Priority Response", "Trip Interruption Coverage", "Fuel Delivery", "All Basic Features"],
         popular: true,
@@ -24,7 +32,7 @@ const plans = [
     },
     {
         name: "Elite",
-        price: "$29.99/mo",
+        price: "₹499/mo",
         description: "Ultimate service and perks for enthusiasts.",
         features: ["Unlimited Towing (100 miles)", "Dedicated Advisor", "Vehicle Inspection Reports", "Rental Car Reimbursement", "All Premium Features"],
         popular: false,

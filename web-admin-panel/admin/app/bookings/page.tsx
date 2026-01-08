@@ -66,6 +66,8 @@ export default function BookingsPage() {
 
     useEffect(() => {
         fetchBookings();
+        const interval = setInterval(fetchBookings, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     const filteredBookings = bookings.filter(booking => {

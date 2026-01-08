@@ -6,7 +6,7 @@ from .views import (
     ReviewViewSet, VehicleExchangeViewSet, WalletViewSet,
     RewardsViewSet, HelplineCallViewSet, AgenticBookingView,
     SubscriptionAnalyticsView, DashboardStatsView, VehicleViewSet,
-    ServiceQuoteViewSet, ProviderJobView
+    ServiceQuoteViewSet, ProviderJobView, AIStatsView
 )
 from .admin_views import user_list, service_request_list, payment_list
 
@@ -24,6 +24,7 @@ router.register(r'provider/jobs', ProviderJobView, basename='provider-jobs')
 urlpatterns = [
     # Admin endpoints
     path('admin/dashboard-stats/', DashboardStatsView.as_view(), name='admin-dashboard-stats'),
+    path('admin/ai-stats/', AIStatsView.as_view(), name='admin-ai-stats'),
     path('admin/users/', user_list, name='admin-user-list'),
     path('admin/bookings/', service_request_list, name='admin-booking-list'),
     path('admin/payments/', payment_list, name='admin-payment-list'),

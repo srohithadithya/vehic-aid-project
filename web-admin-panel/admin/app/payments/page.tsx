@@ -68,6 +68,8 @@ export default function PaymentsPage() {
 
     useEffect(() => {
         fetchPayments();
+        const interval = setInterval(fetchPayments, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     const filteredPayments = payments.filter(payment => {
