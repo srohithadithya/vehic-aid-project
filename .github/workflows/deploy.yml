@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v4
       with:
         python-version: "3.12"
@@ -22,7 +22,7 @@ jobs:
         ls -la
         ls -la backend
         python -m pip install --upgrade pip
-        pip install -r backend/requirements.txt
+        pip install -r backend/requirements-final.txt
         
     - name: Run Tests
       working-directory: ./backend
