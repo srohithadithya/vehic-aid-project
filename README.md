@@ -36,14 +36,14 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Features**: Real-time Dispatch, Earnings Tracker, "Cosmic Glass" UI.
 
 ### **Web Booker App (Customer)**
-- **URL**: [http://localhost:3003](http://localhost:3003)
+- **URL**: [http://localhost:3000](http://localhost:3000)
 - **Features**: Premium Auth, Subscription Plans (INR), Service Requests.
 
 ### **Command Center (Backend Admin)**
 - **Backend**: `http://localhost:8001`
 - **Admin Panel**: `http://localhost:3002`
 - **Provider App**: `http://localhost:3001`
-- **Booker App**: `http://localhost:3003`
+- **Booker App**: `http://localhost:3000`
 
 ### **API Documentation**
 - **Swagger/OpenAPI**: [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
