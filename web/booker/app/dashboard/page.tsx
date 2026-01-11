@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api';
 import { Plus, Battery, MapPin, Zap, AlertTriangle, Phone, Activity, Fuel, Disc, Wrench, Menu, Bell, User, LogOut, Settings, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,15 +28,41 @@ export default function Dashboard() {
     );
 
     if (!user) {
-        router.push('/login');
+        router.push('/auth/login?redirect=/dashboard');
         return null;
     }
 
-    // Mock Data for IoT Device
-    const deviceStatus = {
-        connected: true,
-        battery: 85,
-        location: 'Indiranagar, Bangalore',
+    const [deviceStatus, setDeviceStatus] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchIoTStatus = async () => {
+            try {
+                // Use the backend endpoint: /api/v1/iot/status/
+                // Note: The client logic might need /iot/status/ mapping or direct call
+                // Based on api.ts baseURL, we just call /iot/status/
+                const response = await apiClient.get('/iot/status/');
+                setDeviceStatus(response.data);
+            } catch (err) {
+                console.log("No IoT device linked or error fetching status.");
+                setDeviceStatus(null);
+            }
+        };
+        if (user) {
+            fetchIoTStatus();
+        }
+    }, [user]);
+
+    // Fallback if no device found
+    const displayStatus = deviceStatus ? {
+        connected: deviceStatus.is_active,
+        battery: deviceStatus.battery || 0,
+        location: deviceStatus.latitude ? `${parseFloat(deviceStatus.latitude).toFixed(4)}, ${parseFloat(deviceStatus.longitude).toFixed(4)}` : 'Unknown Location',
+        lat: deviceStatus.latitude,
+        lng: deviceStatus.longitude
+    } : {
+        connected: false,
+        battery: 0,
+        location: 'Not Connected'
     };
 
     const container = {
@@ -151,18 +178,18 @@ export default function Dashboard() {
                             <div className="flex justify-between items-start mb-6">
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className={`w-2 h-2 rounded-full ${deviceStatus.connected ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-red-400'} animate-pulse`}></div>
+                                        <div className={`w-2 h-2 rounded-full ${displayStatus.connected ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]' : 'bg-red-400'} animate-pulse`}></div>
                                         <span className="text-xs font-medium uppercase tracking-wider text-slate-300">System Online</span>
                                     </div>
                                     <h2 className="text-2xl font-bold">Vehic-Aid Connect</h2>
                                     <p className="text-slate-400 text-sm flex items-center gap-1 mt-1">
-                                        <MapPin size={14} /> {deviceStatus.location}
+                                        <MapPin size={14} /> {displayStatus.location}
                                     </p>
                                 </div>
                                 <div className="text-right">
                                     <div className="text-3xl font-bold flex items-center justify-end gap-2">
-                                        {deviceStatus.battery}%
-                                        <Battery className={deviceStatus.battery > 20 ? 'text-green-400' : 'text-red-400'} />
+                                        {displayStatus.battery}%
+                                        <Battery className={displayStatus.battery > 20 ? 'text-green-400' : 'text-red-400'} />
                                     </div>
                                     <p className="text-xs text-slate-400 mt-1">Battery Level</p>
                                 </div>

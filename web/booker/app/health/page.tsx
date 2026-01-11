@@ -24,7 +24,7 @@ export default function HealthPage() {
     );
 
     if (!user) {
-        router.push('/login');
+        router.push('/auth/login?redirect=/health');
         return null;
     }
 
@@ -100,8 +100,10 @@ export default function HealthPage() {
                                     <div className="flex items-center space-x-3">
                                         <LucideSignal size={20} className="text-blue-500" />
                                         <div>
-                                            <div className="text-xl font-bold">Strong</div>
-                                            <div className="text-[10px] text-muted-foreground uppercase">Signal</div>
+                                            <div className="text-xl font-bold">{device.is_active ? 'Strong' : 'Offline'}</div>
+                                            <div className="text-[10px] text-muted-foreground uppercase">
+                                                {device.last_signal ? new Date(device.last_signal).toLocaleString() : 'No Signal'}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

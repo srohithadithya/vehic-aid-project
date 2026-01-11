@@ -34,8 +34,10 @@ export default function LoginPage() {
             localStorage.setItem('customer_access_token', response.data.access);
             localStorage.setItem('customer_refresh_token', response.data.refresh);
 
-            // Redirect to dashboard
-            router.push('/dashboard');
+            // Redirect to dashboard or return URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect') || '/dashboard';
+            router.push(redirectUrl);
         } catch (err: any) {
             console.error('Login failed', err);
             setError('Invalid credentials. Please double-check your email and password.');
