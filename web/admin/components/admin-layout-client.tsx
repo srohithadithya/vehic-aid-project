@@ -15,7 +15,7 @@ export function AdminLayoutClient({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("admin_access_token");
       if (!token && pathname !== "/login") {
         window.location.href = "/login";
       }

@@ -26,6 +26,11 @@ export default function Dashboard() {
         </div>
     );
 
+    if (!user) {
+        router.push('/login');
+        return null;
+    }
+
     // Mock Data for IoT Device
     const deviceStatus = {
         connected: true,
