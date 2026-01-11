@@ -39,7 +39,7 @@ The Vehic-Aid platform consists of **three web applications** and **one backend 
 
 ## 📱 Application Details
 
-### 1. Admin Panel (Port 3000)
+### 1. Admin Panel (Port 3002)
 
 **Purpose:** Platform management and monitoring
 
@@ -207,7 +207,7 @@ cd web/admin
 npm run dev
 ```
 
-Access at: http://localhost:3000
+Access at: http://localhost:3002
 
 ### Start Provider Portal
 
@@ -369,7 +369,7 @@ CELERY_BROKER_URL=redis://localhost:6379/0
 ```
 Username: admin
 Password: admin123
-URL: http://localhost:3000/login
+URL: http://localhost:3002/login
 ```
 
 ### Provider
@@ -417,7 +417,7 @@ URL: http://localhost:3002/login (when ready)
 | Component | Status | Port | Features |
 |-----------|--------|------|----------|
 | Backend API | ✅ Complete | 8000 | 19/19 tests passing |
-| Admin Panel | ✅ Complete | 3000 | Dashboard, CRUD operations |
+| Admin Panel | ✅ Complete | 3002 | Dashboard, CRUD operations |
 | Provider Portal | ✅ Complete | 3001 | Request management, earnings |
 | Customer App | ⏳ Pending | 3002 | Structure exists |
 

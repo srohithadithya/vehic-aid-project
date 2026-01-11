@@ -22,7 +22,7 @@ npm run dev
 
 | Service | URL | Purpose |
 |---------|-----|---------|
-| **Frontend** | http://localhost:3000 | Admin panel |
+| **Admin Panel** | http://localhost:3002 | Platform Management |
 | **API** | http://localhost:8000/api/v1/ | Backend API |
 | **Admin** | http://localhost:8000/admin/ | Django admin |
 | **API** | http://localhost:8001/api/v1/ | Backend API |

@@ -15,9 +15,9 @@ The Vehic-Aid platform consists of four main components:
 | Application | URL | Port |
 | :--- | :--- | :--- |
 | **Backend API** | `http://localhost:8001/api/v1/` | 8001 |
-| **Admin Panel** | `http://localhost:3000` | 3000 |
+| **Admin Panel** | `http://localhost:3002` | 3002 |
 | **Provider Portal** | `http://localhost:3001` | 3001 |
-| **Customer App** | `http://localhost:3002` | 3002 |
+| **Customer App** | `http://localhost:3000` | 3000 |
 
 ## 3. Key Features Implemented
 

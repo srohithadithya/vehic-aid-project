@@ -221,7 +221,7 @@ npm run dev
 **Access:**
 - Backend Admin: http://localhost:8001/admin
 - API: http://localhost:8001/api/v1/
-- Frontend: http://localhost:3000
+- Frontend (Admin): http://localhost:3002
 
 ---
 
@@ -539,6 +539,6 @@ docker-compose up -d
 cd web/admin
 npm run dev
 
-# Open http://localhost:3000 in browser
+# Open http://localhost:3002 in browser
 ```
 
