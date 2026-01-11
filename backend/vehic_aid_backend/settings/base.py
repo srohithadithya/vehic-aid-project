@@ -247,7 +247,7 @@ JAZZMIN_SETTINGS = {
     "search_model": "users.CustomUser",
     "topmenu_links": [
         {"name": "Command Center",  "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Web Dashboard", "url": "http://localhost:3000/dashboard", "new_window": False},
+        {"name": "Web Dashboard", "url": "http://localhost:3002/dashboard", "new_window": True},
         {"name": "API Console", "url": "swagger-ui", "new_window": True},
         {"name": "Tech Specs", "url": "redoc", "new_window": True},
         {"name": "Return to Home", "url": "/", "new_window": False},

@@ -27,9 +27,9 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 ## Services & Credentials
 
 ### **Web Admin Panel**
-- **URL**: [http://localhost:3000/login](http://localhost:3000/login)
-- **Username**: `admin`
-- **Password**: `admin123`
+- **URL**: [http://localhost:3002/login](http://localhost:3002/login)
+- **Username**: `admin_mobile`
+- **Password**: `password123`
 
 ### **Web Provider App (Mission Control)**
 - **URL**: [http://localhost:3001](http://localhost:3001)
@@ -41,7 +41,7 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 
 ### **Command Center (Backend Admin)**
 - **Backend**: `http://localhost:8001`
-- **Admin Panel**: `http://localhost:3000`
+- **Admin Panel**: `http://localhost:3002`
 - **Provider App**: `http://localhost:3001`
 - **Booker App**: `http://localhost:3003`
 
