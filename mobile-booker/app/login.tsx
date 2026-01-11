@@ -4,11 +4,14 @@ import { useAuth } from '../src/context/AuthContext';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
 import { LucideShieldCheck, LucideMail, LucideLock } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { Image } from 'react-native';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useAuth();
+    const router = useRouter();
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme ?? 'light'];
 
@@ -31,7 +34,11 @@ export default function LoginScreen() {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <LucideShieldCheck size={80} color={theme.tint} />
+                    <Image
+                        source={require('../assets/images/logo.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
                     <Text style={[styles.title, { color: theme.text }]}>Vehic-Aid</Text>
                     <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Roadside Assistance at your fingertips</Text>
                 </View>
@@ -75,7 +82,7 @@ export default function LoginScreen() {
 
                 <View style={styles.footer}>
                     <Text style={{ color: theme.tabIconDefault }}>Don't have an account? </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => router.push('/signup')}>
                         <Text style={[styles.signUpText, { color: theme.tint }]}>Sign Up</Text>
                     </TouchableOpacity>
                 </View>
@@ -96,6 +103,11 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         marginBottom: 40,
+    },
+    logo: {
+        width: 120,
+        height: 120,
+        marginBottom: 10,
     },
     title: {
         fontSize: 32,

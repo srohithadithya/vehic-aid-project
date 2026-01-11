@@ -8,6 +8,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (credentials: any) => Promise<void>;
+    register: (details: any) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -39,17 +40,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = async (credentials: any) => {
         try {
-            const response = await apiClient.post<LoginResponse>('/users/login/', credentials);
-            const { access, refresh, user } = response.data;
+            // 1. Get Tokens
+            const response = await apiClient.post<LoginResponse>('/users/token/', credentials);
+            const { access, refresh } = response.data;
 
             await AsyncStorage.setItem('access_token', access);
             await AsyncStorage.setItem('refresh_token', refresh);
+
+            // 2. Fetch User Profile immediately
+            const profileResponse = await apiClient.get('/users/profile/');
+            const user = profileResponse.data.user;
+
             await AsyncStorage.setItem('user', JSON.stringify(user));
 
             setUser(user);
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error("Login failed", error?.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const register = async (details: any) => {
+        try {
+            await apiClient.post('/users/register/', {
+                ...details,
+                role: 'PROVIDER'
+            });
+            // Auto login after register
+            await login({
+                username: details.username,
+                password: details.password
+            });
+        } catch (error: any) {
+            console.error("Registration failed", error?.response?.data || error.message);
             throw error;
         }
     };
@@ -61,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
             {children}
         </AuthContext.Provider>
     );

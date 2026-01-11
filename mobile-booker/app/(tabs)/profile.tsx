@@ -1,95 +1,93 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Switch, SafeAreaView, Alert } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, Switch, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../../src/context/AuthContext';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from '../../components/useColorScheme';
-import { LucideLanguages, LucideCoins, LucideLogOut, LucideChevronRight, LucideUser } from 'lucide-react-native';
-import { useAuth } from '../../src/context/AuthContext';
-import { useRouter } from 'expo-router';
+import { LucideUser, LucideCar, LucideCreditCard, LucideSettings, LucideInfo, LucideLogOut, LucideChevronRight, LucideHeartPulse, LucideMessageSquare } from 'lucide-react-native';
 
 export default function ProfileScreen() {
-    const { t, i18n } = useTranslation();
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme ?? 'light'];
     const { user, logout } = useAuth();
     const router = useRouter();
+    const colorScheme = useColorScheme();
+    const theme = Colors[colorScheme ?? 'light'];
 
-    const toggleLanguage = async () => {
-        const newLang = i18n.language === 'en' ? 'hi' : 'en';
-        await i18n.changeLanguage(newLang);
-        await AsyncStorage.setItem('user-language', newLang);
-        Alert.alert('Language Updated', `Now speaking ${newLang === 'en' ? 'English' : 'हिन्दी'}`);
-    };
+    const menuItems = [
+        { icon: LucideCar, title: 'My Vehicles', link: '/vehicles' }, // Will create later
+        { icon: LucideCreditCard, title: 'Wallet & Payments', link: '/wallet' }, // Placeholder
+        { icon: LucideHeartPulse, title: 'Vehicle Health (IoT)', link: '/health' },
+        { icon: LucideMessageSquare, title: 'Support & Help', link: '/support' },
+        { icon: LucideSettings, title: 'Settings', link: '/settings' }, // Language/Theme
+        { icon: LucideInfo, title: 'About VehicAid', link: '/about' },
+    ];
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
         Alert.alert(
-            "Logout",
-            "Are you sure you want to logout?",
+            "Log Out",
+            "Are you sure you want to log out?",
             [
                 { text: "Cancel", style: "cancel" },
-                {
-                    text: "Logout", style: "destructive", onPress: async () => {
-                        await logout();
-                    }
-                }
+                { text: "Log Out", style: "destructive", onPress: logout }
             ]
         );
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={styles.header}>
-                <View style={[styles.avatar, { backgroundColor: theme.tint }]}>
-                    <LucideUser size={40} color="#fff" />
+                <View style={[styles.avatarContainer, { borderColor: theme.tint }]}>
+                    <Text style={[styles.avatarText, { color: theme.tint }]}>
+                        {user?.username?.[0]?.toUpperCase() || 'U'}
+                    </Text>
                 </View>
-                <Text style={[styles.userName, { color: theme.text }]}>{user?.username || 'Guest'}</Text>
-                <Text style={[styles.userEmail, { color: theme.tabIconDefault }]}>{user?.email || 'No email provided'}</Text>
+                <Text style={[styles.name, { color: theme.text }]}>
+                    {user?.username || 'Guest User'}
+                </Text>
+                <Text style={[styles.email, { color: theme.tabIconDefault }]}>
+                    {user?.email || 'guest@vehicaid.com'}
+                </Text>
+                <Text style={[styles.phone, { color: theme.tabIconDefault }]}>
+                    {user?.phone_number || '+91 98765 43210'}
+                </Text>
             </View>
 
-            <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: theme.tabIconDefault }]}>PREFERENCES</Text>
+            <ScrollView contentContainerStyle={styles.menuContainer}>
+                {menuItems.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                        <TouchableOpacity
+                            key={index}
+                            style={[styles.menuItem, { backgroundColor: theme.card, borderColor: theme.border }]}
+                            onPress={() => item.link ? router.push(item.link as any) : null}
+                        >
+                            <View style={styles.menuLeft}>
+                                <View style={[styles.iconContainer, { backgroundColor: theme.tint + '15' }]}>
+                                    <Icon size={20} color={theme.tint} />
+                                </View>
+                                <Text style={[styles.menuTitle, { color: theme.text }]}>{item.title}</Text>
+                            </View>
+                            <LucideChevronRight size={20} color={theme.tabIconDefault} />
+                        </TouchableOpacity>
+                    );
+                })}
 
                 <TouchableOpacity
-                    style={[styles.optionRow, { backgroundColor: theme.card, borderColor: theme.border }]}
-                    onPress={toggleLanguage}
-                >
-                    <View style={styles.optionLeft}>
-                        <LucideLanguages size={22} color={theme.tint} />
-                        <Text style={[styles.optionText, { color: theme.text }]}>Language / भाषा</Text>
-                    </View>
-                    <View style={styles.optionRight}>
-                        <Text style={[styles.currentValue, { color: theme.tabIconDefault }]}>
-                            {i18n.language === 'en' ? 'English' : 'हिन्दी'}
-                        </Text>
-                        <LucideChevronRight size={18} color={theme.tabIconDefault} />
-                    </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.optionRow, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                    <View style={styles.optionLeft}>
-                        <LucideCoins size={22} color={theme.tint} />
-                        <Text style={[styles.optionText, { color: theme.text }]}>Currency</Text>
-                    </View>
-                    <View style={styles.optionRight}>
-                        <Text style={[styles.currentValue, { color: theme.tabIconDefault }]}>INR (₹)</Text>
-                        <LucideChevronRight size={18} color={theme.tabIconDefault} />
-                    </View>
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: theme.tabIconDefault }]}>ACCOUNT</Text>
-
-                <TouchableOpacity
-                    style={[styles.logoutButton, { borderColor: '#ef4444' }]}
+                    style={[styles.menuItem, { backgroundColor: theme.card, borderColor: theme.border, marginTop: 20 }]}
                     onPress={handleLogout}
                 >
-                    <LucideLogOut size={22} color="#ef4444" />
-                    <Text style={styles.logoutText}>Logout</Text>
+                    <View style={styles.menuLeft}>
+                        <View style={[styles.iconContainer, { backgroundColor: '#ef444415' }]}>
+                            <LucideLogOut size={20} color="#ef4444" />
+                        </View>
+                        <Text style={[styles.menuTitle, { color: '#ef4444' }]}>Log Out</Text>
+                    </View>
                 </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+
+                <View style={styles.versionContainer}>
+                    <Text style={[styles.versionText, { color: theme.tabIconDefault }]}>VehicAid v2.0.0 (Beta)</Text>
+                </View>
+            </ScrollView>
+        </View>
     );
 }
 
@@ -99,74 +97,70 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'center',
-        padding: 40,
+        paddingVertical: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(150,150,150,0.1)',
     },
-    avatar: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+    avatarContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 15,
-        elevation: 5,
+        backgroundColor: 'rgba(157, 80, 187, 0.05)',
     },
-    userName: {
+    avatarText: {
+        fontSize: 40,
+        fontWeight: 'bold',
+    },
+    name: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginBottom: 5,
     },
-    userEmail: {
+    email: {
         fontSize: 14,
-        marginTop: 5,
+        marginBottom: 2,
     },
-    section: {
-        paddingHorizontal: 20,
-        marginBottom: 30,
+    phone: {
+        fontSize: 14,
     },
-    sectionTitle: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-        marginBottom: 10,
+    menuContainer: {
+        padding: 20,
     },
-    optionRow: {
+    menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 18,
+        padding: 15,
         borderRadius: 15,
-        borderWidth: 1,
         marginBottom: 10,
+        borderWidth: 1,
     },
-    optionLeft: {
+    menuLeft: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    optionText: {
+    iconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    menuTitle: {
         fontSize: 16,
         fontWeight: '600',
-        marginLeft: 15,
     },
-    optionRight: {
-        flexDirection: 'row',
+    versionContainer: {
         alignItems: 'center',
+        marginTop: 30,
+        marginBottom: 20,
     },
-    currentValue: {
-        fontSize: 14,
-        marginRight: 10,
-    },
-    logoutButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 18,
-        borderRadius: 15,
-        borderWidth: 1,
-        backgroundColor: 'rgba(239, 68, 68, 0.05)',
-    },
-    logoutText: {
-        color: '#ef4444',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
+    versionText: {
+        fontSize: 12,
     },
 });

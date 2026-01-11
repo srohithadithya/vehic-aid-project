@@ -205,8 +205,25 @@ class RewardsProgramSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "tier", "created_at", "updated_at"]
 
 
-class RewardTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RewardTransaction
         fields = ["id", "points", "transaction_type", "description", "points_balance_after", "created_at"]
         read_only_fields = ["id", "points_balance_after", "created_at"]
+
+
+class ProviderJobSerializer(serializers.ModelSerializer):
+    """
+    Rich serializer for providers to see job details.
+    """
+    booker_name = serializers.CharField(source="booker.username", read_only=True)
+    booker_phone = serializers.CharField(source="booker.phone_number", read_only=True)
+    vehicle_details = serializers.CharField(source="vehicle.__str__", read_only=True)
+    
+    class Meta:
+        model = ServiceRequest
+        fields = [
+            "id", "service_type", "status", "priority", 
+            "latitude", "longitude", "customer_notes", 
+            "booker_name", "booker_phone", "vehicle_details",
+            "created_at"
+        ]

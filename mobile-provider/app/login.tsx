@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, Text, View, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Text, View, KeyboardAvoidingView, Platform, ScrollView, Alert, Image } from 'react-native';
 import { useAuth } from '../src/context/AuthContext';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
-import { LucideTruck, LucideMail, LucideLock } from 'lucide-react-native';
+import { LucideShieldCheck, LucideMail, LucideLock, LucideTruck } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useAuth();
+    const router = useRouter();
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme ?? 'light'];
 
@@ -31,12 +33,23 @@ export default function LoginScreen() {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <LucideTruck size={80} color={theme.tint} />
-                    <Text style={[styles.title, { color: theme.text }]}>Vehic-Aid</Text>
-                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Service Provider Terminal</Text>
+                    <Image
+                        source={require('../assets/images/logo.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+                    <Text style={[styles.title, { color: theme.text }]}>Partner Portal</Text>
+                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Manage your fleet and missions</Text>
                 </View>
 
                 <View style={[styles.formContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                    <View style={styles.inputWrapper}>
+                        <Text style={{ color: theme.tabIconDefault }}>Want to join the fleet? </Text>
+                        <TouchableOpacity onPress={() => router.push('/signup')}>
+                            <Text style={[styles.signUpText, { color: theme.tint }]}>Apply Now</Text>
+                        </TouchableOpacity>
+                    </View>
+
                     <View style={styles.inputWrapper}>
                         <LucideMail size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
@@ -86,6 +99,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 40,
     },
+    logo: {
+        width: 120,
+        height: 120,
+        marginBottom: 10,
+    },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
@@ -113,6 +131,9 @@ const styles = StyleSheet.create({
         borderBottomColor: 'rgba(0, 210, 255, 0.2)',
         marginBottom: 20,
         paddingHorizontal: 10,
+    },
+    signUpText: {
+        fontWeight: 'bold',
     },
     icon: {
         marginRight: 10,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions, Alert } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { apiClient } from '../src/api/client';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
 import { LucideTruck, LucidePhone, LucideMessageSquare, LucideChevronLeft } from 'lucide-react-native';
@@ -24,17 +25,39 @@ export default function TrackingScreen() {
         longitude: 77.5946,
     });
 
-    // Simulate movement
+    // Poll for status updates
     useEffect(() => {
-        const interval = setInterval(() => {
-            setProviderCoords(prev => ({
-                latitude: prev.latitude - 0.0001,
-                longitude: prev.longitude - 0.0001,
-            }));
-        }, 1000);
+        if (!requestId) return;
+
+        const fetchStatus = async () => {
+            try {
+                const response = await apiClient.get(`/services/request/${requestId}/`);
+                const data = response.data;
+
+                // In a real app with specialized endpoints, we'd get lat/lng here
+                // For now, if status is DISPATCHED/ARRIVED, we might mock provider movement or read 'provider_location' if available
+                if (data.provider_location) {
+                    setProviderCoords({
+                        latitude: data.provider_location.latitude,
+                        longitude: data.provider_location.longitude
+                    });
+                } else if (data.status === 'DISPATCHED') {
+                    // Fallback simulation if backend doesn't send live coords yet
+                    setProviderCoords(prev => ({
+                        latitude: prev.latitude - 0.0001,
+                        longitude: prev.longitude - 0.0001,
+                    }));
+                }
+            } catch (err) {
+                console.log("Polling error", err);
+            }
+        };
+
+        const interval = setInterval(fetchStatus, 5000);
+        fetchStatus(); // Initial call
 
         return () => clearInterval(interval);
-    }, []);
+    }, [requestId]);
 
     return (
         <View style={styles.container}>

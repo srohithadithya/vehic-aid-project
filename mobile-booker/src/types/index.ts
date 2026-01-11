@@ -23,6 +23,10 @@ export interface ServiceRequest {
     created_at: string;
     customer_notes?: string;
     dynamic_total?: number;
+    provider_location?: {
+        latitude: number;
+        longitude: number;
+    };
 }
 export type ServiceType = 'basic_tow' | 'flatbed_tow' | 'mechanic' | 'fuel_delivery' | 'battery_jump' | 'lockout' | 'tire_change' | 'TOWING' | 'FUEL' | 'JUMPSTART' | 'LOCKOUT' | 'FLAT_TYRE';
 
@@ -39,6 +43,7 @@ export interface VehicleState {
     make: string;
     model: string;
     licensePlate: string;
+    fuelType?: string;
 }
 
 export interface BookingState {
@@ -54,6 +59,7 @@ export type Action =
     | { type: 'SET_SERVICE'; payload: ServiceType }
     | { type: 'SET_LOCATION'; payload: Partial<LocationState> }
     | { type: 'SET_VEHICLE'; payload: Partial<VehicleState> }
+    | { type: 'RESET' };
 
 export interface IoTDevice {
     device_id: string;

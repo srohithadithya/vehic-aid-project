@@ -1,198 +1,305 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Switch, Alert, Image, Platform } from 'react-native';
+import { useAuth } from '../../src/context/AuthContext';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from '../../components/useColorScheme';
-import { LucideLanguages, LucideLogOut, LucideUser, LucideCheckCircle, LucideShield } from 'lucide-react-native';
-import { useAuth } from '../../src/context/AuthContext';
-import { useRouter } from 'expo-router';
+import { LucideUser, LucideShieldCheck, LucideStar, LucideAward, LucideCalendar, LucideTruck, LucideCreditCard, LucideSettings, LucideLogOut, LucideLanguages } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../src/i18n'; // Ensure i18n is initialized in provider app too
 
-export default function ProviderProfileScreen() {
-    const { t, i18n } = useTranslation();
+export default function ProfileScreen() {
+    const { user, logout } = useAuth();
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme ?? 'light'];
-    const { user, logout } = useAuth();
-    const router = useRouter();
+    const { t, i18n: i18nInstance } = useTranslation();
+    const [isHindi, setIsHindi] = useState(i18n.language === 'hi');
 
-    const toggleLanguage = async () => {
-        const newLang = i18n.language === 'en' ? 'hi' : 'en';
-        await i18n.changeLanguage(newLang);
-        await AsyncStorage.setItem('provider-language', newLang);
-        Alert.alert('Language Updated', `अब इंटरफ़ेस ${newLang === 'en' ? 'English' : 'हिन्दी'} में है`);
+    // Mock Provider Stats
+    const stats = {
+        rating: 4.9,
+        missions: 142,
+        joined: 'Jan 2024'
     };
 
-    const handleLogout = async () => {
-        Alert.alert(
-            "Logout",
-            "Are you sure you want to logout?",
-            [
-                { text: "Cancel", style: "cancel" },
-                {
-                    text: "Logout", style: "destructive", onPress: async () => {
-                        await logout();
-                    }
-                }
-            ]
-        );
+    const toggleLanguage = async (value: boolean) => {
+        setIsHindi(value);
+        const newLang = value ? 'hi' : 'en';
+        i18nInstance.changeLanguage(newLang);
+        await AsyncStorage.setItem('user-language', newLang);
+    };
+
+    const handleLogout = () => {
+        Alert.alert("Log Out", "Are you sure?", [{ text: "Cancel" }, { text: "Log Out", onPress: logout, style: 'destructive' }]);
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-            <View style={styles.header}>
-                <View style={[styles.avatar, { backgroundColor: theme.tint }]}>
-                    <LucideUser size={40} color="#fff" />
-                </View>
-                <Text style={[styles.userName, { color: theme.text }]}>{user?.username || 'Provider'}</Text>
+        <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
 
-                <View style={styles.verifyBadge}>
-                    <LucideShield size={14} color="#10b981" />
-                    <Text style={styles.verifyText}>Verified Partner</Text>
-                </View>
-            </View>
-
-            <View style={styles.statsRow}>
-                <View style={[styles.statItem, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.statValue, { color: theme.text }]}>4.9</Text>
-                    <Text style={[styles.statLabel, { color: theme.tabIconDefault }]}>Rating</Text>
-                </View>
-                <View style={[styles.statItem, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.statValue, { color: theme.text }]}>124</Text>
-                    <Text style={[styles.statLabel, { color: theme.tabIconDefault }]}>Jobs</Text>
-                </View>
-            </View>
-
-            <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: theme.tabIconDefault }]}>SETTINGS</Text>
-
-                <TouchableOpacity
-                    style={[styles.optionRow, { backgroundColor: theme.card, borderColor: theme.border }]}
-                    onPress={toggleLanguage}
+            {/* Digital ID Card */}
+            <View style={styles.idCardContainer}>
+                <LinearGradient
+                    colors={['#9d50bb', '#6e48aa']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.idCard}
                 >
-                    <View style={styles.optionLeft}>
-                        <LucideLanguages size={22} color={theme.tint} />
-                        <Text style={[styles.optionText, { color: theme.text }]}>Interface Language</Text>
+                    <View style={styles.idHeader}>
+                        <View style={styles.avatarContainer}>
+                            <View style={styles.avatar}>
+                                <LucideUser size={40} color="#fff" />
+                            </View>
+                            <View style={styles.verifiedBadge}>
+                                <Text style={styles.verifiedText}>VERIFIED</Text>
+                            </View>
+                        </View>
+                        <View style={styles.idInfo}>
+                            <Text style={styles.providerName}>{user?.username || 'Provider'}</Text>
+                            <Text style={styles.providerTitle}>Senior Recovery Specialist</Text>
+                            <Text style={styles.providerId}>ID: PRO-{user?.id || '882'}</Text>
+                        </View>
                     </View>
-                    <Text style={[styles.currentValue, { color: theme.tabIconDefault }]}>
-                        {i18n.language === 'en' ? 'English' : 'हिन्दी'}
-                    </Text>
-                </TouchableOpacity>
+
+                    <View style={styles.statsRow}>
+                        <View style={styles.statItem}>
+                            <View style={styles.statRow}>
+                                <LucideStar size={16} color="#fbbf24" fill="#fbbf24" />
+                                <Text style={styles.statValue}>{stats.rating}</Text>
+                            </View>
+                            <Text style={styles.statLabel}>Rating</Text>
+                        </View>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statItem}>
+                            <View style={styles.statRow}>
+                                <LucideAward size={16} color="#fb923c" />
+                                <Text style={styles.statValue}>{stats.missions}</Text>
+                            </View>
+                            <Text style={styles.statLabel}>Missions</Text>
+                        </View>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statItem}>
+                            <View style={styles.statRow}>
+                                <LucideCalendar size={16} color="#60a5fa" />
+                                <Text style={styles.statValue}>{stats.joined}</Text>
+                            </View>
+                            <Text style={styles.statLabel}>Joined</Text>
+                        </View>
+                    </View>
+                </LinearGradient>
             </View>
 
-            <View style={styles.footer}>
-                <TouchableOpacity
-                    style={[styles.logoutButton, { borderColor: '#ef4444' }]}
-                    onPress={handleLogout}
-                >
-                    <LucideLogOut size={22} color="#ef4444" />
-                    <Text style={styles.logoutText}>Go Offline & Logout</Text>
-                </TouchableOpacity>
+            {/* Vehicle Info Box */}
+            <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: theme.tabIconDefault }]}>VEHICLE & FLEET</Text>
+                <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                    <View style={styles.vehicleRow}>
+                        <View style={[styles.iconBox, { backgroundColor: '#3b82f620' }]}>
+                            <LucideTruck size={24} color="#3b82f6" />
+                        </View>
+                        <View>
+                            <Text style={[styles.cardTitle, { color: theme.text }]}>Tata Xenon Retrieval Unit</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.tabIconDefault }]}>KA-01-EQ-9988</Text>
+                        </View>
+                    </View>
+                    <View style={styles.divider} />
+                    <View style={styles.vehicleRow}>
+                        <View style={[styles.iconBox, { backgroundColor: '#22c55e20' }]}>
+                            <LucideCreditCard size={24} color="#22c55e" />
+                        </View>
+                        <View>
+                            <Text style={[styles.cardTitle, { color: theme.text }]}>Commercial License</Text>
+                            <View style={styles.verifiedRow}>
+                                <LucideShieldCheck size={14} color="#22c55e" />
+                                <Text style={{ color: '#22c55e', fontSize: 12, fontWeight: 'bold', marginLeft: 4 }}>ACTIVE & VERIFIED</Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
             </View>
-        </SafeAreaView>
+
+            {/* Settings & Preferences */}
+            <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: theme.tabIconDefault }]}>PREFERENCES</Text>
+                <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                        <LucideLanguages size={24} color={theme.text} />
+                        <Text style={[styles.cardTitle, { color: theme.text }]}>Hindi / हिंदी</Text>
+                    </View>
+                    <Switch
+                        value={isHindi}
+                        onValueChange={toggleLanguage}
+                        trackColor={{ false: '#767577', true: theme.tint }}
+                        thumbColor={'#f4f3f4'}
+                    />
+                </View>
+            </View>
+
+            <TouchableOpacity
+                style={[styles.logoutButton, { backgroundColor: '#ef444420' }]}
+                onPress={handleLogout}
+            >
+                <LucideLogOut size={20} color="#ef4444" style={{ marginRight: 10 }} />
+                <Text style={{ color: '#ef4444', fontWeight: 'bold' }}>Log Out</Text>
+            </TouchableOpacity>
+
+            <View style={{ height: 100 }} />
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 20,
     },
-    header: {
+    idCardContainer: {
+        marginTop: 40,
+        marginBottom: 30,
+        shadowColor: "#9d50bb",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    idCard: {
+        borderRadius: 25,
+        padding: 25,
+    },
+    idHeader: {
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: 40,
+        gap: 20,
+        marginBottom: 25,
+    },
+    avatarContainer: {
+        position: 'relative',
     },
     avatar: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 15,
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.3)',
     },
-    userName: {
-        fontSize: 24,
+    verifiedBadge: {
+        position: 'absolute',
+        bottom: -10,
+        right: -10,
+        backgroundColor: '#22c55e',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: '#9d50bb', // Match card bg
+    },
+    verifiedText: {
+        color: '#000',
+        fontSize: 10,
         fontWeight: 'bold',
     },
-    verifyBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#10b98120',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 15,
-        marginTop: 10,
+    idInfo: {
+        flex: 1,
     },
-    verifyText: {
-        color: '#10b981',
+    providerName: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    providerTitle: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 14,
+        marginBottom: 5,
+    },
+    providerId: {
+        color: 'rgba(255,255,255,0.5)',
         fontSize: 12,
-        fontWeight: 'bold',
-        marginLeft: 5,
+        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+        letterSpacing: 1,
     },
     statsRow: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
         justifyContent: 'space-between',
-        marginBottom: 30,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        padding: 15,
+        borderRadius: 15,
     },
     statItem: {
-        flex: 0.48,
-        padding: 20,
-        borderRadius: 20,
         alignItems: 'center',
+        flex: 1,
+    },
+    statRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        marginBottom: 2,
     },
     statValue: {
-        fontSize: 24,
+        color: '#fff',
         fontWeight: 'bold',
+        fontSize: 16,
     },
     statLabel: {
-        fontSize: 12,
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 10,
+        textTransform: 'uppercase',
+    },
+    statDivider: {
+        width: 1,
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
     section: {
-        paddingHorizontal: 20,
+        marginBottom: 25,
     },
     sectionTitle: {
         fontSize: 12,
         fontWeight: 'bold',
-        letterSpacing: 1,
         marginBottom: 10,
+        marginLeft: 10,
     },
-    optionRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 18,
-        borderRadius: 15,
+    card: {
+        borderRadius: 20,
+        padding: 20,
         borderWidth: 1,
     },
-    optionLeft: {
+    vehicleRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 15,
     },
-    optionText: {
+    iconBox: {
+        width: 50,
+        height: 50,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cardTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        marginLeft: 15,
+        fontWeight: 'bold',
     },
-    currentValue: {
+    cardSubtitle: {
         fontSize: 14,
+        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
     },
-    footer: {
-        marginTop: 'auto',
-        padding: 20,
-        paddingBottom: 40,
+    divider: {
+        height: 1,
+        backgroundColor: 'rgba(150,150,150,0.1)',
+        marginVertical: 15,
+    },
+    verifiedRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 2,
     },
     logoutButton: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'center',
-        padding: 18,
+        alignItems: 'center',
+        padding: 15,
         borderRadius: 15,
-        borderWidth: 1,
-        backgroundColor: 'rgba(239, 68, 68, 0.05)',
-    },
-    logoutText: {
-        color: '#ef4444',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
     },
 });

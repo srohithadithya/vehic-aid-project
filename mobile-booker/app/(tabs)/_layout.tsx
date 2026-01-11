@@ -49,24 +49,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="vehicle"
-        options={{
-          title: t('autocare'),
-          tabBarIcon: ({ color }) => <LucideActivity size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: t('ai_support'),
-          tabBarIcon: ({ color }) => <LucideBot size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="two"
         options={{
           title: t('history'),
           tabBarIcon: ({ color }) => <LucideHistory size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="health"
+        options={{
+          title: 'Health (IoT)',
+          tabBarIcon: ({ color }) => <LucideActivity size={24} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -13,11 +13,12 @@ export default function VehicleInfo() {
     const [make, setMake] = useState(state.vehicle?.make || '');
     const [model, setModel] = useState(state.vehicle?.model || '');
     const [plate, setPlate] = useState(state.vehicle?.licensePlate || '');
+    const [fuelType, setFuelType] = useState(state.vehicle?.fuelType || 'PETROL');
 
     const handleNext = () => {
         dispatch({
             type: 'SET_VEHICLE',
-            payload: { make, model, licensePlate: plate }
+            payload: { make, model, licensePlate: plate, fuelType }
         });
         dispatch({ type: 'NEXT_STEP' });
     };
@@ -65,6 +66,31 @@ export default function VehicleInfo() {
                         autoCapitalize="characters"
                     />
                 </View>
+
+                {/* Simple Fuel Selection */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
+                    {['PETROL', 'DIESEL', 'EV'].map((type) => (
+                        <TouchableOpacity
+                            key={type}
+                            onPress={() => setFuelType(type)}
+                            style={{
+                                flex: 1,
+                                padding: 15,
+                                marginHorizontal: 5,
+                                backgroundColor: fuelType === type ? theme.tint : theme.card,
+                                borderRadius: 10,
+                                alignItems: 'center',
+                                borderWidth: 1,
+                                borderColor: theme.border
+                            }}
+                        >
+                            <Text style={{
+                                color: fuelType === type ? '#fff' : theme.text,
+                                fontWeight: 'bold'
+                            }}>{type}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
             </View>
 
             <View style={styles.footer}>
@@ -85,7 +111,7 @@ export default function VehicleInfo() {
                     <LucideArrowRight size={20} color="#fff" />
                 </TouchableOpacity>
             </View>
-        </View>
+        </View >
     );
 }
 
