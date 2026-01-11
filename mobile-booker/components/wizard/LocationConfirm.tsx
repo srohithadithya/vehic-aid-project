@@ -66,15 +66,43 @@ export default function LocationConfirm() {
     const handleSubmit = async () => {
         setSubmitting(true);
         try {
+            let vehicleId = state.vehicle?.id;
+
+            // 1. Create Vehicle if not exists
+            if (!vehicleId && state.vehicle) {
+                const vehiclePayload = {
+                    make: state.vehicle.make,
+                    model: state.vehicle.model,
+                    license_plate: state.vehicle.licensePlate,
+                    fuel_type: state.vehicle.fuelType || 'PETROL',
+                };
+                // Try to create or get (backend should handle unique constraints gracefully usually, 
+                // but here we just try create. If 400 because unique license plate, we should probably fetch it.
+                // For MVP we assume success or if 400 we try to fetch list and find it.
+                try {
+                    const vRes = await apiClient.post('/vehicles/', vehiclePayload);
+                    vehicleId = vRes.data.id;
+                } catch (vErr: any) {
+                    if (vErr.response?.data?.license_plate && state.vehicle) {
+                        // Likely exists, fetch my vehicles
+                        const listRes = await apiClient.get('/vehicles/');
+                        const existing = listRes.data.find((v: any) => v.license_plate === state.vehicle!.licensePlate);
+                        if (existing) vehicleId = existing.id;
+                    }
+                }
+            }
+
+            if (!vehicleId) throw new Error("Could not register vehicle");
+
             const payload = {
                 service_type: state.serviceType,
-                pickup_location: address,
-                vehicle_details: state.vehicle,
+                customer_notes: state.location.pickup, // Mapping address to notes for now
+                vehicle_id: vehicleId,
                 latitude: region.latitude,
                 longitude: region.longitude,
             };
 
-            await apiClient.post('/services/request/', payload);
+            const reqRes = await apiClient.post('/services/request/', payload);
 
             Alert.alert(
                 'Success!',
@@ -82,13 +110,14 @@ export default function LocationConfirm() {
                 [{
                     text: 'View Status', onPress: () => {
                         dispatch({ type: 'RESET' });
-                        router.replace('/(tabs)/two');
+                        // In real app we might pass the ID: reqRes.data.id
+                        router.replace({ pathname: '/tracking', params: { requestId: reqRes.data.id } });
                     }
                 }]
             );
-        } catch (error) {
+        } catch (error: any) {
             console.error("Submission failed", error);
-            Alert.alert('Error', 'Failed to submit request. Please try again.');
+            Alert.alert('Error', error.request ? 'Network Error' : 'Failed to submit request.');
         } finally {
             setSubmitting(false);
         }

@@ -104,7 +104,7 @@ export default function BookingHistoryScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.headerTitle, { color: theme.text }]}>Your Requests</Text>
+      <Text style={[styles.headerTitle, { color: theme.text }]}>Service History</Text>
 
       <FlatList
         data={requests}

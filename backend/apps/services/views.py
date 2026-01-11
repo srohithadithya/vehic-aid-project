@@ -676,10 +676,10 @@ class ProviderJobView(viewsets.ViewSet):
 
     def list(self, request):
         """List all open requests available for pickup."""
-        # Using 'REQUESTED' as the status for open jobs
-        jobs = ServiceRequest.objects.filter(status='REQUESTED').order_by('-created_at')
-        from .serializers import ServiceRequestSerializer
-        serializer = ServiceRequestSerializer(jobs, many=True)
+        # Using 'PENDING_DISPATCH' as the status for open jobs
+        jobs = ServiceRequest.objects.filter(status='PENDING_DISPATCH').order_by('-created_at')
+        from .serializers import ProviderJobSerializer
+        serializer = ProviderJobSerializer(jobs, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
@@ -687,7 +687,7 @@ class ProviderJobView(viewsets.ViewSet):
         """Provider accepts a job."""
         job = get_object_or_404(ServiceRequest, pk=pk)
         
-        if job.status != 'REQUESTED':
+        if job.status != 'PENDING_DISPATCH':
              return Response({"error": "Job is no longer available."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if provider is available
@@ -696,7 +696,7 @@ class ProviderJobView(viewsets.ViewSet):
              return Response({"error": "User is not a service provider."}, status=status.HTTP_403_FORBIDDEN)
 
         job.provider = provider
-        job.status = 'IN_PROGRESS' # or 'DISPATCHED'
+        job.status = 'DISPATCHED'
         job.save()
         
         return Response({"status": "Job accepted", "job_id": job.id})

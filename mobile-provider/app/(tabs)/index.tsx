@@ -31,13 +31,22 @@ export default function JobDashboard() {
     fetchJobs();
   }, []);
 
-  const updateStatus = async (jobId: number, status: string) => {
+  /* 
+   * Handles Accept and Status Updates 
+   */
+  const handleAction = async (jobId: number, actionType: 'ACCEPT' | 'UPDATE', statusArg?: string) => {
     try {
-      await apiClient.patch(`/services/provider/jobs/${jobId}/`, { status });
-      Alert.alert('Status Updated', `Job status changed to ${status.replace('_', ' ')}`);
+      if (actionType === 'ACCEPT') {
+        await apiClient.post(`/services/provider/jobs/${jobId}/accept/`);
+        Alert.alert('Job Accepted', 'You have been assigned to this request.');
+      } else {
+        await apiClient.post(`/services/provider/update/${jobId}/`, { status: statusArg });
+        Alert.alert('Status Updated', `Status changed to ${statusArg}`);
+      }
       fetchJobs();
-    } catch (error) {
-      Alert.alert('Error', 'Failed to update status');
+    } catch (error: any) {
+      console.log(error);
+      Alert.alert('Error', 'Action failed. ' + (error.response?.data?.error || ''));
     }
   };
 
@@ -59,68 +68,81 @@ export default function JobDashboard() {
             <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>{item.status}</Text>
           </View>
           <Text style={[styles.time, { color: theme.tabIconDefault }]}>
-            <LucideClock size={12} /> Just Now
+            #{item.id} • {item.created_at.substring(11, 16)}
           </Text>
         </View>
 
         <Text style={[styles.serviceType, { color: theme.text }]}>
-          {item.service_request.service_type.replace('_', ' ').toUpperCase()}
+          {item.service_type.replace('_', ' ').toUpperCase()}
         </Text>
 
         <View style={styles.detailRow}>
           <LucideAlertCircle size={16} color={theme.tabIconDefault} />
-          <Text style={[styles.detailText, { color: theme.text }]}>Customer: {item.service_request.customer_name}</Text>
+          <Text style={[styles.detailText, { color: theme.text }]}>Customer: {item.booker_name} ({item.vehicle_details})</Text>
         </View>
 
         <View style={styles.detailRow}>
           <LucideNavigation size={16} color={theme.tabIconDefault} />
-          <Text style={[styles.detailText, { color: theme.text }]}>{item.service_request.pickup_location}</Text>
+          <Text style={[styles.detailText, { color: theme.text }]}>{item.customer_notes || 'No location notes'}</Text>
         </View>
 
         <View style={styles.actions}>
-          {(item.status === 'ASSIGNED' || item.status === 'EN_ROUTE') && (
+          {/* If PENDING_DISPATCH, show Accept */}
+          {item.status === 'PENDING_DISPATCH' && (
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: theme.tint, marginBottom: 10 }]}
-              onPress={() => router.push({
-                pathname: '/navigation',
-                params: {
-                  lat: item.service_request.latitude,
-                  lng: item.service_request.longitude,
-                  customer: item.service_request.customer_name
-                }
-              })}
-            >
-              <LucideNavigation size={18} color="#fff" style={styles.actionIcon} />
-              <Text style={styles.actionButtonText}>Navigate to Customer</Text>
-            </TouchableOpacity>
-          )}
-
-          {item.status === 'ASSIGNED' && (
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#3b82f6' }]}
-              onPress={() => updateStatus(item.id, 'EN_ROUTE')}
-            >
-              <LucideTruck size={18} color="#fff" style={styles.actionIcon} />
-              <Text style={styles.actionButtonText}>Start Trip</Text>
-            </TouchableOpacity>
-          )}
-          {item.status === 'EN_ROUTE' && (
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#10b981' }]}
-              onPress={() => updateStatus(item.id, 'ARRIVED')}
-            >
-              <LucideNavigation size={18} color="#fff" style={styles.actionIcon} />
-              <Text style={styles.actionButtonText}>I've Arrived</Text>
-            </TouchableOpacity>
-          )}
-          {item.status === 'ARRIVED' && (
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: '#9d50bb' }]}
-              onPress={() => updateStatus(item.id, 'COMPLETED')}
+              style={[styles.actionButton, { backgroundColor: theme.tint }]}
+              onPress={() => handleAction(item.id, 'ACCEPT')}
             >
               <LucideCheckCircle size={18} color="#fff" style={styles.actionIcon} />
-              <Text style={styles.actionButtonText}>Complete Job</Text>
+              <Text style={styles.actionButtonText}>Accept Job</Text>
             </TouchableOpacity>
+          )}
+          {/* If active, show Navigate and Status buttons */}
+          {['DISPATCHED', 'ARRIVED', 'SERVICE_IN_PROGRESS'].includes(item.status) && (
+            <>
+              <TouchableOpacity
+                style={[styles.actionButton, { backgroundColor: theme.tint, marginBottom: 10 }]}
+                onPress={() => router.push({
+                  pathname: '/navigation',
+                  params: {
+                    lat: item.latitude,
+                    lng: item.longitude,
+                    customer: item.booker_name
+                  }
+                })}
+              >
+                <LucideNavigation size={18} color="#fff" style={styles.actionIcon} />
+                <Text style={styles.actionButtonText}>Navigate Map</Text>
+              </TouchableOpacity>
+
+              {item.status === 'DISPATCHED' && (
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#10b981' }]}
+                  onPress={() => handleAction(item.id, 'UPDATE', 'ARRIVED')}
+                >
+                  <LucideNavigation size={18} color="#fff" style={styles.actionIcon} />
+                  <Text style={styles.actionButtonText}>I've Arrived</Text>
+                </TouchableOpacity>
+              )}
+              {item.status === 'ARRIVED' && (
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#9d50bb' }]}
+                  onPress={() => handleAction(item.id, 'UPDATE', 'SERVICE_IN_PROGRESS')}
+                >
+                  <LucideCheckCircle size={18} color="#fff" style={styles.actionIcon} />
+                  <Text style={styles.actionButtonText}>Start Service</Text>
+                </TouchableOpacity>
+              )}
+              {item.status === 'SERVICE_IN_PROGRESS' && (
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#3b82f6' }]}
+                  onPress={() => handleAction(item.id, 'UPDATE', 'COMPLETED')}
+                >
+                  <LucideCheckCircle size={18} color="#fff" style={styles.actionIcon} />
+                  <Text style={styles.actionButtonText}>Complete Job</Text>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
       </View>

@@ -17,14 +17,14 @@ export type ServiceStatus = 'PENDING_DISPATCH' | 'DISPATCHED' | 'ARRIVED' | 'SER
 
 export interface JobAssignment {
     id: number;
-    service_request: {
-        id: number;
-        service_type: string;
-        customer_name: string;
-        pickup_location: string;
-        status: ServiceStatus;
-        latitude: number;
-        longitude: number;
-    };
-    status: 'ASSIGNED' | 'EN_ROUTE' | 'ARRIVED' | 'COMPLETED' | 'CANCELLED';
+    service_type: string;
+    status: ServiceStatus;
+    priority: string;
+    latitude: number;
+    longitude: number;
+    customer_notes: string;
+    booker_name: string;
+    booker_phone: string;
+    vehicle_details: string;
+    created_at: string;
 }
