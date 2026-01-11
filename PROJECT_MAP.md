@@ -45,9 +45,9 @@ docker-compose up -d --build
 
 ### **Frontend Apps (Next.js)**
 *Requires `npm install` in each directory.*
-- **Admin**: `cd web/admin && npm run dev` (Port 3000)
+- **Admin**: `cd web/admin && npm run dev` (Port 3002)
 - **Provider**: `cd web/provider && npm run dev` (Port 3001)
-- **Booker**: `cd web/booker && npm run dev` (Port 3003)
+- **Booker**: `cd web/booker && npm run dev` (Port 3000)
 
 ---
 
@@ -70,7 +70,7 @@ Pull latest changes and clean local environment:
 ## 🏁 4. Roadmap & Progress
 Refer to **`ROADMAP.md`** for detailed feature tracking.
 - **Phase 1**: Full-Stack Foundation & Web Interfaces (**COMPLETED**)
-- **Phase 2**: Mobile App Development & Auth Integration (**IN PROGRESS**)
+- **Phase 2**: Mobile App Development & Deployment (**COMPLETED**)
 
 ---
-*Last Updated: 2026-01-04*
+*Last Updated: 2026-01-11*

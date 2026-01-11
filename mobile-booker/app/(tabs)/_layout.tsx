@@ -49,7 +49,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="history"
         options={{
           title: t('history'),
           tabBarIcon: ({ color }) => <LucideHistory size={24} color={color} />,
