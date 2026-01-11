@@ -7,10 +7,26 @@ import { apiClient } from '@/lib/api';
 import { LucideZap, LucideSignal, LucideCpu, LucideAlertTriangle, LucideCheckCircle2, LucideActivity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+
 export default function HealthPage() {
     const { t } = useLanguage();
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
     const [device, setDevice] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(true);
+
+    if (authLoading) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+        </div>
+    );
+
+    if (!user) {
+        router.push('/login');
+        return null;
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,7 +36,7 @@ export default function HealthPage() {
             } catch (error) {
                 console.error("Failed to fetch IoT status", error);
             } finally {
-                setLoading(false);
+                setDataLoading(false);
             }
         };
         fetchData();
@@ -48,7 +64,7 @@ export default function HealthPage() {
                         </div>
                     </div>
 
-                    {loading ? (
+                    {dataLoading ? (
                         <div className="h-64 flex items-center justify-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                         </div>

@@ -22,8 +22,8 @@ export default function LoginPage() {
         username,
         password,
       });
-      localStorage.setItem("access_token", response.data.access);
-      localStorage.setItem("refresh_token", response.data.refresh);
+      localStorage.setItem("admin_access_token", response.data.access);
+      localStorage.setItem("admin_refresh_token", response.data.refresh);
       router.push("/dashboard");
     } catch (err: any) {
       setError(
