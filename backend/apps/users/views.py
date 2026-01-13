@@ -152,6 +152,8 @@ class UserProfileView(APIView):
                 }
             )
 
+        return Response({"user": response_data})
+
 
 class DeviceTokenView(APIView):
     """
