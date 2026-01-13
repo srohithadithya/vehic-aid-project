@@ -24,6 +24,25 @@ export default function ProviderNavigation() {
         longitude: customerCoords.longitude + 0.01,
     };
 
+    // Live Location Simulation
+    React.useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                // In real app: let { coords } = await Location.getCurrentPositionAsync();
+                // For simulator verify: we push static or slightly moving coords
+                await apiClient.post('/services/provider/update-location/', {
+                    latitude: providerCoords.latitude,
+                    longitude: providerCoords.longitude,
+                    is_available: true
+                });
+                console.log("Location Pulse Sent");
+            } catch (e) {
+                console.log("Location Pulse Failed");
+            }
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <View style={styles.container}>
             <MapView
