@@ -15,7 +15,7 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-import { LucideLayoutDashboard, LucideHistory, LucideUser } from 'lucide-react-native';
+import { LucideLayoutDashboard, LucideHistory, LucideUser, LucideIndianRupee, LucideSettings } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import '../../src/i18n';
 
@@ -41,6 +41,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="earnings"
+        options={{
+          title: 'Earnings',
+          tabBarIcon: ({ color }) => <LucideIndianRupee size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="history"
         options={{
           title: t('history'),
@@ -52,6 +59,13 @@ export default function TabLayout() {
         options={{
           title: 'Account',
           tabBarIcon: ({ color }) => <LucideUser size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <LucideSettings size={24} color={color} />,
         }}
       />
     </Tabs>

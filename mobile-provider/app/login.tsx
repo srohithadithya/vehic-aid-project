@@ -34,12 +34,12 @@ export default function LoginScreen() {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
                     <Image
-                        source={require('../assets/images/logo.png')}
+                        source={require('../assets/images/provider_logo_final.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />
-                    <Text style={[styles.title, { color: theme.text }]}>Partner Portal</Text>
-                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Manage your fleet and missions</Text>
+                    <Text style={[styles.title, { color: theme.text }]}>Vehic-Aid</Text>
+                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Empowering Roadside Heroes</Text>
                 </View>
 
                 <View style={[styles.formContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>

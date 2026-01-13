@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Platform, ScrollView, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
 import Colors from '../constants/Colors';
@@ -57,7 +57,7 @@ export default function Signup() {
 
                 <View style={styles.headerContainer}>
                     <Image
-                        source={require('../assets/images/logo.png')}
+                        source={require('../assets/images/provider_logo_final.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />
@@ -125,6 +125,11 @@ export default function Signup() {
                             onChangeText={setConfirmPassword}
                             secureTextEntry
                         />
+                    </View>
+
+                    <View style={styles.switchContainer}>
+                        <Text style={[styles.switchLabel, { color: theme.text }]}>Registering as Student Partner?</Text>
+                        <Switch value={false} trackColor={{ false: "#767577", true: "#9d50bb" }} />
                     </View>
 
                     <TouchableOpacity
@@ -224,5 +229,15 @@ const styles = StyleSheet.create({
     },
     loginText: {
         fontWeight: 'bold',
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 15,
+        paddingHorizontal: 5,
+    },
+    switchLabel: {
+        fontSize: 16,
     },
 });

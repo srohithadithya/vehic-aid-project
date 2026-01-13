@@ -130,7 +130,9 @@ export default function JobDashboard() {
                   onPress={() => handleAction(item.id, 'UPDATE', 'SERVICE_IN_PROGRESS')}
                 >
                   <LucideCheckCircle size={18} color="#fff" style={styles.actionIcon} />
-                  <Text style={styles.actionButtonText}>Start Service</Text>
+                  <Text style={styles.actionButtonText}>
+                    {item.service_type === 'VEHICLE_EXCHANGE' ? 'Handover Vehicle' : 'Start Service'}
+                  </Text>
                 </TouchableOpacity>
               )}
               {item.status === 'SERVICE_IN_PROGRESS' && (
@@ -139,7 +141,9 @@ export default function JobDashboard() {
                   onPress={() => handleAction(item.id, 'UPDATE', 'COMPLETED')}
                 >
                   <LucideCheckCircle size={18} color="#fff" style={styles.actionIcon} />
-                  <Text style={styles.actionButtonText}>Complete Job</Text>
+                  <Text style={styles.actionButtonText}>
+                    {item.service_type === 'VEHICLE_EXCHANGE' ? 'Complete Exchange' : 'Complete Job'}
+                  </Text>
                 </TouchableOpacity>
               )}
             </>
