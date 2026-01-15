@@ -95,26 +95,26 @@ The Vehic-Aid platform consists of **three web applications** and **one backend 
 
 ---
 
-### 3. Customer App (Port 3002)
+### 3. Customer App (Port 3000)
 
 **Purpose:** Customer service booking
 
 **Location:** `web/booker/`
 
 **Features:**
-- 📋 Customer authentication (planned)
-- 📋 Service request form (planned)
-- 📋 Vehicle management (planned)
-- 📋 Booking history (planned)
-- 📋 Subscription management (planned)
-- 📋 Wallet & rewards (planned)
+- ✅ Customer authentication
+- ✅ Service request wizard
+- ✅ Real-time tracking (Maps)
+- ✅ Booking history
+- ✅ Subscription management
+- ✅ Wallet & rewards
 
 **Access:**
-- URL: http://localhost:3002 (when running)
-- Login: customer1 / password123
+- URL: http://localhost:3000
+- Login: user_basic / password123
 - Token Storage: `customer_access_token` (localStorage)
 
-**Status:** ⏳ Structure exists, implementation pending
+**Status:** ✅ Implementation Complete / Beta
 
 ---
 
@@ -162,7 +162,7 @@ headers: {
 
 ### Shared Endpoints
 
-All applications connect to: `http://localhost:8000/api/v1`
+All applications connect to: `http://localhost:8001/api/v1`
 
 #### Authentication
 - `POST /users/token/` - Login (all users)
@@ -180,6 +180,7 @@ All applications connect to: `http://localhost:8000/api/v1`
 - `GET /services/admin/recent-activity/` - Recent activity feed
 
 #### Payments
+- `GET /payments/dashboard/provider/` - Provider Real-time Earnings
 - `GET /payments/transactions/` - Payment history
 - `GET /payments/settlements/` - Provider settlements
 
@@ -190,14 +191,14 @@ All applications connect to: `http://localhost:8000/api/v1`
 ### Start Backend (Required First)
 
 ```bash
-cd 01_backend
-docker-compose up -d
+cd infrastructure
+docker-compose up -d --build
 ```
 
 **Services Started:**
 - PostgreSQL (port 5432)
 - Redis (port 6379)
-- Django API (port 8000)
+- Django API (port 8001)
 - Celery worker
 
 ### Start Admin Panel
@@ -218,14 +219,14 @@ npm run dev
 
 Access at: http://localhost:3001
 
-### Start Customer App (When Ready)
+### Start Customer App
 
 ```bash
 cd web/booker
 npm run dev
 ```
 
-Access at: http://localhost:3002
+Access at: http://localhost:3000
 
 ---
 
@@ -338,7 +339,7 @@ All three applications share:
 ### Admin Panel (.env.local)
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3002
 ```
 
 ### Provider Portal (.env.local)
@@ -350,15 +351,15 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
 ### Customer App (.env.local)
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
-NEXT_PUBLIC_APP_URL=http://localhost:3002
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Backend (.env.dev)
 ```bash
 DJANGO_SETTINGS_MODULE=vehic_aid_backend.settings.development
 DEBUG=True
-DATABASE_URL=postgres://vehic_aid:vehic_aid123@localhost:5432/vehic_aid_db
-CELERY_BROKER_URL=redis://localhost:6379/0
+DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid_db
+CELERY_BROKER_URL=redis://redis:6379/0
 ```
 
 ---
@@ -367,23 +368,23 @@ CELERY_BROKER_URL=redis://localhost:6379/0
 
 ### Admin
 ```
-Username: admin
-Password: admin123
+Username: admin_mobile
+Password: password123
 URL: http://localhost:3002/login
 ```
 
 ### Provider
 ```
-Username: provider1
+Username: prov_tow
 Password: password123
 URL: http://localhost:3001/login
 ```
 
 ### Customer
 ```
-Username: customer1
+Username: user_basic
 Password: password123
-URL: http://localhost:3002/login (when ready)
+URL: http://localhost:3000/login
 ```
 
 ---
@@ -393,8 +394,8 @@ URL: http://localhost:3002/login (when ready)
 ### Immediate
 - [x] Admin panel - Complete ✅
 - [x] Provider portal - Complete ✅
-- [ ] Customer app - Implement pages
-- [ ] Link all three with real-time updates
+- [x] Customer app - Complete ✅
+- [x] Link all three with real-time updates
 
 ### Short Term
 - [ ] Real-time notifications (WebSockets)
@@ -403,7 +404,7 @@ URL: http://localhost:3002/login (when ready)
 - [ ] Chat between customer and provider
 
 ### Long Term
-- [ ] Mobile apps (React Native)
+- [x] Mobile apps (React Native) - Phase 2 Complete
 - [ ] IoT device integration
 - [ ] AI-powered provider matching
 - [ ] Analytics dashboard
@@ -416,10 +417,10 @@ URL: http://localhost:3002/login (when ready)
 
 | Component | Status | Port | Features |
 |-----------|--------|------|----------|
-| Backend API | ✅ Complete | 8000 | 19/19 tests passing |
+| Backend API | ✅ Complete | 8001 | 19/19 tests passing |
 | Admin Panel | ✅ Complete | 3002 | Dashboard, CRUD operations |
 | Provider Portal | ✅ Complete | 3001 | Request management, earnings |
-| Customer App | ⏳ Pending | 3002 | Structure exists |
+| Customer App | ✅ Complete | 3000 | Booking Wizard, Profile |
 
 **All applications are linked through:**
 - Shared backend API
@@ -429,6 +430,6 @@ URL: http://localhost:3002/login (when ready)
 
 ---
 
-**Last Updated:** November 26, 2025  
-**Platform Version:** 1.0.0  
-**Status:** ✅ Admin & Provider Ready | 📋 Customer Pending
+**Last Updated:** January 16, 2026
+**Platform Version:** 1.0.0
+**Status:** ✅ Admin & Provider Ready | ✅ Customer Ready
