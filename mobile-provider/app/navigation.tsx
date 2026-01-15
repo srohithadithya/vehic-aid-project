@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
 import { LucideChevronLeft, LucideUser, LucideNavigation2 } from 'lucide-react-native';
+import { apiClient } from '../src/api/client';
 
 const { width, height } = Dimensions.get('window');
 
