@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguageToggle } from "./LanguageToggle";
-import { LucideLayoutDashboard, LucideHistory, LucideUser } from "lucide-react";
+import { LucideLayoutDashboard, LucideHistory, LucideUser, LucideIndianRupee } from "lucide-react";
 
 export function Navbar() {
     const { t } = useLanguage();
@@ -45,6 +45,10 @@ export function Navbar() {
                         <Link href="/dashboard" className="flex items-center space-x-2 text-sm font-medium hover:text-green-400 transition">
                             <LucideLayoutDashboard size={16} />
                             <span>{t('nav.dashboard')}</span>
+                        </Link>
+                        <Link href="/earnings" className="flex items-center space-x-2 text-sm font-medium hover:text-green-400 transition">
+                            <LucideIndianRupee size={16} />
+                            <span>Earnings</span>
                         </Link>
                         <Link href="/history" className="flex items-center space-x-2 text-sm font-medium hover:text-green-400 transition">
                             <LucideHistory size={16} />

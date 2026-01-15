@@ -149,16 +149,18 @@ export default function ProviderDashboard() {
 
                 {/* KPI Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group hover:bg-white/10 transition-colors">
-                        <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Wallet className="w-24 h-24" />
+                    <Link href="/earnings" className="block">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group hover:bg-white/10 transition-colors cursor-pointer">
+                            <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Wallet className="w-24 h-24" />
+                            </div>
+                            <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Today's Earnings</p>
+                            <h3 className="text-4xl font-bold text-white mt-2">₹ 2,450</h3>
+                            <div className="mt-4 flex items-center gap-2 text-green-400 text-xs font-mono">
+                                <Activity className="w-3 h-3" /> +12% from yesterday
+                            </div>
                         </div>
-                        <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Today's Earnings</p>
-                        <h3 className="text-4xl font-bold text-white mt-2">₹ 2,450</h3>
-                        <div className="mt-4 flex items-center gap-2 text-green-400 text-xs font-mono">
-                            <Activity className="w-3 h-3" /> +12% from yesterday
-                        </div>
-                    </div>
+                    </Link>
 
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden group hover:bg-white/10 transition-colors">
                         <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
