@@ -86,7 +86,11 @@ export default function SubscriptionPage() {
                                     </ul>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
+                                    <Button
+                                        className="w-full"
+                                        variant={plan.popular ? "default" : "outline"}
+                                        onClick={() => window.location.href = `/payment?amount=${plan.price.replace('₹', '').replace('/mo', '')}&planId=${plan.name}`}
+                                    >
                                         Subscribe Now
                                     </Button>
                                 </CardFooter>

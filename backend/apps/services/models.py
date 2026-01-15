@@ -13,9 +13,10 @@ class SubscriptionPlan(models.Model):
     """Defines the various tiers of service plans (Free, Premium, IoT+Subscription)."""
 
     PLAN_CHOICES = [
-        ("FREE", "Free Plan (On-Demand Only)"),
-        ("STANDARD", "Standard Subscription"),
-        ("PREMIUM", "Premium Subscription (24/7 Helpline, Exchange Add-on)"),
+        ("FREE", "Free Access"),
+        ("BASIC", "Basic Plan"),
+        ("PREMIUM", "Premium Plan"),
+        ("ELITE", "Elite Plan"),
     ]
 
     name = models.CharField(max_length=50, choices=PLAN_CHOICES, unique=True)

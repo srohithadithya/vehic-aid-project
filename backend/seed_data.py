@@ -1,276 +1,196 @@
 """
-Seed script to populate the database with test data for Vehic-Aid platform.
-Run with: python manage.py shell < seed_data.py
+Seed script to populate the database with precise test data:
+- 4 Booker Users (Free, Basic, Premium, Elite)
+- 4 Service Providers
+- 4 Service Requests (1 per user, linked to different providers)
+- 4 Subscription Plans (Free, Basic, Premium, Elite)
 """
 
 import os
 import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vehic_aid_backend.settings.development")
-django.setup()
-
-from django.contrib.auth import get_user_model
-from apps.users.models import ServiceBooker, ServiceProvider
-from apps.services.models import Vehicle
-from apps.services.models import ServiceRequest, SubscriptionPlan, UserSubscription
-from apps.payments.models import Transaction
-from apps.iot_devices.models import IoTDevice
 from decimal import Decimal
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vehic_aid_backend.settings.development")
+django.setup()
+
+from django.core.management import call_command
+from django.contrib.auth import get_user_model
+from apps.users.models import ServiceBooker, ServiceProvider
+from apps.services.models import Vehicle, ServiceRequest, SubscriptionPlan, UserSubscription
+from apps.payments.models import Transaction
+
 User = get_user_model()
 
-print("Starting database seeding...")
+print("🧹 Flushing database...")
+call_command('flush', interactive=False)
+print("✅ Database flushed.")
 
-# Create superuser
-print("\nCreating superuser...")
+# ------------------------------------------------------------------
+# 1. Create Superuser
+# ------------------------------------------------------------------
+print("\nAdmin...")
 if not User.objects.filter(username='admin').exists():
-    admin = User.objects.create_superuser(
+    User.objects.create_superuser(
         username='admin',
         email='admin@vehicaid.com',
         password='admin123',
-        phone_number='+919876543210',
-        is_service_booker=False,
-        is_service_provider=False,
+        phone_number='+910000000000',
+        is_service_booker=True,
+        is_service_provider=True
     )
-    print("Superuser created: admin/admin123")
-else:
-    admin = User.objects.get(username='admin')
-    print("Superuser already exists")
+print("Created: admin/admin123")
 
-# Create test customers
-print("\nCreating test customers...")
-customers_data = [
-    {'username': 'customer1', 'email': 'customer1@test.com', 'phone': '+919876543211', 'name': 'Rajesh Kumar', 'lang': 'hi'},
-    {'username': 'customer2', 'email': 'customer2@test.com', 'phone': '+919876543212', 'name': 'Priya Sharma', 'lang': 'ta'},
-    {'username': 'customer3', 'email': 'customer3@test.com', 'phone': '+919876543213', 'name': 'Amit Patel', 'lang': 'gu'},
+# ------------------------------------------------------------------
+# 2. Create Plans
+# ------------------------------------------------------------------
+print("\nCreating Plans...")
+plans = {}
+plan_defs = [
+    ('FREE', 'Free Access', 0, 0, 'Pay-per-use services'),
+    ('BASIC', 'Basic Plan', 99, 30, 'Discounted towing, Priority'),
+    ('PREMIUM', 'Premium Plan', 199, 30, 'Free towing (50km), Helpline'),
+    ('ELITE', 'Elite Plan', 499, 30, 'Unlimited towing, VIP support, Exchange'),
 ]
 
-customers = []
-for data in customers_data:
-    if not User.objects.filter(username=data['username']).exists():
-        user = User.objects.create_user(
-            username=data['username'],
-            email=data['email'],
-            password='password123',
-            phone_number=data['phone'],
-            is_service_booker=True,
-            is_service_provider=False,
-        )
-        booker, created = ServiceBooker.objects.get_or_create(
-            user=user,
-            defaults={'preferred_language': data.get('lang', 'en')}
-        )
-        customers.append(booker)
-        print(f"Created/Fetched customer: {data['username']} (Lang: {booker.preferred_language})")
-        print(f"DEBUG: Appended customer type: {type(booker)}")
-    else:
-        user = User.objects.get(username=data['username'])
-        try:
-            booker = ServiceBooker.objects.get(user=user)
-            customers.append(booker)
-            print(f"Customer exists: {data['username']}")
-            print(f"DEBUG: Appended customer type: {type(booker)}")
-        except ServiceBooker.DoesNotExist:
-            print(f"WARNING: ServiceBooker missing for {data['username']}. Creating...")
-            booker = ServiceBooker.objects.create(user=user)
-            customers.append(booker)
-
-# Create test providers
-print("\nCreating test providers...")
-providers_data = [
-    {'username': 'provider1', 'email': 'provider1@test.com', 'phone': '+919876543221', 'name': 'Suresh Mechanic', 'service': 'TOWING', 'lat': 19.0760, 'lon': 72.8777},
-    {'username': 'provider2', 'email': 'provider2@test.com', 'phone': '+919876543222', 'name': 'Ramesh Repairs', 'service': 'FLAT_TIRE', 'lat': 19.1000, 'lon': 72.9000},
-    {'username': 'provider3', 'email': 'provider3@test.com', 'phone': '+919876543223', 'name': 'Vijay Services', 'service': 'BATTERY_JUMP', 'lat': 18.9000, 'lon': 72.8000},
-]
-
-providers = []
-for data in providers_data:
-    if not User.objects.filter(username=data['username']).exists():
-        user = User.objects.create_user(
-            username=data['username'],
-            email=data['email'],
-            password='password123',
-            phone_number=data['phone'],
-            is_service_booker=False,
-            is_service_provider=True,
-        )
-        provider, created = ServiceProvider.objects.get_or_create(
-            user=user,
-            defaults={
-                'service_types': [data['service']],
-                'is_verified': True,
-                'is_available': True,
-                'average_rating': 4.5,
-                'latitude': data.get('lat'),
-                'longitude': data.get('lon')
-            }
-        )
-        providers.append(provider)
-        print(f"Created/Fetched provider: {data['username']} at ({data.get('lat')}, {data.get('lon')})")
-    else:
-        user = User.objects.get(username=data['username'])
-        provider = ServiceProvider.objects.get(user=user)
-        providers.append(provider)
-        print(f"Provider exists: {data['username']}")
-
-# Create vehicles for customers
-print("\nCreating test vehicles...")
-vehicles_data = [
-    {'booker': customers[0], 'make': 'Maruti', 'model': 'Swift', 'year': 2020, 'reg': 'MH01AB1234'},
-    {'booker': customers[0], 'make': 'Hyundai', 'model': 'i20', 'year': 2021, 'reg': 'MH01CD5678'},
-    {'booker': customers[1], 'make': 'Honda', 'model': 'City', 'year': 2019, 'reg': 'MH02EF9012'},
-    {'booker': customers[2], 'make': 'Tata', 'model': 'Nexon', 'year': 2022, 'reg': 'MH03GH3456'},
-]
-
-vehicles = []
-for data in vehicles_data:
-    print(f"DEBUG: Vehicle fields: {[f.name for f in Vehicle._meta.get_fields()]}")
-    if not Vehicle.objects.filter(license_plate=data['reg']).exists():
-        vehicle = Vehicle.objects.create(
-            owner=data['booker'].user,
-            make=data['make'],
-            model=data['model'],
-            license_plate=data['reg'],
-            fuel_type='PETROL'
-        )
-        vehicles.append(vehicle)
-        print(f"Created vehicle: {data['reg']}")
-    else:
-        vehicle = Vehicle.objects.get(license_plate=data['reg'])
-        vehicles.append(vehicle)
-        print(f"Vehicle exists: {data['reg']}")
-
-# Create subscription plans
-print("\nCreating subscription plans...")
-plans_data = [
-    {'name': 'Basic', 'price': 499, 'duration': 30, 'features': 'Unlimited towing within 50km, 24/7 helpline'},
-    {'name': 'Premium', 'price': 999, 'duration': 30, 'features': 'Unlimited towing within 100km, Priority support, Free battery jump'},
-    {'name': 'Gold', 'price': 1999, 'duration': 90, 'features': 'Unlimited towing within 200km, VIP support, All services included'},
-]
-
-plans = []
-for data in plans_data:
-    plan, created = SubscriptionPlan.objects.get_or_create(
-        name=data['name'],
-        defaults={
-            'price': Decimal(data['price']),
-            'duration_days': data['duration'],
-            'features': data['features']
-        }
+for code, name, price, days, feats in plan_defs:
+    plan = SubscriptionPlan.objects.create(
+        name=code,  # Using code as name match model choices
+        price=Decimal(price),
+        duration_days=days,
+        features=[feats],
+        description=name
     )
-    plans.append(plan)
-    if created:
-        print(f"Created plan: {data['name']}")
-    else:
-        print(f"Plan exists: {data['name']}")
+    plans[code] = plan
+    print(f"Plan Created: {name} (₹{price})")
 
-# Create service requests
-print("\nCreating service requests...")
-requests_data = [
-    {'booker': customers[0], 'vehicle': vehicles[0], 'provider': providers[0], 'service': 'TOWING', 'status': 'COMPLETED'},
-    {'booker': customers[0], 'vehicle': vehicles[1], 'provider': providers[1], 'service': 'FLAT_TIRE', 'status': 'PENDING'},
-    {'booker': customers[1], 'vehicle': vehicles[2], 'provider': providers[2], 'service': 'BATTERY_JUMP', 'status': 'IN_PROGRESS'},
-    {'booker': customers[2], 'vehicle': vehicles[3], 'provider': providers[0], 'service': 'TOWING', 'status': 'COMPLETED'},
+# ------------------------------------------------------------------
+# 3. Create Bookers (1 per plan)
+# ------------------------------------------------------------------
+print("\nCreating Bookers...")
+bookers = []
+booker_defs = [
+    ('user_free', 'Free User', 'FREE'),
+    ('user_basic', 'Basic User', 'BASIC'),
+    ('user_premium', 'Premium User', 'PREMIUM'),
+    ('user_elite', 'Elite User', 'ELITE'),
 ]
 
-service_requests = []
-for idx, data in enumerate(requests_data):
-    if ServiceRequest.objects.filter(booker=data['booker'].user).count() < 2:
-        request = ServiceRequest.objects.create(
-            booker=data['booker'].user,
-            provider=data['provider'].user,
-            service_type=data['service'],
-            status=data['status'],
-            latitude=19.0760,
-            longitude=72.8777,
-            customer_notes=f'Test service request {idx+1}',
-            priority='HIGH'
-        )
-        service_requests.append(request)
-        print(f"Created service request #{request.id}")
-    else:
-        print(f"Service requests exist for {data['booker'].user.username}")
-
-# Create payments
-# Create payments
-print("\nCreating payment records...")
-if not service_requests:
-    service_requests = ServiceRequest.objects.all()
-
-for request in service_requests:
-    # Force some requests to be COMPLETED for stats
-    if request.status != 'COMPLETED' and request.id % 2 == 0:
-        request.status = 'COMPLETED'
-        request.save()
-        print(f"Updated request #{request.id} to COMPLETED")
-
-    if request.status == 'COMPLETED':
-        if not Transaction.objects.filter(service_request=request).exists():
-            try:
-                # Ensure booker and provider have service profiles
-                if not hasattr(request.booker, 'servicebooker'):
-                     ServiceBooker.objects.create(user=request.booker)
-                if not hasattr(request.provider, 'serviceprovider'):
-                     ServiceProvider.objects.create(user=request.provider, is_verified=True, service_types=['TOWING'])
-
-                payment = Transaction.objects.create(
-                    booker=request.booker.servicebooker,
-                    provider=request.provider.serviceprovider,
-                    service_request=request,
-                    amount=Decimal('500.00'),
-                    payment_method='UPI',
-                    status='SUCCESS',  # valid status for revenue calc
-                    platform_commission=Decimal('100.00'),
-                    provider_payout_amount=Decimal('400.00')
-                )
-                print(f"Created payment for request #{request.id} - Amount: 500.00")
-            except Exception as e:
-                print(f"Error creating payment for request {request.id}: {e}")
-
-# Create user subscriptions
-print("\nCreating user subscriptions...")
-for idx, customer in enumerate(customers[:2]):
-    if not UserSubscription.objects.filter(user=customer).exists():
-        subscription = UserSubscription.objects.create(
-            user=customer,
-            plan=plans[idx],
+for i, (username, full_name, plan_code) in enumerate(booker_defs):
+    user = User.objects.create_user(
+        username=username,
+        email=f'{username}@test.com',
+        password='password123',
+        phone_number=f'+91900000000{i+1}',
+        first_name=full_name.split()[0],
+        last_name=full_name.split()[1],
+        is_service_booker=True
+    )
+    booker = ServiceBooker.objects.create(user=user)
+    bookers.append(booker)
+    
+    # Subscription
+    if plan_code != 'FREE':
+        UserSubscription.objects.create(
+            user=booker,
+            plan=plans[plan_code],
             start_date=timezone.now().date(),
-            end_date=(timezone.now() + timedelta(days=plans[idx].duration_days)).date(),
+            end_date=timezone.now().date() + timedelta(days=30),
             is_active=True,
-            auto_renew=True
+            status='ACTIVE'
         )
-        print(f"Created subscription for {customer.user.username}")
-        print(f"Subscription exists for {customer.user.username}")
-
-# Create IoT Devices
-print("\nCreating IoT devices...")
-for idx, customer in enumerate(customers[:1]):
-    device_id = f"IOT-DEV-{idx+1000}"
-    if not IoTDevice.objects.filter(device_id=device_id).exists():
-        device = IoTDevice.objects.create(
-            device_id=device_id,
-            paired_user=customer,
-            is_active=True,
-            last_known_latitude=19.0760,
-            last_known_longitude=72.8777
-        )
-        print(f"Created IoT device: {device_id} for {customer.user.username}")
+        print(f"User Created: {username} -> {plan_code}")
     else:
-        print(f"IoT device exists: {device_id}")
+        print(f"User Created: {username} -> FREE (No Sub)")
 
-print("\nDatabase seeding completed successfully!")
-print("\nSummary:")
-print(f"   - Users: {User.objects.count()}")
-print(f"   - Customers: {ServiceBooker.objects.count()}")
-print(f"   - Providers: {ServiceProvider.objects.count()}")
-print(f"   - Vehicles: {Vehicle.objects.count()}")
-print(f"   - Service Requests: {ServiceRequest.objects.count()}")
-print(f"   - Payments: {Transaction.objects.count()}")
-print(f"   - Subscription Plans: {SubscriptionPlan.objects.count()}")
-print(f"   - User Subscriptions: {UserSubscription.objects.count()}")
-print("\nLogin credentials:")
-print("   Admin: admin / admin123")
-print("   Customer: customer1 / password123")
-print("   Provider: provider1 / password123")
+# ------------------------------------------------------------------
+# 4. Create Vehicles (1 per booker)
+# ------------------------------------------------------------------
+print("\nCreating Vehicles...")
+vehicles = []
+cars = [('Maruti', 'Swift'), ('Hyundai', 'i20'), ('Tata', 'Nexon'), ('Honda', 'City')]
+for i, booker in enumerate(bookers):
+    v = Vehicle.objects.create(
+        owner=booker.user,
+        make=cars[i][0],
+        model=cars[i][1],
+        license_plate=f"MH0{i+1}AB{1000+i}",
+        fuel_type='PETROL'
+    )
+    vehicles.append(v)
+    print(f"Vehicle: {v.license_plate} -> {booker.user.username}")
+
+# ------------------------------------------------------------------
+# 5. Create Providers
+# ------------------------------------------------------------------
+print("\nCreating Providers...")
+providers = []
+prov_defs = [
+    ('prov_tow', 'Towing Expert', 'TOWING'),
+    ('prov_mech', 'Mechanic Pro', 'FLAT_TIRE'),
+    ('prov_bat', 'Battery King', 'BATTERY_JUMP'),
+    ('prov_gen', 'General Aid', 'FUEL_DELIVERY'),
+]
+
+for i, (username, name, service) in enumerate(prov_defs):
+    u = User.objects.create_user(
+        username=username,
+        email=f'{username}@test.com',
+        password='password123',
+        phone_number=f'+91910000000{i+1}',
+        first_name=name.split()[0],
+        last_name=name.split()[1],
+        is_service_provider=True
+    )
+    p = ServiceProvider.objects.create(
+        user=u,
+        is_verified=True,
+        is_available=True,
+        service_types=[service],
+        latitude=12.9716 + (i * 0.01), # Bangalore coords spread
+        longitude=77.5946 + (i * 0.01)
+    )
+    providers.append(p)
+    print(f"Provider: {username} ({service})")
+
+# ------------------------------------------------------------------
+# 6. Create Service Requests (1 per Booker -> 1 Provider)
+# ------------------------------------------------------------------
+print("\nCreating Service Requests & Links...")
+req_defs = [
+    (bookers[0], vehicles[0], providers[0], 'TOWING', 'COMPLETED'),
+    (bookers[1], vehicles[1], providers[1], 'FLAT_TIRE', 'COMPLETED'),
+    (bookers[2], vehicles[2], providers[2], 'BATTERY_JUMP', 'SERVICE_IN_PROGRESS'),
+    (bookers[3], vehicles[3], providers[3], 'FUEL_DELIVERY', 'PENDING_DISPATCH'),
+]
+
+for i, (booker, vehicle, provider, service, status) in enumerate(req_defs):
+    req = ServiceRequest.objects.create(
+        booker=booker.user,
+        vehicle=vehicle,
+        provider=provider.user,
+        service_type=service,
+        status=status,
+        latitude=provider.latitude,
+        longitude=provider.longitude,
+        customer_notes=f"Issue #{i+1} for {service}",
+        priority='HIGH' if status == 'PENDING_DISPATCH' else 'MEDIUM'
+    )
+    print(f"Request: #{req.id} {booker.user.username} -> {provider.user.username} ({status})")
+
+    # If completed, add transaction
+    if status == 'COMPLETED':
+        Transaction.objects.create(
+            service_request=req,
+            booker=booker,
+            provider=provider,
+            amount=Decimal('500.00'),
+            platform_commission=Decimal('50.00'),
+            provider_payout_amount=Decimal('450.00'),
+            status='SUCCESS',
+            payment_method='UPI'
+        )
+        print("   -> Payment Created")
+
+print("\n✅ SEEDING COMPLETE")
