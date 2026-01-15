@@ -117,3 +117,33 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 ---
 
 **Built with ❤️ for the Future of Roadside Assistance.**
+
+## 🏃 Run Commands (New!)
+
+### **Quick Start (Docker)**
+The easiest way to run the full stack:
+```bash
+docker-compose -f infrastructure/docker-compose.verify.yml up --build -d
+```
+Then access:
+- **Provider Dashboard**: http://localhost:3001
+- **Booker App**: http://localhost:3000
+- **Admin Panel**: http://localhost:3002
+
+### **Mobile Apps (Expo)**
+Ensure the backend is running first.
+
+**Mobile Booker**:
+```bash
+cd mobile-booker
+npm install
+npx expo start -c
+```
+
+**Mobile Provider**:
+```bash
+cd mobile-provider
+npm install
+npx expo start -c
+```
+*Press 'a' to run on Android Emulator.*
