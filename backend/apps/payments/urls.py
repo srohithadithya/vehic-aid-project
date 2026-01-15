@@ -1,8 +1,10 @@
 from django.urls import path
 
-from .views import RazorpayWebhookView, PaymentInitiationView, MockPaymentConfirmView
+from .views import RazorpayWebhookView, PaymentInitiationView, MockPaymentConfirmView, ProviderDashboardView
 
 urlpatterns = [
+    # Dashboard Data
+    path("dashboard/provider/", ProviderDashboardView.as_view(), name="provider-dashboard"),
     # Primary webhook for payment confirmation (No user auth needed here)
     path("webhook/razorpay/", RazorpayWebhookView.as_view(), name="razorpay-webhook"),
     # Endpoint used by the mobile app/web app to create a new order ID

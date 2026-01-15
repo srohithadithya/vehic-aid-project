@@ -137,14 +137,35 @@ const WeekChart = () => {
     );
 };
 
+import { apiClient } from '../../lib/api';
+// ... existing imports ...
+
 export default function EarningsPage() {
-    const transactions = [
-        { id: "TXN-001", type: 'Service Payout', service: 'Towing Service', customer: 'Arun K.', amount: 1500, date: '2025-01-15T10:30:00', status: 'Completed', method: 'Wallet' },
-        { id: "TXN-002", type: 'Service Payout', service: 'Battery Jumpstart', customer: 'Priya M.', amount: 800, date: '2025-01-15T08:15:00', status: 'Completed', method: 'Cash' },
-        { id: "TXN-003", type: 'Withdrawal', service: 'Weekly Settlement', customer: '-', amount: -6500, date: '2025-01-14T18:00:00', status: 'Processed', method: 'Bank Transfer' },
-        { id: "TXN-004", type: 'Service Payout', service: 'Flat Tyre Change', customer: 'Rahul D.', amount: 500, date: '2025-01-14T14:20:00', status: 'Completed', method: 'Wallet' },
-        { id: "TXN-005", type: 'Bonus', service: 'Peak Hour Bonus', customer: 'System', amount: 200, date: '2025-01-14T14:00:00', status: 'Completed', method: 'Wallet' },
-    ];
+    const [stats, setStats] = useState({
+        current_balance: 0,
+        todays_earnings: 0,
+        pending_payouts: 0,
+        weekly_chart: { values: [0, 0, 0, 0, 0, 0, 0], labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+        recent_transactions: []
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const response = await apiClient.get('/payments/dashboard/provider/');
+                setStats(response.data);
+            } catch (error) {
+                console.error("Failed to fetch earnings data", error);
+                // Fallback to zero values or keep simple loading state logic
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDashboardData();
+    }, []);
+
+    const transactions = stats.recent_transactions || [];
 
     return (
         <div className="min-h-screen bg-background relative overflow-hidden">
@@ -194,7 +215,48 @@ export default function EarningsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
                         >
-                            <WalletCard />
+                            <div className="relative h-56 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-500 group">
+                                {/* Gradient Background */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-800" />
+                                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay" />
+
+                                <div className="relative p-6 h-full flex flex-col justify-between text-white border border-white/10 rounded-3xl">
+                                    <div className="flex justify-between items-start">
+                                        <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+                                            <Wallet className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs font-medium text-white/60 uppercase tracking-widest">Current Balance</p>
+                                            <h2 className="text-3xl font-bold mt-1 tracking-tight">
+                                                {loading ? "..." : `₹${stats.current_balance.toLocaleString()}`}
+                                            </h2>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            {/* Chip Simulation */}
+                                            <div className="w-12 h-9 rounded-md bg-gradient-to-tr from-yellow-200 to-yellow-500/80 border border-yellow-400 shadow-inner flex items-center justify-center overflow-hidden relative">
+                                                <div className="absolute inset-0 border-[0.5px] border-black/20 rounded-[inherit]" />
+                                                <Activity className="w-8 h-8 text-black/10 rotate-90 scale-150" />
+                                            </div>
+                                            <div className="text-lg font-mono tracking-widest text-white/80">
+                                                •••• •••• •••• 4291
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <p className="text-[10px] text-white/50 uppercase">Card Holder</p>
+                                                <p className="font-medium tracking-wide">ROHIT ADITHYA</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="italic font-bold text-xl opacity-80">VISA</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </motion.div>
 
                         <GlassCard className="p-6">
@@ -216,14 +278,14 @@ export default function EarningsPage() {
                             <StatCard
                                 delay={0.3}
                                 title="Today's Earnings"
-                                value="₹4,500"
+                                value={loading ? "..." : `₹${stats.todays_earnings.toLocaleString()}`}
                                 trend={12}
                                 icon={DollarSign}
                             />
                             <StatCard
                                 delay={0.4}
                                 title="Pending Payouts"
-                                value="₹1,200"
+                                value={loading ? "..." : `₹${stats.pending_payouts.toLocaleString()}`}
                                 icon={Activity}
                             />
                         </div>
@@ -248,7 +310,35 @@ export default function EarningsPage() {
                                         ))}
                                     </div>
                                 </div>
-                                <WeekChart />
+                                {/* Inlined WeekChart to access stats.weekly_chart data easily */}
+                                <div className="h-64 flex items-end justify-between gap-4 mt-8 px-2">
+                                    {stats.weekly_chart.values.map((h: any, i: any) => {
+                                        const maxVal = Math.max(...(stats.weekly_chart.values as number[])) || 100;
+                                        const percentage = (h / maxVal) * 100;
+                                        return (
+                                            <div key={i} className="flex flex-col items-center gap-2 group w-full">
+                                                <div className="relative w-full h-48 flex items-end rounded-2xl bg-muted/20 overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ height: 0 }}
+                                                        animate={{ height: `${percentage}%` }}
+                                                        transition={{ duration: 1, delay: i * 0.1, ease: "backOut" }}
+                                                        className="w-full bg-gradient-to-t from-primary/60 to-primary relative group-hover:from-primary group-hover:to-purple-400 transition-all duration-300"
+                                                    >
+                                                        <div className="absolute top-0 w-full h-[2px] bg-white/50" />
+                                                    </motion.div>
+                                                    {/* Tooltip */}
+                                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs py-1 px-2 rounded-lg shadow-lg font-bold border">
+                                                        ₹{h}
+                                                    </div>
+                                                </div>
+                                                <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                                                    {/* @ts-ignore */}
+                                                    {stats.weekly_chart.labels[i]}
+                                                </span>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </GlassCard>
                         </motion.div>
                     </div>
