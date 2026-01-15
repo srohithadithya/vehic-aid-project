@@ -238,7 +238,92 @@ class MockPaymentConfirmView(APIView):
                     # We'd need a Transaction model update to support non-service_request payments (nullable)
                     # For now just confirming success is enough for UI.
 
+
+class ProviderDashboardView(APIView):
+    """
+    Returns aggregated financial data for the Provider Dashboard.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # 1. Ensure user is a Service Provider
+        if not getattr(request.user, 'is_service_provider', False):
+             return Response({"error": "Access denied. Provider account required."}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            provider = request.user.serviceprovider
+        except ServiceProvider.DoesNotExist:
+             return Response({"error": "Provider profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        from django.db.models import Sum
+        from django.utils import timezone
+        import datetime
+
+        now = timezone.now()
+        today = now.date()
+        
+        # --- Metrics ---
+        
+        # 1. Current Balance (Unsettled successful transactions)
+        balance_agg = Transaction.objects.filter(
+            provider=provider, 
+            status='SUCCESS', 
+            settled=False
+        ).aggregate(Sum('provider_payout_amount'))
+        current_balance = balance_agg['provider_payout_amount__sum'] or Decimal('0.00')
+
+        # 2. Today's Earnings
+        today_agg = Transaction.objects.filter(
+            provider=provider,
+            status='SUCCESS',
+            created_at__date=today
+        ).aggregate(Sum('provider_payout_amount'))
+        todays_earnings = today_agg['provider_payout_amount__sum'] or Decimal('0.00')
+
+        # 3. Pending Payouts (Same as balance for now, unless we distinguish "processing" vs "unsettled")
+        # In this simplified model, Unsettled = Pending Payout
+        pending_payouts = current_balance
+
+        # --- Chart Data (Last 7 Days) ---
+        weekly_chart = []
+        days_labels = []
+        
+        for i in range(6, -1, -1):
+            day = today - datetime.timedelta(days=i)
+            day_agg = Transaction.objects.filter(
+                provider=provider,
+                status='SUCCESS',
+                created_at__date=day
+            ).aggregate(Sum('provider_payout_amount'))
+            amount = day_agg['provider_payout_amount__sum'] or Decimal('0.00')
+            weekly_chart.append(float(amount))
+            days_labels.append(day.strftime("%a")) # Mon, Tue...
+
+        # --- Recent Transactions ---
+        recent_txs = Transaction.objects.filter(
+            provider=provider
+        ).order_by('-created_at')[:10]
+        
+        tx_data = []
+        for tx in recent_txs:
+            tx_data.append({
+                "id": f"TRX-{tx.id}",
+                "service": tx.service_request.service_type if tx.service_request else "General Credit",
+                "customer": tx.booker.user.first_name or tx.booker.user.username,
+                "amount": float(tx.provider_payout_amount),
+                "date": tx.created_at.isoformat(),
+                "status": tx.status, # SUCCESS, PENDING
+                "type": "Service Payout", # Static for now as most are service payouts
+                "method": tx.payment_method
+            })
+
         return Response({
-            "message": "Payment confirmed successfully (Mock)",
-            "status": "SUCCESS"
-        }, status=status.HTTP_200_OK)
+            "current_balance": float(current_balance),
+            "todays_earnings": float(todays_earnings),
+            "pending_payouts": float(pending_payouts),
+            "weekly_chart": {
+                "values": weekly_chart,
+                "labels": days_labels
+            },
+            "recent_transactions": tx_data
+        })
