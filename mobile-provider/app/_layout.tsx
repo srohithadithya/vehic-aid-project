@@ -19,7 +19,7 @@ export const unstable_settings = {
 
 SplashScreen.preventAutoHideAsync();
 
-function RootLayoutNav() {
+function RootLayoutNav({ fontsLoaded }: { fontsLoaded: boolean }) {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
   const segments = useSegments();
@@ -37,6 +37,12 @@ function RootLayoutNav() {
     }
   }, [user, loading, segments]);
 
+  useEffect(() => {
+    if (user !== undefined && !loading) {
+      // Ready to show
+    }
+  }, [user, loading]);
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
@@ -45,7 +51,6 @@ function RootLayoutNav() {
         <Stack.Screen name="options/help" options={{ presentation: 'modal', title: 'Help & Support' }} />
         <Stack.Screen name="options/terms" options={{ presentation: 'modal', title: 'Terms & Privacy' }} />
         <Stack.Screen name="options/about" options={{ presentation: 'modal', title: 'About' }} />
-
       </Stack>
     </ThemeProvider>
   );
@@ -61,19 +66,13 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
   if (!loaded) {
     return null;
   }
 
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <RootLayoutNav fontsLoaded={loaded} />
     </AuthProvider>
   );
 }
