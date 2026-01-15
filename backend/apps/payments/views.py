@@ -186,27 +186,57 @@ class MockPaymentConfirmView(APIView):
 
     def post(self, request, *args, **kwargs):
         request_id = request.data.get('request_id')
+        plan_id = request.data.get('plan_id')
         
-        if not request_id:
-             return Response({"error": "request_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not request_id and not plan_id:
+             return Response({"error": "request_id or plan_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
-            service_request = get_object_or_404(ServiceRequest, id=request_id)
-            service_request.status = 'COMPLETED'
-            service_request.save()
+            if request_id:
+                # Handle Service Request Payment
+                service_request = get_object_or_404(ServiceRequest, id=request_id)
+                service_request.status = 'COMPLETED'
+                service_request.save()
 
-            # Create a mock transaction if one doesn't exist
-            Transaction.objects.get_or_create(
-                service_request=service_request,
-                defaults={
-                    'booker': service_request.booker,
-                    'amount': Decimal('1499.00'),
-                    'status': 'SUCCESS',
-                    'payment_method': request.data.get('payment_method', 'RAZORPAY'),
-                    'razorpay_order_id': f"mock_order_{request_id}",
-                    'razorpay_payment_id': f"mock_pay_{request_id}",
-                }
-            )
+                # Create transaction
+                Transaction.objects.get_or_create(
+                    service_request=service_request,
+                    defaults={
+                        'booker': service_request.booker,
+                        'amount': Decimal(request.data.get('amount', '500.00')),
+                        'status': 'SUCCESS',
+                        'payment_method': request.data.get('payment_method', 'RAZORPAY'),
+                        'razorpay_order_id': f"mock_order_{request_id}",
+                    }
+                )
+            
+            elif plan_id:
+                # Handle Subscription Payment
+                from apps.services.models import SubscriptionPlan, UserSubscription
+                from django.utils import timezone
+                from datetime import timedelta
+
+                # Find the plan by name (using plan_id passed from frontend as name, e.g. 'Standard')
+                # Or by ID if passed as ID. The frontend passes name currently.
+                plan = SubscriptionPlan.objects.filter(name__iexact=plan_id).first()
+                if not plan:
+                    # Fallback if ID passed
+                    plan = SubscriptionPlan.objects.filter(id=plan_id).first()
+                
+                if plan:
+                    # Create/Update Subscription
+                    UserSubscription.objects.create(
+                        user=request.user.servicebooker,
+                        plan=plan,
+                        start_date=timezone.now().date(),
+                        end_date=timezone.now().date() + timedelta(days=plan.duration_days),
+                        is_active=True,
+                        status='ACTIVE'
+                    )
+                    
+                    # Log Transaction (Optional for now, but good for completeness)
+                    # We'd need a Transaction model update to support non-service_request payments (nullable)
+                    # For now just confirming success is enough for UI.
 
         return Response({
             "message": "Payment confirmed successfully (Mock)",

@@ -117,6 +117,10 @@ export default function SubscriptionsScreen() {
                                 styles.selectButton,
                                 { backgroundColor: plan.popular ? plan.color : 'transparent', borderColor: plan.color, borderWidth: 1 }
                             ]}
+                            onPress={() => router.push({
+                                pathname: '/payment',
+                                params: { amount: plan.price, planId: plan.id }
+                            })}
                         >
                             <Text style={[styles.selectButtonText, { color: plan.popular ? '#fff' : plan.color }]}>
                                 {plan.popular ? 'Unlock Platinum' : 'Get Started'}
