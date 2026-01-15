@@ -32,8 +32,10 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
-            // Future: Implement refresh token logic here
-            // For now, just sign out or handle error
+            // Handle unauthorized - clear tokens and potentially redirect
+            console.warn("Unauthorized! Clearing tokens...");
+            await AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']);
+            // The app will likely redirect on the next protected API call or state check
         }
         return Promise.reject(error);
     }

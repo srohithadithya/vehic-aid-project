@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, ActivityIndicator, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
@@ -30,7 +31,7 @@ export default function PaymentScreen() {
                     });
 
                     Alert.alert('Payment Successful', 'Receipt has been sent to your email.', [
-                        { text: 'OK', onPress: () => router.replace('/(tabs)/two') }
+                        { text: 'OK', onPress: () => router.replace('/(tabs)/history') }
                     ]);
                 }
             } catch (error) {

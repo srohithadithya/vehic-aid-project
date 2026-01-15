@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, View, StatusBar } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBooking } from '../../src/context/BookingContext';
 import ServiceSelection from '../../components/wizard/ServiceSelection';
 import VehicleInfo from '../../components/wizard/VehicleInfo';

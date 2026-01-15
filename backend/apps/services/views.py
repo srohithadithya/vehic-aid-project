@@ -100,7 +100,7 @@ class ServiceRequestView(APIView):
         if request_id:
             # Detail View
             service_request = get_object_or_404(
-                ServiceRequest, id=request_id, booker=booker
+                ServiceRequest, id=request_id, booker=request.user
             )
             return Response(
                 {
@@ -114,7 +114,7 @@ class ServiceRequestView(APIView):
             )
         else:
             # List View (Dashboard)
-            requests = ServiceRequest.objects.filter(booker=booker).order_by('-created_at')[:20]
+            requests = ServiceRequest.objects.filter(booker=request.user).order_by('-created_at')[:20]
             # Use the existing serializer
             serializer = ServiceRequestSerializer(requests, many=True)
             return Response(serializer.data)
@@ -348,7 +348,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             # Ensure the request belongs to the user
             service_request = serializer.validated_data['request']
-            if service_request.booker != request.user.servicebooker:
+            if service_request.booker != request.user:
                 return Response(
                     {"error": "You can only review your own service requests."},
                     status=status.HTTP_403_FORBIDDEN
