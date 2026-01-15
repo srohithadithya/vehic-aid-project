@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Navbar } from '@/components/Navbar';
+// import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
 import { LucideSend, LucideBot, LucideUser, LucideSparkles, LucideCalendarCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -74,7 +74,7 @@ export default function SupportPage() {
 
     return (
         <main className="min-h-screen bg-background flex flex-col">
-            <Navbar />
+            {/* Navbar handled in layout */}
 
             <div className="flex-1 container mx-auto max-w-4xl p-4 md:p-6 flex flex-col h-[calc(100vh-64px)] overflow-hidden">
                 <div className="flex items-center space-x-3 mb-6">

@@ -5,11 +5,21 @@ import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { LucideActivity, LucideBot, LucideUser, LucideLayoutDashboard } from "lucide-react";
+import { LucideActivity, LucideBot, User, LucideLayoutDashboard, Bell, CreditCard, Settings, LogOut } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
     const { t } = useLanguage();
     const { user, logout } = useAuth();
+    const router = useRouter();
 
     return (
         <header className="border-b sticky top-0 z-50 bg-background/80 backdrop-blur-md">
@@ -41,10 +51,36 @@ export function Navbar() {
                 <div className="flex items-center space-x-4">
                     <LanguageToggle />
                     {user ? (
-                        <div className="flex items-center space-x-3">
-                            <LucideUser className="text-muted-foreground" size={20} />
-                            <Button variant="ghost" size="sm" onClick={() => logout()}>Log Out</Button>
-                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold ring-2 ring-primary/20">
+                                        {user?.username?.[0]?.toUpperCase() || 'U'}
+                                    </div>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                                    <User className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push('/billing')}>
+                                    <CreditCard className="mr-2 h-4 w-4" />
+                                    <span>Billing</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => logout()}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     ) : (
                         <>
                             <Link href="/auth/login">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Navbar } from '@/components/Navbar';
+// import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
 import { apiClient } from '@/lib/api';
 import { LucideZap, LucideSignal, LucideCpu, LucideAlertTriangle, LucideCheckCircle2, LucideActivity } from 'lucide-react';
@@ -46,7 +46,7 @@ export default function HealthPage() {
 
     return (
         <main className="min-h-screen bg-background">
-            <Navbar />
+            {/* Navbar handled in layout */}
 
             <div className="container mx-auto px-4 py-12">
                 <motion.div
