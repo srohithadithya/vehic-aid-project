@@ -7,16 +7,13 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '../components/useColorScheme';
+import { View, ActivityIndicator } from 'react-native';
+import Colors from '../constants/Colors';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
-
-// export const unstable_settings = {
-//   // Ensure that reloading on `/modal` keeps a back button present.
-//   initialRouteName: '(tabs)',
-// };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -24,12 +21,20 @@ SplashScreen.preventAutoHideAsync();
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
 import { BookingProvider } from '../src/context/BookingContext';
 import { useRouter, useSegments } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-function RootLayoutNav() {
+function RootLayoutNav({ fontsLoaded }: { fontsLoaded: boolean }) {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const theme = Colors[colorScheme ?? 'light'];
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   useEffect(() => {
     if (loading) return;
@@ -45,12 +50,19 @@ function RootLayoutNav() {
     }
   }, [user, loading, segments]);
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.background }}>
+        <ActivityIndicator size="large" color={theme.tint} />
+      </View>
+    );
+  }
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
       </Stack>
     </ThemeProvider>
   );
@@ -66,21 +78,13 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
   return (
-    <AuthProvider>
-      <BookingProvider>
-        <RootLayoutNav />
-      </BookingProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <BookingProvider>
+          <RootLayoutNav fontsLoaded={loaded} />
+        </BookingProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
-import { Plus, Battery, MapPin, Zap, AlertTriangle, Phone, Activity, Fuel, Disc, Wrench, Menu, Bell, User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { Plus, Battery, MapPin, Zap, AlertTriangle, Phone, Activity, Fuel, Disc, Wrench, Menu, Bell, User, LogOut, Settings, CreditCard, Truck, Headphones, ArrowLeftRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
@@ -236,7 +236,9 @@ export default function Dashboard() {
                             { title: 'Towing', icon: Wrench, color: 'text-blue-500', bg: 'bg-blue-500/10', desc: 'Recovery', link: '?type=TOWING' },
                             { title: 'Fuel', icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-500/10', desc: 'Delivery', link: '?type=FUEL' },
                             { title: 'Flat Tire', icon: Disc, color: 'text-slate-500', bg: 'bg-slate-500/10', desc: 'Repair', link: '?type=FLAT_TIRE' },
-                            { title: 'Exchange', icon: Zap, color: 'text-purple-500', bg: 'bg-purple-500/10', desc: 'Vehicle Swap', link: '/exchange' },
+                            { title: 'Exchange', icon: ArrowLeftRight, color: 'text-purple-500', bg: 'bg-purple-500/10', desc: 'Vehicle Swap', link: '/exchange' },
+                            { title: 'Placement', icon: Truck, color: 'text-green-500', bg: 'bg-green-500/10', desc: 'Move Vehicle', link: '/placement' },
+                            { title: 'Helpline', icon: Headphones, color: 'text-red-500', bg: 'bg-red-500/10', desc: '24/7 Support', link: '/helpline' },
                         ].map((service, i) => (
                             <motion.button
                                 key={service.title}

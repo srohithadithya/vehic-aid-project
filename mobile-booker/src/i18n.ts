@@ -16,7 +16,21 @@ const resources = {
             "location": "Location",
             "vehicle_info": "Vehicle Info",
             "request_assistance": "Request Assistance",
-            "select_service": "Select a Service"
+            "select_service": "Select a Service",
+            "diagnostic_status": "Diagnostics",
+            "vehicle_exchange": "Vehicle Exchange",
+            "vehicle_placement": "Vehicle Placement",
+            "helpline": "24/7 Helpline",
+            "my_vehicles": "My Vehicles",
+            "wallet": "Wallet & Payments",
+            "subscriptions": "Subscriptions & Plans",
+            "iot_device": "IoT Device Status",
+            "support": "Support & Help",
+            "settings": "Settings",
+            "about": "About VehicAid",
+            "upgrade_now": "Upgrade Now",
+            "toll_free": "Toll Free",
+            "call_now": "Call Now"
         }
     },
     hi: {
@@ -32,7 +46,21 @@ const resources = {
             "location": "स्थान",
             "vehicle_info": "वाहन की जानकारी",
             "request_assistance": "सहायता का अनुरोध करें",
-            "select_service": "एक सेवा चुनें"
+            "select_service": "एक सेवा चुनें",
+            "diagnostic_status": "नैदानिक",
+            "vehicle_exchange": "वाहन विनिमय",
+            "vehicle_placement": "वाहन प्लेसमेंट",
+            "helpline": "24/7 हेल्पलाइन",
+            "my_vehicles": "मेरे वाहन",
+            "wallet": "वॉलेट और भुगतान",
+            "subscriptions": "सब्सक्रिप्शन और प्लान",
+            "iot_device": "IoT डिवाइस स्थिति",
+            "support": "सहायता और मदद",
+            "settings": "सेटिंग्स",
+            "about": "VehicAid के बारे में",
+            "upgrade_now": "अभी अपग्रेड करें",
+            "toll_free": "टोल फ्री",
+            "call_now": "अभी कॉल करें"
         }
     }
 };

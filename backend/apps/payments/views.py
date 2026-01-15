@@ -175,3 +175,40 @@ class RazorpayWebhookView(APIView):
                     {"error": "Internal processing error."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+
+
+class MockPaymentConfirmView(APIView):
+    """
+    Mock endpoint for the mobile/web app to directly confirm payment.
+    Useful for testing and demo flows.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        request_id = request.data.get('request_id')
+        
+        if not request_id:
+             return Response({"error": "request_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        with transaction.atomic():
+            service_request = get_object_or_404(ServiceRequest, id=request_id)
+            service_request.status = 'COMPLETED'
+            service_request.save()
+
+            # Create a mock transaction if one doesn't exist
+            Transaction.objects.get_or_create(
+                service_request=service_request,
+                defaults={
+                    'booker': service_request.booker,
+                    'amount': Decimal('1499.00'),
+                    'status': 'SUCCESS',
+                    'payment_method': request.data.get('payment_method', 'RAZORPAY'),
+                    'razorpay_order_id': f"mock_order_{request_id}",
+                    'razorpay_payment_id': f"mock_pay_{request_id}",
+                }
+            )
+
+        return Response({
+            "message": "Payment confirmed successfully (Mock)",
+            "status": "SUCCESS"
+        }, status=status.HTTP_200_OK)

@@ -17,7 +17,7 @@ export default function BookingHistoryScreen() {
 
   const fetchRequests = async () => {
     try {
-      const response = await apiClient.get('/services/my-requests/');
+      const response = await apiClient.get('/services/request/');
       setRequests(response.data);
     } catch (error) {
       console.error("Failed to fetch requests", error);

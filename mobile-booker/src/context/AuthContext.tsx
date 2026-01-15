@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const register = async (details: any) => {
         try {
-            await apiClient.post('/users/register/', {
+            await apiClient.post('/users/register/booker/', {
                 ...details,
                 role: 'BOOKER'
             });

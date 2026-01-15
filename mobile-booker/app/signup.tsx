@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/context/AuthContext';
 import Colors from '../constants/Colors';
 import { useColorScheme } from '../components/useColorScheme';
 import { LucideUser, LucideMail, LucideLock, LucidePhone, LucideArrowLeft } from 'lucide-react-native';
+
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 export default function Signup() {
     const router = useRouter();
@@ -37,9 +39,6 @@ export default function Signup() {
                 phone_number: phone,
                 password
             });
-            // Provide feedback is handled inside register (auto login) or throws error
-            // If success, AuthContext redirects, but we might want to show a toast?
-            // AuthContext does router.replace('/(tabs)'), so we are good.
         } catch (error: any) {
             const msg = error.response?.data?.error || "Registration failed. Please check your details.";
             Alert.alert('Registration Failed', msg);
@@ -58,19 +57,24 @@ export default function Signup() {
                     <LucideArrowLeft size={24} color={theme.text} />
                 </TouchableOpacity>
 
-                <View style={styles.headerContainer}>
-                    <Image
-                        source={require('../assets/images/logo.png')}
-                        style={styles.logo}
-                        resizeMode="contain"
-                    />
+                <Animated.View entering={FadeInUp.duration(800)} style={styles.headerContainer}>
+                    <View style={styles.logoBlur}>
+                        <Image
+                            source={require('../assets/images/logo.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
+                    </View>
                     <Text style={[styles.title, { color: theme.text }]}>Join VehicAid</Text>
-                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Create an account to get started</Text>
-                </View>
+                    <Text style={[styles.subtitle, { color: theme.tabIconDefault }]}>Experience premium roadside assistance</Text>
+                </Animated.View>
 
-                <View style={styles.formContainer}>
-                    <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <LucideUser size={20} color={theme.tabIconDefault} style={styles.icon} />
+                <Animated.View
+                    entering={FadeInUp.delay(200).duration(800)}
+                    style={[styles.formContainer, { backgroundColor: theme.card, borderColor: theme.border }]}
+                >
+                    <View style={styles.inputWrapper}>
+                        <LucideUser size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
                             placeholder="Username"
                             placeholderTextColor={theme.tabIconDefault}
@@ -81,8 +85,8 @@ export default function Signup() {
                         />
                     </View>
 
-                    <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <LucideMail size={20} color={theme.tabIconDefault} style={styles.icon} />
+                    <View style={styles.inputWrapper}>
+                        <LucideMail size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
                             placeholder="Email"
                             placeholderTextColor={theme.tabIconDefault}
@@ -94,8 +98,8 @@ export default function Signup() {
                         />
                     </View>
 
-                    <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <LucidePhone size={20} color={theme.tabIconDefault} style={styles.icon} />
+                    <View style={styles.inputWrapper}>
+                        <LucidePhone size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
                             placeholder="Phone Number"
                             placeholderTextColor={theme.tabIconDefault}
@@ -106,8 +110,8 @@ export default function Signup() {
                         />
                     </View>
 
-                    <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <LucideLock size={20} color={theme.tabIconDefault} style={styles.icon} />
+                    <View style={styles.inputWrapper}>
+                        <LucideLock size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
                             placeholder="Password"
                             placeholderTextColor={theme.tabIconDefault}
@@ -118,8 +122,8 @@ export default function Signup() {
                         />
                     </View>
 
-                    <View style={[styles.inputContainer, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                        <LucideLock size={20} color={theme.tabIconDefault} style={styles.icon} />
+                    <View style={styles.inputWrapper}>
+                        <LucideLock size={20} color={theme.tint} style={styles.icon} />
                         <TextInput
                             placeholder="Confirm Password"
                             placeholderTextColor={theme.tabIconDefault}
@@ -135,15 +139,15 @@ export default function Signup() {
                         onPress={handleSignup}
                         disabled={loading}
                     >
-                        <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
+                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Get Started</Text>}
                     </TouchableOpacity>
+                </Animated.View>
 
-                    <View style={styles.loginRow}>
-                        <Text style={{ color: theme.tabIconDefault }}>Already have an account? </Text>
-                        <TouchableOpacity onPress={() => router.push('/login')}>
-                            <Text style={[styles.loginText, { color: theme.tint }]}>Log In</Text>
-                        </TouchableOpacity>
-                    </View>
+                <View style={styles.loginRow}>
+                    <Text style={{ color: theme.tabIconDefault }}>Already member? </Text>
+                    <TouchableOpacity onPress={() => router.push('/login')}>
+                        <Text style={[styles.loginText, { color: theme.tint }]}>Log In</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -151,81 +155,51 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        padding: 20,
-        justifyContent: 'center',
-    },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
-    },
-    headerContainer: {
-        alignItems: 'center',
-        marginBottom: 40,
-        marginTop: 60,
-    },
-    logo: {
+    container: { flex: 1 },
+    scrollContent: { flexGrow: 1, padding: 25, justifyContent: 'center' },
+    backButton: { position: 'absolute', top: 50, left: 20, zIndex: 10 },
+    headerContainer: { alignItems: 'center', marginBottom: 40, marginTop: 40 },
+    logoBlur: {
         width: 100,
         height: 100,
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    subtitle: {
-        fontSize: 16,
-    },
-    formContainer: {
-        width: '100%',
-    },
-    inputContainer: {
-        flexDirection: 'row',
+        borderRadius: 25,
+        backgroundColor: 'rgba(157, 80, 187, 0.1)',
+        justifyContent: 'center',
         alignItems: 'center',
-        height: 55,
-        borderRadius: 12,
-        borderWidth: 1,
-        paddingHorizontal: 15,
         marginBottom: 15,
     },
-    icon: {
-        marginRight: 10,
+    logo: { width: 70, height: 70 },
+    title: { fontSize: 30, fontWeight: 'bold' },
+    subtitle: { fontSize: 16, marginTop: 5 },
+    formContainer: {
+        padding: 25,
+        borderRadius: 30,
+        borderWidth: 1,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.1,
+        shadowRadius: 15,
     },
-    input: {
-        flex: 1,
-        height: '100%',
-        fontSize: 16,
-    },
-    button: {
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
         height: 55,
         borderRadius: 12,
+        backgroundColor: 'rgba(0,0,0,0.03)',
+        marginBottom: 15,
+    },
+    icon: { marginRight: 12 },
+    input: { flex: 1, height: '100%', fontSize: 16 },
+    button: {
+        height: 60,
+        borderRadius: 18,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    loginRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: 20,
-    },
-    loginText: {
-        fontWeight: 'bold',
-    },
+    buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    loginRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 30 },
+    loginText: { fontWeight: 'bold' },
 });

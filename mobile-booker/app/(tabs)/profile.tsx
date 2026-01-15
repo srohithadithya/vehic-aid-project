@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/context/AuthContext';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from '../../components/useColorScheme';
-import { LucideUser, LucideCar, LucideCreditCard, LucideSettings, LucideInfo, LucideLogOut, LucideChevronRight, LucideHeartPulse, LucideMessageSquare } from 'lucide-react-native';
+import { LucideUser, LucideCar, LucideCreditCard, LucideSettings, LucideInfo, LucideLogOut, LucideChevronRight, LucideHeartPulse, LucideMessageSquare, LucideStar, LucideArrowLeftRight, LucideTruck, LucidePhone } from 'lucide-react-native';
 
 export default function ProfileScreen() {
     const { user, logout } = useAuth();
@@ -13,11 +13,15 @@ export default function ProfileScreen() {
     const theme = Colors[colorScheme ?? 'light'];
 
     const menuItems = [
-        { icon: LucideCar, title: 'My Vehicles', link: '/vehicles' }, // Will create later
-        { icon: LucideCreditCard, title: 'Wallet & Payments', link: '/wallet' }, // Placeholder
-        { icon: LucideHeartPulse, title: 'Vehicle Health (IoT)', link: '/health' },
-        { icon: LucideMessageSquare, title: 'Support & Help', link: '/support' },
-        { icon: LucideSettings, title: 'Settings', link: '/settings' }, // Language/Theme
+        { icon: LucideCar, title: 'My Vehicles', link: '/vehicles' },
+        { icon: LucideCreditCard, title: 'Wallet & Payments', link: '/wallet' },
+        { icon: LucideStar, title: 'Subscriptions & Plans', link: '/subscriptions' },
+        { icon: LucideArrowLeftRight, title: 'Vehicle Exchange', link: '/exchange', premium: true },
+        { icon: LucideTruck, title: 'Vehicle Placement', link: '/placement', premium: true },
+        { icon: LucidePhone, title: '24/7 Helpline', link: '/helpline', premium: true },
+        { icon: LucideHeartPulse, title: 'IoT Device Status', link: '/(tabs)/iot' },
+        { icon: LucideMessageSquare, title: 'Support & Help', link: '/(tabs)/chat' },
+        { icon: LucideSettings, title: 'Settings', link: '/settings' },
         { icon: LucideInfo, title: 'About VehicAid', link: '/about' },
     ];
 

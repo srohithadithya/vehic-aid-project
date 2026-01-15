@@ -32,6 +32,7 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
     vehicle_id = serializers.PrimaryKeyRelatedField(
         queryset=Vehicle.objects.all(), write_only=True, required=True, source="vehicle"
     )
+    dynamic_total = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceRequest
@@ -44,8 +45,19 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
             "longitude",
             "status",
             "priority",
+            "created_at",
+            "dynamic_total",
         ]
-        read_only_fields = ["id", "status", "priority"]
+        read_only_fields = ["id", "status", "priority", "created_at", "dynamic_total"]
+
+    def get_dynamic_total(self, obj):
+        # Fetch the accepted quote if exists
+        quote = obj.quotes.filter(status="ACCEPTED").first()
+        if quote:
+            return float(quote.dynamic_total)
+        # Fallback to pending quote if only one exists
+        quote = obj.quotes.first()
+        return float(quote.dynamic_total) if quote else None
 
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
@@ -205,6 +217,7 @@ class RewardsProgramSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "tier", "created_at", "updated_at"]
 
 
+class RewardTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RewardTransaction
         fields = ["id", "points", "transaction_type", "description", "points_balance_after", "created_at"]

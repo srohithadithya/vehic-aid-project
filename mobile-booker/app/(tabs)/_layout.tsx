@@ -15,7 +15,7 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-import { LucideShieldAlert, LucideHistory, LucideTruck, LucideBot, LucideActivity, LucideUser } from 'lucide-react-native';
+import { LucideShieldAlert, LucideHistory, LucideTruck, LucideBot, LucideActivity, LucideUser, LucideCar, LucideWrench } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import '../../src/i18n';
 
@@ -56,10 +56,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="health"
+        name="chat"
         options={{
-          title: 'Health (IoT)',
-          tabBarIcon: ({ color }) => <LucideActivity size={24} color={color} />,
+          title: 'Support',
+          tabBarIcon: ({ color }) => <LucideBot size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="iot"
+        options={{
+          title: t('diagnostic_status'),
+          tabBarIcon: ({ color }) => <LucideWrench size={24} color={color} />,
         }}
       />
       <Tabs.Screen
