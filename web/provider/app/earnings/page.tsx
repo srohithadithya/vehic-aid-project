@@ -1,176 +1,176 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { IndianRupee, TrendingUp, Calendar, ArrowUpRight } from 'lucide-react';
-import { apiClient } from '@/lib/api';
-
-interface Job {
-    id: number;
-    amount: string;
-    status: string;
-    created_at: string;
-}
-
-interface WeeklyStat {
-    day: string;
-    amount: number;
-}
-
-interface StatsState {
-    total_earnings: number;
-    weekly_breakdown: WeeklyStat[];
-    payouts: Job[];
-}
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowUpRight, ArrowDownLeft, DollarSign, Wallet, Calendar, Download, MoreHorizontal, Filter } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function EarningsPage() {
-    const [stats, setStats] = useState<StatsState>({ total_earnings: 0, weekly_breakdown: [], payouts: [] });
-    const [loading, setLoading] = useState(true);
+    // Mock Data mimicking mobile app
+    const earnings = {
+        today: 4500,
+        week: 12800,
+        month: 54300,
+        balance: 3200,
+    };
 
-    useEffect(() => {
-        const fetchEarnings = async () => {
-            try {
-                // Fetch real stats from backend
-                const response = await apiClient.get('/services/provider/jobs/');
-                // Calculate local stats from job history
-                const jobs: Job[] = response.data.filter((j: Job) => j.status === 'COMPLETED');
-                const total = jobs.reduce((sum: number, j: Job) => sum + (parseFloat(j.amount) || 0), 0);
-
-                // Group by day for the last 7 days
-                const last7Days = Array.from({ length: 7 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() - (6 - i));
-                    return d.toISOString().split('T')[0];
-                });
-
-                const breakdown: WeeklyStat[] = last7Days.map(dateStr => {
-                    const dayJobs = jobs.filter(j => j.created_at.startsWith(dateStr));
-                    const dayTotal = dayJobs.reduce((sum, j) => sum + (parseFloat(j.amount) || 0), 0);
-                    const dayName = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
-                    return { day: dayName, amount: dayTotal };
-                });
-
-                setStats({
-                    total_earnings: total,
-                    weekly_breakdown: breakdown,
-                    payouts: jobs.slice(0, 5) // Last 5 completed jobs
-                });
-            } catch (e) {
-                console.error("Failed to fetch earnings", e);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchEarnings();
-    }, []);
-
-    const maxAmount = stats.weekly_breakdown.length > 0
-        ? Math.max(...stats.weekly_breakdown.map(d => d.amount)) || 1
-        : 1;
-
-    if (loading) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
+    const recentTransactions = [
+        { id: "TXN-001", type: 'Service Payout', desc: 'Towing Service - Honda City', amount: 1500, date: '2025-01-15 10:30 AM', status: 'Completed', method: 'Wallet' },
+        { id: "TXN-002", type: 'Service Payout', desc: 'Battery Jumpstart - Swift', amount: 800, date: '2025-01-15 08:15 AM', status: 'Completed', method: 'Cash' },
+        { id: "TXN-003", type: 'Withdrawal', desc: 'Weekly Settlement', amount: -6500, date: '2025-01-14 06:00 PM', status: 'Processed', method: 'Bank Transfer' },
+        { id: "TXN-004", type: 'Service Payout', desc: 'Flat Tyre - Creta', amount: 500, date: '2025-01-14 02:20 PM', status: 'Completed', method: 'Wallet' },
+        { id: "TXN-005", type: 'Bonus', desc: 'Peak Hour Bonus', amount: 200, date: '2025-01-14 02:00 PM', status: 'Completed', method: 'Wallet' },
+    ];
 
     return (
-        <div className="p-8 space-y-8 bg-gray-50/50 min-h-screen">
-            <div className="flex items-center justify-between">
+        <div className="min-h-screen bg-background p-6 space-y-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Earnings</h2>
-                    <p className="text-muted-foreground">Track your revenue and payouts</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Earnings & Finance</h1>
+                    <p className="text-muted-foreground mt-1">Manage your revenue, payouts, and financial health.</p>
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="gap-2">
+                        <Download className="w-4 h-4" /> Export CSV
+                    </Button>
+                    <Button size="sm" className="gap-2">
+                        <Wallet className="w-4 h-4" /> Request Payout
+                    </Button>
                 </div>
             </div>
 
+            {/* KPI Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="bg-primary text-primary-foreground">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                        <IndianRupee className="h-4 w-4 text-primary-foreground/70" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">₹{stats.total_earnings.toLocaleString()}</div>
-                        <p className="text-xs text-primary-foreground/70 flex items-center mt-1">
-                            <TrendingUp className="h-3 w-3 mr-1" />
-                            +20.1% from last month
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* Placeholder Cards for Future Stats */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Completed Jobs</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+                        <Wallet className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">₹{earnings.balance.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">Available for withdrawal</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Today's Earnings</CardTitle>
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-emerald-600">₹{earnings.today.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">5 jobs completed today</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">This Week</CardTitle>
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats.payouts.length}</div>
-                        <p className="text-xs text-muted-foreground">in current period</p>
+                        <div className="text-2xl font-bold">₹{earnings.week.toLocaleString()}</div>
+                        <p className="text-xs text-emerald-600 mt-1 flex items-center">
+                            <ArrowUpRight className="h-3 w-3 mr-1" /> +12% from last week
+                        </p>
                     </CardContent>
                 </Card>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Weekly Breakdown</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-2">
-                        <div className="h-[200px] flex items-end justify-between px-4 gap-2">
-                            {stats.weekly_breakdown.map((item, index) => (
-                                <div key={index} className="flex flex-col items-center flex-1 group">
-                                    <div
-                                        className="w-full bg-primary/20 rounded-t-md hover:bg-primary/40 transition-all relative group-hover:shadow-lg"
-                                        style={{ height: `${Math.max((item.amount / maxAmount) * 100, 5)}%` }}
-                                    >
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                            ₹{item.amount}
-                                        </div>
-                                    </div>
-                                    <span className="text-xs text-muted-foreground mt-2 font-medium">{item.day}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Recent Payouts</CardTitle>
-                        <CardDescription>
-                            Latest completed services
-                        </CardDescription>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">This Month</CardTitle>
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            {stats.payouts.map((job, i) => (
-                                <div key={i} className="flex items-center justify-between p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <ArrowUpRight className="h-4 w-4 text-primary" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-medium leading-none">Service Payment</p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {new Date(job.created_at).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="font-bold text-green-600">
-                                        +₹{job.amount || 0}
-                                    </div>
-                                </div>
-                            ))}
-                            {stats.payouts.length === 0 && (
-                                <p className="text-sm text-muted-foreground text-center py-4">No recent payouts found.</p>
-                            )}
-                        </div>
+                        <div className="text-2xl font-bold">₹{earnings.month.toLocaleString()}</div>
+                        <p className="text-xs text-emerald-600 mt-1 flex items-center">
+                            <ArrowUpRight className="h-3 w-3 mr-1" /> +8% from last month
+                        </p>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Transactions Table */}
+            <Card className="col-span-4">
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle>Transaction History</CardTitle>
+                            <CardDescription>Recent earnings and payouts.</CardDescription>
+                        </div>
+                        <Button variant="ghost" size="icon">
+                            <Filter className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px]">ID</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Method</TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
+                                <TableHead className="text-right">Status</TableHead>
+                                <TableHead className="w-[50px]"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {recentTransactions.map((tx) => (
+                                <TableRow key={tx.id}>
+                                    <TableCell className="font-medium">{tx.id}</TableCell>
+                                    <TableCell>{tx.desc}</TableCell>
+                                    <TableCell>
+                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${tx.type === 'Withdrawal' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+                                            }`}>
+                                            {tx.type}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>{tx.date}</TableCell>
+                                    <TableCell className="text-muted-foreground">{tx.method}</TableCell>
+                                    <TableCell className={`text-right font-medium ${tx.amount > 0 ? 'text-emerald-600' : 'text-foreground'
+                                        }`}>
+                                        {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount).toLocaleString()}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                                            {tx.status}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>View details</DropdownMenuItem>
+                                                <DropdownMenuItem>Download receipt</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     );
 }

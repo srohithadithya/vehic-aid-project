@@ -14,7 +14,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["is_booker"] = user.is_service_booker
         token["is_provider"] = user.is_service_provider
 
-        if user.is_service_provider:
+        if user.is_service_provider and hasattr(user, 'serviceprovider'):
             token["provider_verified"] = user.serviceprovider.is_verified
 
         return token

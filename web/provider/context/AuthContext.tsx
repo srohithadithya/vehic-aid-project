@@ -47,8 +47,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = async (credentials: any) => {
         try {
-            const response = await apiClient.post('/users/login/', credentials);
-            const { access, refresh, user } = response.data;
+            const response = await apiClient.post('/users/token/', credentials);
+            const { access, refresh } = response.data;
+            // Decode token or fetch profile if available. For now, use placeholder matching structure.
+            const user = { id: 1, username: credentials.username || credentials.email, is_service_provider: true };
 
             localStorage.setItem('provider_access_token', access);
             localStorage.setItem('provider_refresh_token', refresh);

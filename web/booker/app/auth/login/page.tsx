@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
+import { useRef } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -19,30 +21,25 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const { login } = useAuth();
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
         try {
-            const response = await apiClient.post('/users/token/', {
+            console.log('Attempting login with:', { username: email, password: password });
+            await login({
                 username: email,
                 password: password,
             });
-
-            // Store tokens
-            localStorage.setItem('customer_access_token', response.data.access);
-            localStorage.setItem('customer_refresh_token', response.data.refresh);
-
-            // Redirect to dashboard or return URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirectUrl = urlParams.get('redirect') || '/dashboard';
-            router.push(redirectUrl);
+            // Redirect is handled in auth.login
         } catch (err: any) {
             console.error('Login failed', err);
-            setError('Invalid credentials. Please double-check your email and password.');
-        } finally {
-            setIsLoading(false);
+            const errorMessage = err.response?.data?.detail || err.message || 'Login failed';
+            setError(`Error: ${errorMessage}`);
+            setIsLoading(false); // Only stop loading on error, let success redirect
         }
     };
 
@@ -60,14 +57,14 @@ export default function LoginPage() {
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
+                            <Label htmlFor="email">Username / Email Address</Label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                 <Input
                                     id="email"
-                                    type="email"
-                                    placeholder="name@example.com"
-                                    className="pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+                                    type="text"
+                                    placeholder="Username or Email"
+                                    className="pl-10 h-11 transition-all focus:ring-2 focus:ring-primary/20"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -77,12 +74,6 @@ export default function LoginPage() {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="password">Password</Label>
-                                <Link
-                                    href="/auth/reset-password"
-                                    className="text-xs text-primary hover:underline"
-                                >
-                                    Forgot password?
-                                </Link>
                             </div>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
@@ -90,7 +81,7 @@ export default function LoginPage() {
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="••••••••"
-                                    className="pl-10 pr-10 transition-all focus:ring-2 focus:ring-primary/20"
+                                    className="pl-10 pr-10 h-11 transition-all focus:ring-2 focus:ring-primary/20"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
@@ -98,7 +89,7 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="h-5 w-5" />
@@ -107,6 +98,19 @@ export default function LoginPage() {
                                     )}
                                 </button>
                             </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="remember" className="rounded border-gray-300 text-primary focus:ring-primary" />
+                                <label htmlFor="remember" className="text-muted-foreground">Remember me</label>
+                            </div>
+                            <Link
+                                href="/auth/reset-password"
+                                className="text-primary hover:underline font-medium"
+                            >
+                                Forgot password?
+                            </Link>
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@
 
 import { BookingProvider } from "@/context/BookingContext";
 import BookingWizard from "@/components/booking/BookingWizard";
-import { Navbar } from "@/components/Navbar";
+// import { Navbar } from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -27,7 +27,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background overflow-hidden">
-      <Navbar />
+// Navbar removed (handled in layout)
 
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 lg:py-32">

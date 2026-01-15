@@ -41,7 +41,8 @@ export default function ProviderLoginPage() {
             router.push('/dashboard');
         } catch (err: any) {
             console.error('Login failed', err);
-            setError('Invalid credentials. validations failed or server unreachable. Try demo: provider@vehicaid.com / vehicaid123');
+            const errorMessage = err.response?.data?.detail || err.message || 'Login failed';
+            setError(`Error: ${errorMessage}`);
         } finally {
             if (email !== 'provider@vehicaid.com') setIsLoading(false);
         }
@@ -78,7 +79,7 @@ export default function ProviderLoginPage() {
                                     type="text"
                                     required
                                     className="block w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
-                                    placeholder="Provider ID / Email (try: provider@vehicaid.com)"
+                                    placeholder="Username / Provider ID (e.g., prov_tow)"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
