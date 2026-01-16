@@ -321,6 +321,8 @@ class ProviderDashboardView(APIView):
             "current_balance": float(current_balance),
             "todays_earnings": float(todays_earnings),
             "pending_payouts": float(pending_payouts),
+            "jobs_completed": provider.jobs_completed,
+            "rating": float(provider.average_rating),
             "weekly_chart": {
                 "values": weekly_chart,
                 "labels": days_labels

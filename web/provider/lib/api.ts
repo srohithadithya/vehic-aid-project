@@ -34,11 +34,7 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             if (typeof window !== 'undefined') {
                 const token = localStorage.getItem('provider_access_token');
-                // DEMO FIX: Do not log out if we are in demo mode
-                if (token === 'demo-access-token-verified') {
-                    console.warn('API 401 suppressed in Demo Mode');
-                    return Promise.reject(error);
-                }
+                localStorage.removeItem('provider_access_token');
 
                 localStorage.removeItem('provider_access_token');
                 localStorage.removeItem('provider_refresh_token');

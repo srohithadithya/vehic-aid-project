@@ -7,8 +7,11 @@ import { useRouter } from 'next/navigation';
 
 interface User {
     id: number;
-    username: string;
-    is_service_provider: boolean;
+    username?: string;
+    full_name?: string;
+    email?: string;
+    is_service_provider?: boolean;
+    provider_id?: string;
 }
 
 interface AuthContextType {
@@ -31,13 +34,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const token = localStorage.getItem('provider_access_token');
             if (token) {
                 try {
-                    // Fetch profile or just set user from assumed token validity for MVP
-                    // const response = await apiClient.get('/users/profile/');
-                    // setUser(response.data.user);
-                    // Mock user for now if API not fully ready with profile endpoint
-                    setUser({ id: 1, username: 'Provider', is_service_provider: true });
+                    const response = await apiClient.get('/users/profile/');
+                    setUser(response.data);
                 } catch (error) {
                     localStorage.removeItem('provider_access_token');
+                    setUser(null);
                 }
             }
             setLoading(false);
@@ -49,13 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await apiClient.post('/users/token/', credentials);
             const { access, refresh } = response.data;
-            // Decode token or fetch profile if available. For now, use placeholder matching structure.
-            const user = { id: 1, username: credentials.username || credentials.email, is_service_provider: true };
 
             localStorage.setItem('provider_access_token', access);
             localStorage.setItem('provider_refresh_token', refresh);
-            setUser(user);
-            router.push('/jobs');
+
+            const profileRes = await apiClient.get('/users/profile/');
+            setUser(profileRes.data);
+
+            router.push('/dashboard');
         } catch (error) {
             console.error("Login failed", error);
             throw error;

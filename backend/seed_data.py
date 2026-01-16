@@ -109,17 +109,25 @@ for i, (username, full_name, plan_code) in enumerate(booker_defs):
 # ------------------------------------------------------------------
 print("\nCreating Vehicles...")
 vehicles = []
-cars = [('Maruti', 'Swift'), ('Hyundai', 'i20'), ('Tata', 'Nexon'), ('Honda', 'City')]
+vehicle_data = [
+    # 2 Four Wheelers
+    ('Maruti', 'Swift', 'FOUR_WHEELER'),
+    ('Hyundai', 'i20', 'FOUR_WHEELER'),
+    # 2 Two Wheelers
+    ('Honda', 'Activa', 'TWO_WHEELER'),
+    ('Royal Enfield', 'Classic 350', 'TWO_WHEELER')
+]
 for i, booker in enumerate(bookers):
     v = Vehicle.objects.create(
         owner=booker.user,
-        make=cars[i][0],
-        model=cars[i][1],
+        make=vehicle_data[i][0],
+        model=vehicle_data[i][1],
         license_plate=f"MH0{i+1}AB{1000+i}",
-        fuel_type='PETROL'
+        fuel_type='PETROL',
+        vehicle_type=vehicle_data[i][2]  # Added vehicle type
     )
     vehicles.append(v)
-    print(f"Vehicle: {v.license_plate} -> {booker.user.username}")
+    print(f"Vehicle: {v.license_plate} ({v.vehicle_type}) -> {booker.user.username}")
 
 # ------------------------------------------------------------------
 # 5. Create Providers
@@ -148,8 +156,10 @@ for i, (username, name, service) in enumerate(prov_defs):
         is_verified=True,
         is_available=True,
         service_types=[service],
-        latitude=12.9716 + (i * 0.01), # Bangalore coords spread
-        longitude=77.5946 + (i * 0.01)
+        latitude=12.9716 + (i * 0.01),
+        longitude=77.5946 + (i * 0.01),
+        average_rating=4.5 + (i * 0.1),
+        jobs_completed=12 + (i * 5)
     )
     providers.append(p)
     print(f"Provider: {username} ({service})")

@@ -32,64 +32,47 @@ export default function ProviderDashboard() {
     const [isAvailable, setIsAvailable] = useState(true);
     const [loading, setLoading] = useState(true);
 
+    const [stats, setStats] = useState({
+        todays_earnings: 0,
+        jobs_completed: 0,
+        rating: 5.0
+    });
+
     useEffect(() => {
         if (!localStorage.getItem('provider_access_token')) {
             router.push('/login');
             return;
         }
         fetchJobs();
+        fetchStats();
     }, [router]);
 
-    const fetchJobs = async () => {
-        // DEMO BYPASS: Check for demo token
-        const token = localStorage.getItem('provider_access_token');
-        if (token === 'demo-access-token-verified') {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 800));
-            // Mock data consistent with "Mission Control" UI
-            const mockJobs: ServiceRequest[] = [
-                {
-                    id: 204,
-                    service_type: 'FUEL_DELIVERY',
-                    status: 'PENDING',
-                    created_at: new Date().toISOString(),
-                    customer_notes: 'Ran out of petrol on highway',
-                    provider_id: null,
-                    priority: 'HIGH'
-                },
-                {
-                    id: 205,
-                    service_type: 'TIRE_CHANGE',
-                    status: 'PENDING',
-                    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-                    customer_notes: 'Flat tire, need spare change',
-                    provider_id: null,
-                    priority: 'NORMAL'
-                }
-            ];
-            setAvailableJobs(mockJobs);
-            // Simulate one active job for demo purposes if needed, else empty
-            setActiveJobs([{
-                id: 199,
-                service_type: 'TOW_SERVICE',
-                status: 'IN_PROGRESS',
-                created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-                customer_notes: 'Engine overheat, need tow to garage',
-                provider_id: 123,
-                priority: 'CRITICAL'
-            }]);
-            setLoading(false);
-            return;
-        }
-
+    const fetchStats = async () => {
         try {
-            const response = await apiClient.get('/admin/bookings/');
-            const allRequests: ServiceRequest[] = response.data;
-            setAvailableJobs(allRequests.filter(r => r.status === 'PENDING'));
-            setActiveJobs(allRequests.filter(r => r.status === 'DISPATCHED' || r.status === 'IN_PROGRESS'));
+            const response = await apiClient.get('/payments/dashboard/provider/');
+            setStats({
+                todays_earnings: response.data.todays_earnings || 0,
+                jobs_completed: response.data.jobs_completed || 0, // Assuming backend provides this
+                rating: response.data.rating || 5.0
+            });
+        } catch (error) {
+            console.error('Failed to fetch stats', error);
+        }
+    };
+
+    const fetchJobs = async () => {
+        try {
+            // Fetch jobs assigned to this provider (Active Jobs)
+            const activeResponse = await apiClient.get('/services/provider/jobs/');
+            const assignedJobs: ServiceRequest[] = activeResponse.data;
+            setActiveJobs(assignedJobs.filter(r => r.status === 'DISPATCHED' || r.status === 'IN_PROGRESS'));
+
+            // Fetch jobs available for pickup (Available Jobs)
+            const availableResponse = await apiClient.get('/services/provider/jobs/available/');
+            setAvailableJobs(availableResponse.data);
+
         } catch (error) {
             console.error('Failed to fetch jobs', error);
-            // Fallback to empty state instead of crashing/redirecting
             setAvailableJobs([]);
             setActiveJobs([]);
         } finally {
@@ -99,9 +82,7 @@ export default function ProviderDashboard() {
 
     const acceptJob = async (id: number) => {
         try {
-            await apiClient.post(`/provider/update/${id}/`, {
-                status: 'DISPATCHED'
-            });
+            await apiClient.post(`/services/provider/jobs/${id}/accept/`);
             fetchJobs();
         } catch (err) {
             console.error("Failed to accept job", err);
@@ -155,9 +136,9 @@ export default function ProviderDashboard() {
                                 <Wallet className="w-24 h-24" />
                             </div>
                             <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Today's Earnings</p>
-                            <h3 className="text-4xl font-bold text-white mt-2">₹ 2,450</h3>
+                            <h3 className="text-4xl font-bold text-white mt-2">₹ {stats.todays_earnings.toLocaleString()}</h3>
                             <div className="mt-4 flex items-center gap-2 text-green-400 text-xs font-mono">
-                                <Activity className="w-3 h-3" /> +12% from yesterday
+                                <Activity className="w-3 h-3" /> Real-time sync
                             </div>
                         </div>
                     </Link>
@@ -167,9 +148,9 @@ export default function ProviderDashboard() {
                             <CheckCircle className="w-24 h-24" />
                         </div>
                         <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Jobs Completed</p>
-                        <h3 className="text-4xl font-bold text-white mt-2">4</h3>
+                        <h3 className="text-4xl font-bold text-white mt-2">{stats.jobs_completed}</h3>
                         <div className="mt-4 flex items-center gap-2 text-purple-400 text-xs font-mono">
-                            Target: 8 jobs
+                            Daily progress tracked
                         </div>
                     </div>
 
@@ -178,7 +159,7 @@ export default function ProviderDashboard() {
                             <Shield className="w-24 h-24" />
                         </div>
                         <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Rating</p>
-                        <h3 className="text-4xl font-bold text-white mt-2">4.9</h3>
+                        <h3 className="text-4xl font-bold text-white mt-2">{stats.rating.toFixed(1)}</h3>
                         <div className="flex gap-1 mt-4">
                             {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-8 h-1 bg-yellow-500 rounded-full opacity-80" />)}
                         </div>

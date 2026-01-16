@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
 import { ShieldCheck, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function ProviderLoginPage() {
+    const { login } = useAuth();
     const router = useRouter();
     const { t } = useLanguage();
     const [email, setEmail] = useState('');
@@ -20,31 +21,18 @@ export default function ProviderLoginPage() {
         setIsLoading(true);
         setError('');
 
-        // DEMO BYPASS: Allow immediate access for verification
-        if (email === 'provider@vehicaid.com' && password === 'vehicaid123') {
-            setTimeout(() => {
-                localStorage.setItem('provider_access_token', 'demo-access-token-verified');
-                localStorage.setItem('provider_refresh_token', 'demo-refresh-token-verified');
-                router.push('/dashboard');
-            }, 1000); // Simulate network delay
-            return;
-        }
-
         try {
-            const response = await apiClient.post('/users/token/', {
+            await login({
                 username: email,
                 password: password,
             });
-
-            localStorage.setItem('provider_access_token', response.data.access);
-            localStorage.setItem('provider_refresh_token', response.data.refresh);
-            router.push('/dashboard');
+            // Redirect is handled inside AuthContext.login
         } catch (err: any) {
             console.error('Login failed', err);
             const errorMessage = err.response?.data?.detail || err.message || 'Login failed';
             setError(`Error: ${errorMessage}`);
         } finally {
-            if (email !== 'provider@vehicaid.com') setIsLoading(false);
+            setIsLoading(false);
         }
     };
 

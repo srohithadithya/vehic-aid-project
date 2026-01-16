@@ -6,7 +6,7 @@ import { AdminSidebar } from "@/components/admin-sidebar";
 import { AdminHeader } from "@/components/admin-header";
 import { LanguageProvider } from "@/context/LanguageContext";
 
-export function AdminLayoutClient({
+export function AdminMainLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export function AdminLayoutClient({
 
   return (
     <LanguageProvider>
-      <div className="flex min-h-screen bg-gray-100/40">
+      <div data-layout-id="main-admin-layout" className="flex min-h-screen bg-gray-100/40">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
           <AdminHeader />

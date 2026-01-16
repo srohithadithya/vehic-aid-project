@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -125,16 +126,26 @@ class UserProfileView(APIView):
 
         # Add provider-specific data
         if user.is_service_provider:
-            provider = ServiceProvider.objects.get(user=user)
-            response_data.update(
-                {
-                    "is_verified": provider.is_verified,
-                    "average_rating": provider.average_rating,
-                    "jobs_completed": provider.jobs_completed,
-                    "is_available": provider.is_available,
-                    # Add service type and banking info here if required
-                }
-            )
+            try:
+                provider = ServiceProvider.objects.get(user=user)
+                from apps.services.models import Vehicle
+                vehicles = Vehicle.objects.filter(owner=user).values_list('license_plate', flat=True)
+                response_data.update(
+                    {
+                        "provider_id": f"PRO-{user.id:06d}",
+                        "is_verified": provider.is_verified,
+                        "average_rating": float(provider.average_rating),
+                        "jobs_completed": provider.jobs_completed,
+                        "is_available": provider.is_available,
+                        "service_types": provider.service_types,
+                        "vehicles": list(vehicles),
+                        "bank_account": provider.bank_account_number,
+                        "bank_ifsc": provider.bank_ifsc_code,
+                        "server_time": timezone.now().isoformat(),
+                    }
+                )
+            except ServiceProvider.DoesNotExist:
+                pass
 
         # Add customer-specific data
         elif user.is_service_booker:

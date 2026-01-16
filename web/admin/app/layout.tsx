@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AdminLayoutClient } from "@/components/admin-layout-client";
+import { AdminMainLayout } from "@/components/admin-layout-client";
 
 const inter = { className: "font-sans" }; // Use standard tailwind sans font stack
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning={true}>
-        <AdminLayoutClient>{children}</AdminLayoutClient>
+        <AdminMainLayout>{children}</AdminMainLayout>
       </body>
     </html>
   );

@@ -112,6 +112,7 @@ LOGOUT_REDIRECT_URL = "/"
 AUTH_USER_MODEL = "users.CustomUser"
 
 # Use the env helper to read the database URL
+# Use the env helper to read the database URL
 DATABASES = {
     "default": env.db_url(
         "DATABASE_URL",

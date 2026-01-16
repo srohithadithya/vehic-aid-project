@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
+import { apiClient } from '@/lib/api';
 import {
     Calendar, MapPin, DollarSign, Clock, Search, Filter,
     ArrowUpRight, CheckCircle, XCircle
@@ -11,20 +12,28 @@ import {
 import { clsx } from 'clsx';
 import AuthGuard from '@/components/AuthGuard';
 
-// Mock Data
-const MOCK_HISTORY = [
-    { id: 101, type: 'TOW_SERVICE', date: '2024-03-10T14:30:00', amount: 850, status: 'COMPLETED', location: 'Indiranagar, Bangalore' },
-    { id: 102, type: 'FUEL_DELIVERY', date: '2024-03-09T09:15:00', amount: 300, status: 'COMPLETED', location: 'Koramangala, Bangalore' },
-    { id: 103, type: 'MECHANIC_VISIT', date: '2024-03-08T18:45:00', amount: 0, status: 'CANCELLED', location: 'MG Road, Bangalore' },
-    { id: 104, type: 'TIRE_CHANGE', date: '2024-03-08T11:20:00', amount: 450, status: 'COMPLETED', location: 'Whitefield, Bangalore' },
-    { id: 105, type: 'BATTERY_JUMP', date: '2024-03-07T16:00:00', amount: 500, status: 'COMPLETED', location: 'HSR Layout, Bangalore' },
-];
-
 export default function HistoryPage() {
     const { t } = useLanguage();
     const [filter, setFilter] = useState('ALL');
+    const [history, setHistory] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const filteredHistory = MOCK_HISTORY.filter(item => {
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const response = await apiClient.get('/services/provider/jobs/');
+                // Transform API data to match UI needs if necessary
+                setHistory(response.data);
+            } catch (error) {
+                console.error("Failed to fetch history", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchHistory();
+    }, []);
+
+    const filteredHistory = history.filter(item => {
         if (filter === 'ALL') return true;
         return item.status === filter;
     });
