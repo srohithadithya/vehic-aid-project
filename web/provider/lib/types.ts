@@ -93,3 +93,22 @@ export type Action =
     | { type: 'SET_VEHICLE'; payload: Partial<VehicleState> }
     | { type: 'SET_CONTACT'; payload: Partial<ContactState> }
     | { type: 'RESET' };
+
+export interface ChatMessage {
+    id: number;
+    request: number;
+    sender: number;
+    sender_name: string;
+    message: string;
+    is_read: boolean;
+    is_me: boolean;
+    created_at: string;
+}
+
+export interface ProviderJob extends ServiceRequest {
+    booker_name: string;
+    booker_phone: string;
+    vehicle_details: string;
+    latitude: number;
+    longitude: number;
+}

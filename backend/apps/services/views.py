@@ -23,12 +23,14 @@ from .models import (
     VehicleExchange,
     HelplineCall,
     ServiceQuote,
+    ChatMessage,
 )
 from .serializers import (
     ServiceRequestSerializer,
     SubscriptionPlanSerializer,
     UserSubscriptionSerializer,
     SubscriptionCreateSerializer,
+    ChatMessageSerializer,
 )
 
 
@@ -712,6 +714,13 @@ class ProviderJobView(viewsets.ViewSet):
         
         return Response({"status": "Job accepted", "job_id": job.id})
 
+    def retrieve(self, request, pk=None):
+        """Retrieve details of a specific job assigned to or available to the provider."""
+        job = get_object_or_404(ServiceRequest, pk=pk)
+        from .serializers import ProviderJobSerializer
+        serializer = ProviderJobSerializer(job)
+        return Response(serializer.data)
+
 
 class AIStatsView(APIView):
     """
@@ -751,4 +760,40 @@ class AIStatsView(APIView):
                 { "time": '22:00', "requests": 15 },
             ]
         })
+
+
+class ChatMessageViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = ChatMessage.objects.all()
+    serializer_class = ChatMessageSerializer
+
+    def get_queryset(self):
+        request_id = self.request.query_params.get('request_id')
+        if request_id:
+            return ChatMessage.objects.filter(request_id=request_id).order_by('created_at')
+        return ChatMessage.objects.none()
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+
+class ProviderLocationUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        provider = getattr(request.user, 'serviceprovider', None)
+        if not provider:
+            return Response({"error": "User is not a service provider."}, status=status.HTTP_403_FORBIDDEN)
+        
+        latitude = request.data.get("latitude")
+        longitude = request.data.get("longitude")
+        
+        if latitude is None or longitude is None:
+            return Response({"error": "Latitude and longitude are required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        provider.latitude = latitude
+        provider.longitude = longitude
+        provider.save()
+        
+        return Response({"status": "Location updated successfully."})
 
