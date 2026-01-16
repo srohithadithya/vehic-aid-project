@@ -12,41 +12,58 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 
 ---
 
-## ⚡ Quick Start (Docker Verification)
+## ⚡ Quick Start (Docker Deployment)
 
 1. Navigate to the infrastructure directory:
    ```powershell
    cd infrastructure
    ```
 
-2. Start the verification environment:
+2. Copy environment template and configure:
    ```powershell
-   docker-compose -f docker-compose.verify.yml up --build -d
+   cp .env.example .env
+   # Edit .env with your Google Maps API key and other settings
    ```
 
-## Services & Credentials
+3. Start all services:
+   ```powershell
+   docker-compose up --build -d
+   ```
 
-### **Web Admin Panel**
-- **URL**: [http://localhost:3002/login](http://localhost:3002/login)
+## 🌐 Services & Access Points
+
+### **Web Admin Panel** (Command Center)
+- **URL**: [http://localhost:3000](http://localhost:3000)
 - **Username**: `admin_mobile`
 - **Password**: `password123`
+- **Features**: 
+  - Real-time AI Monitor with 10-second polling
+  - Analytics Dashboard with 30-second updates
+  - Payment Management (INR ₹)
+  - User & Booking Management
 
-### **Web Provider App (Mission Control)**
+### **Web Provider App** (Mission Control)
 - **URL**: [http://localhost:3001](http://localhost:3001)
-- **Features**: Real-time Dispatch, Earnings Tracker, "Cosmic Glass" UI.
+- **Features**: 
+  - Real-time Dispatch Dashboard
+  - Earnings Tracker (INR ₹)
+  - "Cosmic Glass" UI with Glassmorphism
+  - Live Job Notifications
 
-### **Web Booker App (Customer)**
-- **URL**: [http://localhost:3000](http://localhost:3000)
-- **Features**: Premium Auth, Subscription Plans (INR), Service Requests.
+### **Web Booker App** (Customer Portal)
+- **URL**: [http://localhost:3003](http://localhost:3003)
+- **Features**: 
+  - Premium Authentication
+  - Subscription Plans (INR ₹)
+  - **NEW**: Real-time Chat with Providers
+  - **NEW**: Google Maps Location Picker
+  - **NEW**: Live Notifications System
+  - Service Request Tracking
 
-### **Command Center (Backend Admin)**
-- **Backend**: `http://localhost:8001`
-- **Admin Panel**: `http://localhost:3002`
-- **Provider App**: `http://localhost:3001`
-- **Booker App**: `http://localhost:3000`
-
-### **API Documentation**
-- **Swagger/OpenAPI**: [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
+### **Backend API**
+- **URL**: [http://localhost:8001](http://localhost:8001)
+- **API Docs**: [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
+- **WebSocket**: `ws://localhost:8001/ws/`
 
 ---
 
@@ -57,10 +74,23 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Automated Coordination**: `BookingAgent` manages the lifecycle from request -> dispatch -> confirmation.
 - **Auto-Escalation**: Background tasks monitor stuck requests and re-dispatch automatically.
 
+### 💬 Real-Time Communication (NEW)
+- **Customer-Provider Chat**: Live messaging with 3-second polling
+- **WebSocket Updates**: Real-time status changes
+- **Toast Notifications**: Success, error, info, and warning alerts
+- **Auto-refresh**: Status updates without page reload
+
+### 🗺️ Location Services (NEW)
+- **Google Maps Integration**: Interactive location picker
+- **Drag-and-Drop Marker**: Precise location selection
+- **Reverse Geocoding**: Human-readable addresses
+- **Current Location**: Browser geolocation support
+
 ### 🎨 Cosmic Glass Admin Panel & Booker
 - **Premium UI**: Deep midnight blue theme with neon accents and frosted glass effects.
 - **High-Security Auth**: Multi-step registration with identity verification and password strength analysis.
 - **Live Dashboard**: Interactive visualizations for Revenue and Active Users.
+- **Real-Time Analytics**: AI Monitor (10s polling), Subscription Analytics (30s polling)
 
 ### 💼 V3 Provider Mission Control
 - **Glassmorphism Dashboard**: A stunning, "App-like" web experience for providers with rich gradients and animations.
@@ -79,6 +109,7 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 ### 📱 IoT & Real-Time Tracking
 - **Connected Vehicle**: Simulates IoT device heartbeats for vehicle health monitoring.
 - **Live Updates**: WebSocket integration for real-time status changes.
+- **Provider Location**: Real-time GPS tracking during service
 
 ---
 
@@ -96,6 +127,7 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Styling**: Tailwind CSS + shadcn/ui.
 - **Components**: Lucide Icons + Framer Motion.
 - **Charts**: Recharts.
+- **Maps**: Google Maps JavaScript API
 
 ### Integrations
 - **Payments**: Razorpay.
