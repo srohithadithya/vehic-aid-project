@@ -96,16 +96,13 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
     container_name: vehicaid_admin_verify
-    command: sh -c "npm install && npm run dev"
     ports:
-      - "3002:3002"
-    volumes:
-      - ../web/admin:/app
-      - /app/node_modules
-      - /app/.next
+      - "3002:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
-      - API_URL=http://web:8000/api
+      - API_URL=http://web:8000/api/v1
+      - NODE_ENV=production
+      - PORT=3000
     depends_on:
       - web
     restart: unless-stopped
@@ -117,15 +114,13 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
     container_name: vehicaid_booker_verify
-    command: sh -c "npm install && npm run dev"
+    user: root
     ports:
       - "3000:3000"
-    volumes:
-      - ../web/booker:/app
-      - /app/node_modules
-      - /app/.next
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - NODE_ENV=production
+      - PORT=3000
     depends_on:
       - web
     restart: unless-stopped
@@ -137,15 +132,13 @@ services:
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
     container_name: vehicaid_provider_verify
-    command: sh -c "npm install && npm run dev"
+    user: root
     ports:
-      - "3001:3001"
-    volumes:
-      - ../web/provider:/app
-      - /app/node_modules
-      - /app/.next
+      - "3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - NODE_ENV=production
+      - PORT=3000
     depends_on:
       - web
     restart: unless-stopped
@@ -154,3 +147,10 @@ volumes:
   db_data_verify:
   static_files_verify:
   media_files_verify:
+  next_admin_cache:
+  next_booker_cache:
+  next_provider_cache:
+  node_modules_admin:
+  node_modules_booker:
+  node_modules_provider:
+  admin_app_isolated:

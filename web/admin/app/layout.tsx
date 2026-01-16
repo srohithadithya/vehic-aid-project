@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { AdminLayoutClient } from "@/components/admin-layout-client";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = { className: "font-sans" }; // Use standard tailwind sans font stack
 
 export const metadata: Metadata = {
   title: "Vehic-Aid Admin Panel",

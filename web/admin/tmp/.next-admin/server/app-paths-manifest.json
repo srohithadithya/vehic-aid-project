@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/ai-monitor/page": "app/ai-monitor/page.js",
+  "/page": "app/page.js",
+  "/bookings/page": "app/bookings/page.js",
+  "/iot-fleet/page": "app/iot-fleet/page.js",
+  "/payments/page": "app/payments/page.js",
+  "/analytics/page": "app/analytics/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/map-test/page": "app/map-test/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/settlements/page": "app/settlements/page.js",
+  "/users/page": "app/users/page.js",
+  "/login/page": "app/login/page.js"
+}
