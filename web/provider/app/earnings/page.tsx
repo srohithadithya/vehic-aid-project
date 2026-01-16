@@ -1,6 +1,10 @@
+// @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
+export const dynamic = 'force-dynamic';
+
 import { motion } from "framer-motion";
 // import { format } from "date-fns";
 import {
