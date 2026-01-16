@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, Filter, DollarSign } from 'lucide-react';
+import { FileText, Download, Filter, IndianRupee } from 'lucide-react';
 import { clsx } from 'clsx';
 
 // Mock Data for Settlements
@@ -47,7 +47,7 @@ export default function SettlementsPage() {
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-gray-500 font-medium">Total Payouts (Dec)</h3>
                         <div className="p-2 bg-green-50 rounded-lg text-green-600">
-                            <DollarSign className="w-5 h-5" />
+                            <IndianRupee className="w-5 h-5" />
                         </div>
                     </div>
                     <p className="text-3xl font-bold text-gray-900">₹23,601.25</p>

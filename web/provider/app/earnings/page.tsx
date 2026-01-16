@@ -12,7 +12,7 @@ import {
     MoreHorizontal,
     TrendingUp,
     CreditCard,
-    DollarSign,
+    IndianRupee,
     Calendar,
     Activity
 } from "lucide-react";
@@ -245,7 +245,7 @@ export default function EarningsPage() {
                                 title="Today's Earnings"
                                 value={loading ? "..." : `₹${stats.todays_earnings.toLocaleString()}`}
                                 trend={12}
-                                icon={DollarSign}
+                                icon={IndianRupee}
                             />
                             <StatCard
                                 delay={0.4}
