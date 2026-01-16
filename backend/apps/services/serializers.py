@@ -15,6 +15,7 @@ from .models import (
     WalletTransaction,
     RewardsProgram,
     RewardTransaction,
+    ChatMessage,
 )
 
 
@@ -237,6 +238,21 @@ class ProviderJobSerializer(serializers.ModelSerializer):
         fields = [
             "id", "service_type", "status", "priority", 
             "latitude", "longitude", "customer_notes", 
-            "booker_name", "booker_phone", "vehicle_details",
             "created_at"
         ]
+
+
+class ChatMessageSerializer(serializers.ModelSerializer):
+    sender_name = serializers.CharField(source="sender.username", read_only=True)
+    is_me = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ChatMessage
+        fields = ["id", "request", "sender", "sender_name", "message", "is_read", "is_me", "created_at"]
+        read_only_fields = ["id", "sender", "created_at"]
+
+    def get_is_me(self, obj):
+        request = self.context.get("request")
+        if request and request.user:
+            return obj.sender == request.user
+        return False

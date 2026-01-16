@@ -6,7 +6,8 @@ from .views import (
     ReviewViewSet, VehicleExchangeViewSet, WalletViewSet,
     RewardsViewSet, HelplineCallViewSet, AgenticBookingView,
     SubscriptionAnalyticsView, DashboardStatsView, VehicleViewSet,
-    ServiceQuoteViewSet, ProviderJobView, AIStatsView
+    ServiceQuoteViewSet, ProviderJobView, AIStatsView,
+    ChatMessageViewSet, ProviderLocationUpdateView
 )
 from .admin_views import user_list, service_request_list, payment_list
 
@@ -20,6 +21,7 @@ router.register(r'wallet', WalletViewSet, basename='wallet')
 router.register(r'rewards', RewardsViewSet, basename='rewards')
 router.register(r'helpline', HelplineCallViewSet, basename='helpline')
 router.register(r'provider/jobs', ProviderJobView, basename='provider-jobs')
+router.register(r'chat', ChatMessageViewSet, basename='chat')
 
 urlpatterns = [
     # Admin endpoints
@@ -35,6 +37,7 @@ urlpatterns = [
     path('subscriptions/analytics/', SubscriptionAnalyticsView.as_view(), name='subscription-analytics'),
     # Provider endpoints
     path('provider/update/<int:request_id>/', ProviderStatusUpdateView.as_view(), name='provider-status-update'),
+    path('provider/location-update/', ProviderLocationUpdateView.as_view(), name='provider-location-update'),
     # All API endpoints (handled by router)
     path('', include(router.urls)),
 ]

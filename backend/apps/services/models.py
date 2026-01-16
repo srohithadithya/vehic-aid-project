@@ -655,3 +655,20 @@ class RewardTransaction(models.Model):
         verbose_name = "Reward Transaction"
         verbose_name_plural = "Reward Transactions"
         ordering = ["-created_at"]
+
+
+class ChatMessage(models.Model):
+    """Real-time chat messages between booker and provider."""
+    request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name="chat_messages")
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat for Request {self.request.id} by {self.sender.username}"
+
+    class Meta:
+        verbose_name = "Chat Message"
+        verbose_name_plural = "Chat Messages"
+        ordering = ["created_at"]

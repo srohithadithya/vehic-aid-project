@@ -67,6 +67,7 @@ The platform includes a **High-End "Cosmic Glass" Admin Panel** for operators to
 - **Provider Identity**: Unique **PRO-XXXXXX** IDs, verified statuses, and dynamic service expertises tied to individual performance.
 - **Real-Time Financials**: Live tracking of Earnings, Pending Payouts, and Transaction History powered by granular backend APIs.
 - **Banking Integration**: Secure display of linked bank accounts and automated daily settlements via Razorpay X.
+- **Live Interactions**: Real-time **Customer Chat** and automated **GPS Location Tracking** for active jobs.
 - **Digital Wallet**: Visual credit-card style wallet component for checking balance at a glance.
 
 ### 🇮🇳 Indian Market Localization
