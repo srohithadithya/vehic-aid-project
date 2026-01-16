@@ -80,14 +80,14 @@ export default function BillingPage() {
                                 <tr className="border-b transition-colors hover:bg-muted/50">
                                     <td className="p-4 align-middle font-medium">INV001</td>
                                     <td className="p-4 align-middle"><Badge variant="default" className="bg-green-500 hover:bg-green-600">Paid</Badge></td>
-                                    <td className="p-4 align-middle">$35.00</td>
+                                    <td className="p-4 align-middle">₹350.00</td>
                                     <td className="p-4 align-middle">Jan 12, 2024</td>
                                     <td className="p-4 align-middle text-right"><Button variant="ghost" size="sm">Download</Button></td>
                                 </tr>
                                 <tr className="border-b transition-colors hover:bg-muted/50">
                                     <td className="p-4 align-middle font-medium">INV002</td>
                                     <td className="p-4 align-middle"><Badge variant="default" className="bg-green-500 hover:bg-green-600">Paid</Badge></td>
-                                    <td className="p-4 align-middle">$8.50</td>
+                                    <td className="p-4 align-middle">₹85.00</td>
                                     <td className="p-4 align-middle">Dec 10, 2023</td>
                                     <td className="p-4 align-middle text-right"><Button variant="ghost" size="sm">Download</Button></td>
                                 </tr>
