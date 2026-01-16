@@ -42,6 +42,9 @@ export default function AIMonitorPage() {
             }
         };
         fetchStats();
+        // Real-time polling every 10 seconds
+        const interval = setInterval(fetchStats, 10000);
+        return () => clearInterval(interval);
     }, []);
 
     if (loading) return <div className="p-8 text-primary">Loading Neural Networks...</div>;

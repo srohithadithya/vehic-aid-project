@@ -32,7 +32,8 @@ export default function AnalyticsPage() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 60000);
+        // Real-time polling every 30 seconds
+        const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
     }, []);
 
