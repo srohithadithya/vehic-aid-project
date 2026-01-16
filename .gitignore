@@ -42,3 +42,14 @@ backend/firebase-adminsdk.json
 .idea/
 # Agent artifacts (temporary working files)
 .agent/artifacts/
+# Temporary documentation and working files
+*_temp.md
+*_draft.md
+*_backup.md
+*_old.md
+temp_*.md
+draft_*.md
+backup_*.md
+TODO.md
+NOTES.md
+SCRATCH.md
