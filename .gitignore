@@ -40,3 +40,5 @@ backend/firebase-adminsdk.json
 # IDE
 .vscode/
 .idea/
+# Agent artifacts (temporary working files)
+.agent/artifacts/
