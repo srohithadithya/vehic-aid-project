@@ -675,8 +675,19 @@ class ProviderJobView(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        """List all open requests available for pickup."""
-        # Using 'PENDING_DISPATCH' as the status for open jobs
+        """List jobs currently assigned to the provider (for Mission Log/History)."""
+        provider = getattr(request.user, 'serviceprovider', None)
+        if not provider:
+             return Response({"error": "User is not a service provider."}, status=status.HTTP_403_FORBIDDEN)
+        
+        jobs = ServiceRequest.objects.filter(provider=provider).order_by('-created_at')
+        from .serializers import ProviderJobSerializer
+        serializer = ProviderJobSerializer(jobs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+        """List all open requests available for pickup (Dispatch Feed)."""
         jobs = ServiceRequest.objects.filter(status='PENDING_DISPATCH').order_by('-created_at')
         from .serializers import ProviderJobSerializer
         serializer = ProviderJobSerializer(jobs, many=True)

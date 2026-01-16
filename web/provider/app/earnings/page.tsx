@@ -1,12 +1,8 @@
-// @ts-nocheck
 'use client';
-
-
 import { useState, useEffect } from 'react';
 export const dynamic = 'force-dynamic';
 
 import { motion } from "framer-motion";
-// import { format } from "date-fns";
 import {
     ArrowUpRight,
     ArrowDownLeft,
@@ -28,6 +24,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
+import { apiClient } from '@/lib/api';
+import { Navbar } from '@/components/Navbar';
 
 // --- Components ---
 
@@ -40,52 +38,6 @@ const GlassCard = ({ children, className }: { children: React.ReactNode; classNa
     </div>
 );
 
-const WalletCard = () => (
-    <div className="relative h-56 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-500 group">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-800" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay" />
-
-        {/* Decorative Circles */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-        <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" />
-
-        <div className="relative p-6 h-full flex flex-col justify-between text-white border border-white/10 rounded-3xl">
-            <div className="flex justify-between items-start">
-                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                    <Wallet className="w-6 h-6 text-white" />
-                </div>
-                <div className="text-right">
-                    <p className="text-xs font-medium text-white/60 uppercase tracking-widest">Current Balance</p>
-                    <h2 className="text-3xl font-bold mt-1 tracking-tight">₹3,200.50</h2>
-                </div>
-            </div>
-
-            <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                    {/* Chip Simulation */}
-                    <div className="w-12 h-9 rounded-md bg-gradient-to-tr from-yellow-200 to-yellow-500/80 border border-yellow-400 shadow-inner flex items-center justify-center overflow-hidden relative">
-                        <div className="absolute inset-0 border-[0.5px] border-black/20 rounded-[inherit]" />
-                        <Activity className="w-8 h-8 text-black/10 rotate-90 scale-150" />
-                    </div>
-                    <div className="text-lg font-mono tracking-widest text-white/80">
-                        •••• •••• •••• 4291
-                    </div>
-                </div>
-
-                <div className="flex justify-between items-end">
-                    <div>
-                        <p className="text-[10px] text-white/50 uppercase">Card Holder</p>
-                        <p className="font-medium tracking-wide">ROHIT ADITHYA</p>
-                    </div>
-                    <div className="text-right">
-                        <span className="italic font-bold text-xl opacity-80">VISA</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-);
 
 const StatCard = ({ title, value, trend, icon: Icon, delay }: any) => (
     <motion.div
@@ -141,10 +93,11 @@ const WeekChart = () => {
     );
 };
 
-import { apiClient } from '../../lib/api';
-// ... existing imports ...
+
 
 export default function EarningsPage() {
+    const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+    const [withdrawStatus, setWithdrawStatus] = useState<'idle' | 'processing' | 'success'>('idle');
     const [stats, setStats] = useState({
         current_balance: 0,
         todays_earnings: 0,
@@ -152,16 +105,20 @@ export default function EarningsPage() {
         weekly_chart: { values: [0, 0, 0, 0, 0, 0, 0], labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
         recent_transactions: []
     });
+    const [userProfile, setUserProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await apiClient.get('/payments/dashboard/provider/');
-                setStats(response.data);
+                const [dashRes, profRes] = await Promise.all([
+                    apiClient.get('/payments/dashboard/provider/'),
+                    apiClient.get('/users/profile/')
+                ]);
+                setStats(dashRes.data);
+                setUserProfile(profRes.data);
             } catch (error) {
                 console.error("Failed to fetch earnings data", error);
-                // Fallback to zero values or keep simple loading state logic
             } finally {
                 setLoading(false);
             }
@@ -173,13 +130,14 @@ export default function EarningsPage() {
 
     return (
         <div className="min-h-screen bg-background relative overflow-hidden">
+            <Navbar />
             {/* Background Blooms */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
                 <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px]" />
             </div>
 
-            <div className="container mx-auto p-6 lg:p-10 max-w-7xl space-y-10">
+            <div className="container mx-auto p-6 lg:p-10 pt-24 max-w-7xl space-y-10">
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -203,7 +161,10 @@ export default function EarningsPage() {
                         <Button variant="outline" className="rounded-xl h-12 px-6 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all">
                             <Download className="w-4 h-4 mr-2" /> Export Report
                         </Button>
-                        <Button className="rounded-xl h-12 px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all">
+                        <Button
+                            onClick={() => setShowWithdrawModal(true)}
+                            className="rounded-xl h-12 px-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
+                        >
                             <Wallet className="w-4 h-4 mr-2" /> Withdraw Funds
                         </Button>
                     </motion.div>
@@ -252,7 +213,7 @@ export default function EarningsPage() {
                                         <div className="flex justify-between items-end">
                                             <div>
                                                 <p className="text-[10px] text-white/50 uppercase">Card Holder</p>
-                                                <p className="font-medium tracking-wide">ROHIT ADITHYA</p>
+                                                <p className="font-medium tracking-wide">{userProfile?.full_name?.toUpperCase() || "VEHICAID PARTNER"}</p>
                                             </div>
                                             <div className="text-right">
                                                 <span className="italic font-bold text-xl opacity-80">VISA</span>
@@ -437,6 +398,94 @@ export default function EarningsPage() {
                     <p>Secure payments processed by Razorpay. All rights reserved.</p>
                 </div>
             </div>
+
+            {/* Withdrawal Modal */}
+            {showWithdrawModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        onClick={() => withdrawStatus !== 'processing' && setShowWithdrawModal(false)}
+                    />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="relative bg-zinc-900 border border-white/10 p-8 rounded-[2.5rem] max-w-md w-full shadow-2xl space-y-6"
+                    >
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-2xl font-bold">Withdraw Funds</h3>
+                                <p className="text-muted-foreground text-sm">Settlement to linked bank account.</p>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full"
+                                onClick={() => setShowWithdrawModal(false)}
+                            >
+                                <MoreHorizontal className="w-5 h-5 rotate-90" />
+                            </Button>
+                        </div>
+
+                        {withdrawStatus === 'idle' && (
+                            <div className="space-y-6">
+                                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">Available Balance</span>
+                                        <span className="font-bold">₹{stats.current_balance.toLocaleString()}</span>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold text-muted-foreground">Settlement Destination</label>
+                                        <p className="font-mono text-sm">HDFC Bank •••• 4291</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20"
+                                    onClick={() => {
+                                        setWithdrawStatus('processing');
+                                        setTimeout(() => setWithdrawStatus('success'), 2000);
+                                    }}
+                                >
+                                    Confirm Payout
+                                </Button>
+                                <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest">
+                                    Funds typically arrive within 2-4 hours
+                                </p>
+                            </div>
+                        )}
+
+                        {withdrawStatus === 'processing' && (
+                            <div className="py-12 flex flex-col items-center gap-6">
+                                <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                                <p className="font-bold animate-pulse">Processing Transaction...</p>
+                            </div>
+                        )}
+
+                        {withdrawStatus === 'success' && (
+                            <div className="py-8 flex flex-col items-center gap-6 text-center">
+                                <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500">
+                                    <ArrowDownLeft className="w-10 h-10 rotate-[-45deg]" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xl font-bold text-emerald-500">Request Sent!</h4>
+                                    <p className="text-muted-foreground text-sm mt-2">Your payout of ₹{stats.current_balance.toLocaleString()} is being processed by Razorpay.</p>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    className="w-full h-12 rounded-xl"
+                                    onClick={() => {
+                                        setShowWithdrawModal(false);
+                                        setWithdrawStatus('idle');
+                                    }}
+                                >
+                                    Done
+                                </Button>
+                            </div>
+                        )}
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }

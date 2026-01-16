@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
+import { apiClient } from '@/lib/api';
 import {
     User, Mail, Phone, Truck, Shield, Star,
     Edit, Save, Award, MapPin, Calendar, CreditCard
@@ -12,17 +13,49 @@ import AuthGuard from '@/components/AuthGuard';
 export default function ProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
     const [userData, setUserData] = useState({
-        name: "Rohith Adithya",
-        title: "Senior Recovery Specialist",
-        id: "PRO-882190",
-        email: "provider@vehicaid.com",
-        phone: "+91 98765 43210",
-        vehicle: "Tata Xenon Retrieval Unit",
-        plate: "KA-01-EQ-9988",
-        joined: "Jan 2024",
-        rating: 4.9,
-        jobs: 142
+        name: "Loading...",
+        title: "Provider",
+        id: "---",
+        email: "---",
+        phone: "---",
+        vehicle: "---",
+        plate: "---",
+        joined: "---",
+        rating: 0,
+        jobs: 0,
+        bankAccount: "---",
+        bankIfsc: "---"
     });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await apiClient.get('/users/profile/');
+                const u = response.data; // Response is the user object directly
+                setUserData({
+                    name: u.full_name,
+                    title: u.service_types && u.service_types.length > 0 ? `${u.service_types[0].replace('_', ' ')} Expert` : "Authorized Provider",
+                    id: u.provider_id || `PRO-${u.id.toString().padStart(6, '0')}`,
+                    email: u.email,
+                    phone: u.phone,
+                    vehicle: u.is_provider ? "Service Vehicle" : "N/A",
+                    plate: u.vehicles && u.vehicles.length > 0 ? u.vehicles[0] : "Verified",
+                    joined: "Jan 2024",
+                    rating: u.average_rating || 5.0,
+                    jobs: u.jobs_completed || 0,
+                    serverTime: u.server_time,
+                    bankAccount: u.bank_account || "Pending",
+                    bankIfsc: u.bank_ifsc || "Pending"
+                });
+            } catch (error) {
+                console.error("Failed to fetch profile", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const handleSave = () => {
         setIsEditing(false);
@@ -108,7 +141,14 @@ export default function ProfilePage() {
 
                             <div className="space-y-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs text-gray-500 uppercase font-bold ml-1">Email Address</label>
+                                    <div className="flex items-center justify-between px-1">
+                                        <label className="text-xs text-gray-500 uppercase font-bold">Email Address</label>
+                                        {(userData as any).serverTime && (
+                                            <span className="text-[10px] text-green-500/60 font-mono">
+                                                SYNCED: {new Date((userData as any).serverTime).toLocaleTimeString()}
+                                            </span>
+                                        )}
+                                    </div>
                                     <div className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-white/5">
                                         <Mail className="w-5 h-5 text-gray-400" />
                                         <input
@@ -161,12 +201,32 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                             </div>
-                            <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-gray-400 hover:bg-white/5 hover:text-white transition-all text-sm font-medium">
-                                + Add Another Vehicle
-                            </button>
+                        </div>
+
+                        {/* Banking Info */}
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-8 space-y-6 md:col-span-2">
+                            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                <Award className="w-5 h-5 text-yellow-500" /> Banking & Payout Settings
+                            </h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-400 uppercase font-bold ml-1">Account Number</label>
+                                    <div className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-white/5 font-mono text-lg tracking-wider">
+                                        {userData.bankAccount.replace(/.(?=.{4})/g, '•')}
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-400 uppercase font-bold ml-1">IFSC Code</label>
+                                    <div className="flex items-center gap-3 bg-black/40 p-4 rounded-xl border border-white/5 font-mono">
+                                        {userData.bankIfsc}
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-gray-500 italic">
+                                * Your payouts are automatically settled daily to this account via Razorpay X.
+                            </p>
                         </div>
                     </div>
-
                 </main>
             </div>
         </AuthGuard>

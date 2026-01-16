@@ -79,7 +79,14 @@ export function AdminHeader() {
                             Settings
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem
+                            onClick={() => {
+                                localStorage.removeItem('admin_access_token');
+                                localStorage.removeItem('admin_refresh_token');
+                                window.location.href = '/login';
+                            }}
+                            className="text-destructive cursor-pointer"
+                        >
                             Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>

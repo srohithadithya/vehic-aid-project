@@ -181,6 +181,17 @@ class Vehicle(models.Model):
     make = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     fuel_type = models.CharField(max_length=10, choices=FUEL_CHOICES)
+    
+    VEHICLE_TYPE_CHOICES = [
+        ("TWO_WHEELER", "Two Wheeler"),
+        ("FOUR_WHEELER", "Four Wheeler"),
+    ]
+    vehicle_type = models.CharField(
+        max_length=20, 
+        choices=VEHICLE_TYPE_CHOICES, 
+        default="FOUR_WHEELER"
+    )
+
     insurance_expiry = models.DateField(null=True, blank=True)
     puc_expiry = models.DateField(null=True, blank=True)
 

@@ -26,6 +26,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
+        // eslint-disable-next-line no-console
         console.error("API Call Failed:", error.config?.url, error.response?.status, error.response?.data);
         if (error.response?.status === 401) {
             localStorage.removeItem('admin_access_token');
