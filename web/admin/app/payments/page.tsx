@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import apiClient from '@/lib/api';
-import { Search, MoreVertical, CreditCard, Download, TrendingUp, Calendar, ArrowUpRight, DollarSign } from 'lucide-react';
+import { Search, MoreVertical, CreditCard, Download, TrendingUp, Calendar, ArrowUpRight, IndianRupee } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -182,7 +182,7 @@ export default function PaymentsPage() {
                     <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
                             <div className="p-3 bg-primary/20 rounded-2xl text-primary">
-                                <DollarSign className="w-6 h-6" />
+                                <IndianRupee className="w-6 h-6" />
                             </div>
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/20">
                                 <TrendingUp className="w-3 h-3 mr-1" /> +12%

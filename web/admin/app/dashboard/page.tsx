@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, Wrench, DollarSign, TrendingUp, Clock, CheckCircle, Activity as ActivityIcon } from 'lucide-react';
+import { Users, Wrench, IndianRupee, TrendingUp, Clock, CheckCircle, Activity as ActivityIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import apiClient from '@/lib/api';
@@ -144,7 +144,7 @@ export default function DashboardPage() {
         {
             title: 'Total Revenue',
             value: `₹${stats?.total_revenue.toLocaleString() || '0'}`,
-            icon: DollarSign,
+            icon: IndianRupee,
             description: 'Lifetime earnings',
             change: growthStats.revenue,
             color: 'text-emerald-400'
