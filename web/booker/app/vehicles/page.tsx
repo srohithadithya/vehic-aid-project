@@ -13,8 +13,19 @@ export default function VehiclesPage() {
         model: '',
         year: '',
         registration: '',
-        color: ''
+        color: '',
+        vehicle_type: 'FOUR_WHEELER'
     });
+
+    const vehicleTypes = [
+        { value: 'TWO_WHEELER', label: 'Two Wheeler', icon: '🏍️', desc: 'Bike/Scooter' },
+        { value: 'THREE_WHEELER', label: 'Three Wheeler', icon: '🛺', desc: 'Auto Rickshaw' },
+        { value: 'FOUR_WHEELER', label: 'Four Wheeler', icon: '🚗', desc: 'Car/Sedan' },
+        { value: 'SUV', label: 'SUV', icon: '🚙', desc: 'Sport Utility Vehicle' },
+        { value: 'VAN', label: 'Van', icon: '🚐', desc: 'Minivan/Cargo' },
+        { value: 'TRUCK', label: 'Truck', icon: '🚛', desc: 'Commercial Vehicle' },
+        { value: 'HEAVY_VEHICLE', label: 'Heavy Vehicle', icon: '🚌', desc: 'Bus/Heavy Truck' },
+    ];
 
     useEffect(() => {
         fetchVehicles();
@@ -50,7 +61,7 @@ export default function VehiclesPage() {
 
             if (response.ok) {
                 setShowForm(false);
-                setFormData({ make: '', model: '', year: '', registration: '', color: '' });
+                setFormData({ make: '', model: '', year: '', registration: '', color: '', vehicle_type: 'FOUR_WHEELER' });
                 fetchVehicles();
             }
         } catch (error) {
@@ -76,6 +87,11 @@ export default function VehiclesPage() {
         }
     };
 
+    const getVehicleIcon = (type: string) => {
+        const vehicle = vehicleTypes.find(v => v.value === type);
+        return vehicle?.icon || '🚗';
+    };
+
     return (
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
@@ -91,6 +107,26 @@ export default function VehiclesPage() {
                 <Card className="p-6">
                     <h2 className="text-xl font-semibold mb-4">Add New Vehicle</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium mb-2">Vehicle Type</label>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {vehicleTypes.map((type) => (
+                                    <button
+                                        key={type.value}
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, vehicle_type: type.value })}
+                                        className={`p-4 border-2 rounded-lg transition-all ${formData.vehicle_type === type.value
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                            }`}
+                                    >
+                                        <div className="text-3xl mb-2">{type.icon}</div>
+                                        <div className="text-sm font-semibold">{type.label}</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">{type.desc}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                         <div>
                             <label className="block text-sm font-medium mb-2">Make</label>
                             <input
