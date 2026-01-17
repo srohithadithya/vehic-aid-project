@@ -105,29 +105,40 @@ for i, (username, full_name, plan_code) in enumerate(booker_defs):
         print(f"User Created: {username} -> FREE (No Sub)")
 
 # ------------------------------------------------------------------
-# 4. Create Vehicles (1 per booker)
+# 4. Create Vehicles (7 vehicles covering all types)
 # ------------------------------------------------------------------
 print("\nCreating Vehicles...")
 vehicles = []
 vehicle_data = [
-    # 2 Four Wheelers
-    ('Maruti', 'Swift', 'FOUR_WHEELER'),
-    ('Hyundai', 'i20', 'FOUR_WHEELER'),
-    # 2 Two Wheelers
-    ('Honda', 'Activa', 'TWO_WHEELER'),
-    ('Royal Enfield', 'Classic 350', 'TWO_WHEELER')
+    # Two Wheeler
+    ('Honda', 'Activa', 'TWO_WHEELER', 'MH01AB1001'),
+    # Three Wheeler
+    ('Bajaj', 'RE Auto', 'THREE_WHEELER', 'MH01AB1002'),
+    # Four Wheeler
+    ('Maruti', 'Swift', 'FOUR_WHEELER', 'MH01AB1003'),
+    # SUV
+    ('Mahindra', 'Scorpio', 'SUV', 'MH01AB1004'),
+    # Van
+    ('Tata', 'Winger', 'VAN', 'MH01AB1005'),
+    # Truck
+    ('Ashok Leyland', 'Dost', 'TRUCK', 'MH01AB1006'),
+    # Heavy Vehicle
+    ('Tata', 'LPT 1613', 'HEAVY_VEHICLE', 'MH01AB1007'),
 ]
+
 for i, booker in enumerate(bookers):
-    v = Vehicle.objects.create(
-        owner=booker.user,
-        make=vehicle_data[i][0],
-        model=vehicle_data[i][1],
-        license_plate=f"MH0{i+1}AB{1000+i}",
-        fuel_type='PETROL',
-        vehicle_type=vehicle_data[i][2]  # Added vehicle type
-    )
-    vehicles.append(v)
-    print(f"Vehicle: {v.license_plate} ({v.vehicle_type}) -> {booker.user.username}")
+    if i < len(vehicle_data):
+        make, model, vtype, plate = vehicle_data[i]
+        v = Vehicle.objects.create(
+            owner=booker.user,
+            make=make,
+            model=model,
+            license_plate=plate,
+            fuel_type='DIESEL' if vtype in ['TRUCK', 'HEAVY_VEHICLE', 'VAN'] else 'PETROL',
+            vehicle_type=vtype
+        )
+        vehicles.append(v)
+        print(f"Vehicle: {v.license_plate} ({v.vehicle_type}) -> {booker.user.username}")
 
 # ------------------------------------------------------------------
 # 5. Create Providers
