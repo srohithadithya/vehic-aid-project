@@ -29,15 +29,26 @@ VehicAid is a comprehensive roadside assistance platform connecting customers wi
 
 ## ✨ Features
 
+### **🚗 Multi-Vehicle Support**
+VehicAid supports **ALL types of vehicles** with customized pricing and services:
+- 🏍️ **Two Wheelers** - Motorcycles, Scooters, Bikes
+- 🛺 **Three Wheelers** - Auto Rickshaws, Tuk-Tuks
+- 🚗 **Four Wheelers** - Cars, Sedans, Hatchbacks
+- 🚙 **SUVs** - Sport Utility Vehicles, Crossovers
+- 🚐 **Vans** - Minivans, Cargo Vans, Passenger Vans
+- 🚛 **Trucks** - Light/Medium Commercial Vehicles
+- 🚌 **Heavy Vehicles** - Buses, Heavy Trucks, Construction Vehicles
+
 ### **Customer Features**
-- 🚗 Real-time service request booking
+- 🚗 Real-time service request booking (all vehicle types)
 - 📍 Google Maps integration for location tracking
 - 💬 In-app chat with service providers
 - 💳 Razorpay payment integration
 - 📱 Push notifications
 - 📊 Service history & invoices
-- 🚙 Vehicle management
+- 🚙 Vehicle management (add multiple vehicles)
 - 📦 Subscription plans (Basic, Premium, Pro)
+- 💰 Dynamic pricing based on vehicle type
 
 ### **Provider Features**
 - 📋 Service request dashboard
@@ -47,15 +58,17 @@ VehicAid is a comprehensive roadside assistance platform connecting customers wi
 - 📄 Document upload (License, Insurance, etc.)
 - 💰 Wallet & payment management
 - ⭐ Rating system
+- 🚗 Multi-vehicle type support
 
 ### **Admin Features**
 - 📊 Advanced reporting & analytics
 - 📧 Email template management
 - 👥 User management
-- 🚗 Service request monitoring
+- 🚗 Service request monitoring (all vehicle types)
 - 💰 Payment & settlement tracking
 - 📈 Real-time dashboards
 - 📤 Export reports (CSV, PDF, Excel)
+- 🚦 Vehicle type analytics
 
 ---
 
@@ -80,6 +93,40 @@ VehicAid Platform
     ├── CI/CD Pipelines
     └── Monitoring (Prometheus/Grafana)
 ```
+
+---
+
+## 🚗 Supported Vehicle Types & Pricing
+
+VehicAid provides comprehensive roadside assistance for **ALL vehicle types** with dynamic pricing based on vehicle category:
+
+### **Vehicle Categories**
+
+| Vehicle Type | Examples | Base Price Range | Per KM Rate |
+|--------------|----------|------------------|-------------|
+| 🏍️ **Two Wheeler** | Motorcycles, Scooters, Bikes | ₹70 - ₹150 | ₹5/km |
+| 🛺 **Three Wheeler** | Auto Rickshaws, Tuk-Tuks | ₹90 - ₹200 | ₹6/km |
+| 🚗 **Four Wheeler** | Cars, Sedans, Hatchbacks | ₹150 - ₹300 | ₹10/km |
+| 🚙 **SUV** | Sport Utility Vehicles, Crossovers | ₹250 - ₹500 | ₹15/km |
+| 🚐 **Van** | Minivans, Cargo Vans, Passenger Vans | ₹300 - ₹600 | ₹18/km |
+| 🚛 **Truck** | Light/Medium Commercial Vehicles | ₹400 - ₹800 | ₹25/km |
+| 🚌 **Heavy Vehicle** | Buses, Heavy Trucks, Construction | ₹600 - ₹1,200 | ₹35/km |
+
+### **Service Types (All Vehicles)**
+- 🚗 **Towing** - Emergency vehicle towing to nearest garage
+- 🔋 **Battery Jumpstart** - On-site battery boost
+- 🛞 **Tire Change** - Flat tire replacement
+- ⛽ **Fuel Delivery** - Emergency fuel delivery
+- 🔑 **Lockout Service** - Key locked inside vehicle
+- 🔧 **General Repair** - On-site minor repairs
+
+### **Pricing Features**
+- ✅ **Dynamic Pricing** - Based on vehicle type and service
+- ✅ **Distance-Based** - Fair per-kilometer charges
+- ✅ **Subscription Discounts** - 15-25% off for members
+- ✅ **Transparent Pricing** - No hidden charges
+- ✅ **Peak Hour Surge** - Minimal 20% during rush hours
+- ✅ **Budget-Friendly** - Designed for Indian market
 
 ---
 
