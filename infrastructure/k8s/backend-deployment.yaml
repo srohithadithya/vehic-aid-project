@@ -1,0 +1,97 @@
+# VehicAid Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicaid-backend
+  labels:
+    app: vehicaid-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vehicaid-backend
+  template:
+    metadata:
+      labels:
+        app: vehicaid-backend
+    spec:
+      containers:
+      - name: backend
+        image: vehicaid/backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "False"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: redis-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: secret-key
+        - name: EMAIL_HOST_USER
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: email-user
+        - name: EMAIL_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: email-password
+        - name: FAST2SMS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: sms-api-key
+        - name: RAZORPAY_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: razorpay-key-id
+        - name: RAZORPAY_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: razorpay-key-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health/
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicaid-backend-service
+spec:
+  selector:
+    app: vehicaid-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP

@@ -1,0 +1,179 @@
+name: VehicAid CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Backend Tests
+  backend-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+    
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://test_user:test_pass@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/1
+      run: |
+        cd backend
+        python manage.py test
+    
+    - name: Run linting
+      run: |
+        cd backend
+        pip install flake8
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  # Build and Push Backend Docker Image
+  backend-build:
+    needs: backend-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Build and push Backend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ github.sha }}
+
+  # Build Web Applications
+  web-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        app: [admin, provider, booker]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/${{ matrix.app }}/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd web/${{ matrix.app }}
+        npm ci
+    
+    - name: Build
+      run: |
+        cd web/${{ matrix.app }}
+        npm run build
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Build and push image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./web/${{ matrix.app }}
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web-${{ matrix.app }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/web-${{ matrix.app }}:${{ github.sha }}
+
+  # Deploy to Kubernetes
+  deploy:
+    needs: [backend-build, web-build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+    
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+    
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f infrastructure/k8s/
+        kubectl rollout status deployment/vehicaid-backend
+        kubectl rollout status deployment/vehicaid-web-admin
+        kubectl rollout status deployment/vehicaid-web-provider
+        kubectl rollout status deployment/vehicaid-web-booker
+    
+    - name: Verify deployment
+      run: |
+        kubectl get pods
+        kubectl get services
+
+  # Notify on Success
+  notify:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Send success notification
+      run: |
+        echo "Deployment successful! 🎉"
+        # Add Slack/Discord/Email notification here
