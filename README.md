@@ -6,6 +6,8 @@
 [![React](https://img.shields.io/badge/react-18.0-blue.svg)](https://reactjs.org/)
 [![React Native](https://img.shields.io/badge/react--native-0.72-blue.svg)](https://reactnative.dev/)
 
+> **⚠️ SECURITY NOTICE**: This documentation uses placeholder values for all sensitive credentials. Never commit real API keys, passwords, or secrets to version control. See [Security Best Practices](#security-best-practices) below.
+
 VehicAid is a comprehensive roadside assistance platform connecting customers with service providers in real-time. Built with Django, React, React Native, and deployed on Kubernetes with complete CI/CD automation.
 
 ---
@@ -243,31 +245,31 @@ docker-compose up -d
 ### **Django Admin**
 ```
 URL: http://localhost:8001/admin/
-Username: admin_mobile
-Password: password123
+Username: <your-admin-username>
+Password: <your-admin-password>
 ```
 
 ### **Test Users**
 
 **Customer Account**:
 ```
-Email: customer@test.com
-Password: testpass123
-Phone: +919876543210
+Email: customer@example.com
+Password: <your-password>
+Phone: +91XXXXXXXXXX
 ```
 
 **Provider Account**:
 ```
-Email: provider@test.com
-Password: testpass123
-Phone: +919876543211
-Provider ID: PRO-001
+Email: provider@example.com
+Password: <your-password>
+Phone: +91XXXXXXXXXX
+Provider ID: PRO-XXX
 ```
 
 **Admin Account**:
 ```
 Email: admin@vehicaid.com
-Password: admin123
+Password: <your-admin-password>
 ```
 
 ### **Database**
@@ -275,15 +277,15 @@ Password: admin123
 Host: localhost (or postgres in Docker)
 Port: 5432
 Database: vehic_aid
-Username: vehic_aid
-Password: vehic_aid123
+Username: <your-db-username>
+Password: <your-db-password>
 ```
 
 ### **Redis**
 ```
 Host: localhost (or redis in Docker)
 Port: 6379
-Password: (none for local)
+Password: <your-redis-password> (or none for local)
 URL: redis://localhost:6379/1
 ```
 
@@ -291,7 +293,7 @@ URL: redis://localhost:6379/1
 ```
 URL: http://<grafana-ip>:3000
 Username: admin
-Password: admin (change on first login)
+Password: <change-on-first-login>
 ```
 
 ---
@@ -303,34 +305,46 @@ Password: admin (change on first login)
 Host: smtp.gmail.com
 Port: 587
 TLS: True
-Email: techflixtelugu@gmail.com
-Password: odef xcec xohg woup (App Password)
+Email: <your-email@gmail.com>
+Password: <your-app-password> (16-digit App Password)
 ```
+
+**Setup Instructions**: See [SMTP_SETUP.md](docs/SMTP_SETUP.md)
 
 ### **SMS (Fast2SMS)**
 ```
 Provider: Fast2SMS
-API Key: 83gDaZcwo9QnFdV7frOKSMEjUCkJh6eu1vTHm05pXyNLtPBYqI...
+API Key: <your-fast2sms-api-key>
 Limit: 50 SMS/day (Free tier)
 ```
+
+**Setup Instructions**: See [FREE_SMS_SETUP.md](docs/FREE_SMS_SETUP.md)
 
 ### **Payment (Razorpay)**
 ```
 Mode: Test
-Key ID: rzp_test_Rv8j6Dfc25hqRt
-Key Secret: U0rUURLVYbnijMi5GcgEAn91
+Key ID: <your-razorpay-key-id>
+Key Secret: <your-razorpay-key-secret>
 ```
+
+**Setup Instructions**: Get credentials from [Razorpay Dashboard](https://dashboard.razorpay.com/)
 
 ### **Google Maps**
 ```
-API Key: AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+API Key: <your-google-maps-api-key>
 ```
+
+**Setup Instructions**: Get API key from [Google Cloud Console](https://console.cloud.google.com/)
 
 ### **Firebase (Push Notifications)**
 ```
-Project ID: studio-7524834929-49622
-API Key: AIzaSyDIF6XTIFj478ejVaBecEvJSThXmanQbHI
+Project ID: <your-firebase-project-id>
+API Key: <your-firebase-api-key>
+Auth Domain: <your-project-id>.firebaseapp.com
+Storage Bucket: <your-project-id>.firebasestorage.app
 ```
+
+**Setup Instructions**: Get credentials from [Firebase Console](https://console.firebase.google.com/)
 
 ---
 
@@ -479,11 +493,11 @@ python manage.py optimize_db
 ```env
 # Django
 DEBUG=True
-SECRET_KEY=your-secret-key
+SECRET_KEY=<your-secret-key-here>
 ALLOWED_HOSTS=*
 
 # Database
-DATABASE_URL=postgres://vehic_aid:vehic_aid123@localhost:5432/vehic_aid
+DATABASE_URL=postgres://<username>:<password>@localhost:5432/vehic_aid
 
 # Redis
 REDIS_URL=redis://localhost:6379/1
@@ -493,26 +507,28 @@ CELERY_BROKER_URL=redis://localhost:6379/0
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=techflixtelugu@gmail.com
-EMAIL_HOST_PASSWORD=odef xcec xohg woup
+EMAIL_HOST_USER=<your-email@gmail.com>
+EMAIL_HOST_PASSWORD=<your-app-password>
 
 # SMS (Fast2SMS)
 SMS_PROVIDER=fast2sms
-FAST2SMS_API_KEY=your-api-key
+FAST2SMS_API_KEY=<your-api-key>
 
 # Payment (Razorpay)
-RAZORPAY_KEY_ID=rzp_test_Rv8j6Dfc25hqRt
-RAZORPAY_KEY_SECRET=U0rUURLVYbnijMi5GcgEAn91
+RAZORPAY_KEY_ID=<your-key-id>
+RAZORPAY_KEY_SECRET=<your-key-secret>
 
 # Google Maps
-GOOGLE_MAPS_API_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+GOOGLE_MAPS_API_KEY=<your-api-key>
 ```
+
+**Note**: Copy `.env.example` to `.env` and fill in your credentials.
 
 ### **Web Applications (.env.local)**
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
 NEXT_PUBLIC_WS_URL=ws://localhost:8001/ws
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<your-api-key>
 ```
 
 ### **Mobile Applications (.env)**
@@ -520,6 +536,44 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
 EXPO_PUBLIC_API_URL=http://localhost:8001/api/v1
 EXPO_PUBLIC_WS_URL=ws://localhost:8001/ws
 ```
+
+---
+
+## 🔐 Security Best Practices
+
+### **Credential Management**
+1. **Never commit sensitive data** to version control
+2. **Use `.env` files** for local development (already in `.gitignore`)
+3. **Use environment variables** in production (Kubernetes Secrets)
+4. **Copy `.env.example`** to `.env` and fill in your credentials
+5. **Rotate credentials regularly** (every 90 days recommended)
+
+### **API Keys & Secrets**
+- **Email**: Use Gmail App Passwords (16 digits), enable 2FA
+- **SMS**: Keep Fast2SMS API key secure, monitor usage
+- **Payment**: Use Razorpay test keys for development, live keys for production
+- **Maps**: Restrict Google Maps API key by domain/IP
+- **Firebase**: Use Firebase security rules, restrict API key usage
+
+### **Database Security**
+- Use strong passwords (minimum 16 characters)
+- Enable SSL/TLS for database connections in production
+- Regular backups (automated daily backups recommended)
+- Restrict database access by IP whitelist
+
+### **Production Deployment**
+- Use HTTPS/SSL certificates (Let's Encrypt recommended)
+- Enable rate limiting on all API endpoints
+- Implement CORS properly (restrict origins in production)
+- Use Kubernetes Secrets for all sensitive data
+- Enable network policies in Kubernetes
+- Regular security audits and dependency updates
+
+### **Monitoring & Alerts**
+- Monitor for suspicious activity
+- Set up alerts for failed login attempts
+- Track API usage and rate limit violations
+- Regular log reviews
 
 ---
 
