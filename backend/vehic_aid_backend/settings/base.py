@@ -371,3 +371,30 @@ EMAIL_TIMEOUT = 10  # seconds
 # SMS Configuration
 SMS_PROVIDER = env('SMS_PROVIDER', default='fast2sms')
 FAST2SMS_API_KEY = env('FAST2SMS_API_KEY', default='')
+
+# Import logging configuration
+from .logging_config import LOGGING
+
+# Add performance middleware
+MIDDLEWARE.insert(1, 'vehic_aid_backend.middleware.performance.PerformanceMonitoringMiddleware')
+MIDDLEWARE.insert(2, 'vehic_aid_backend.middleware.performance.DatabaseQueryCountMiddleware')
+
+# Database connection pooling
+DATABASES['default']['CONN_MAX_AGE'] = 600  # 10 minutes
+
+# Cache configuration (using Redis)
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': env('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'vehicaid',
+        'TIMEOUT': 300,  # 5 minutes default
+    }
+}
+
+# Session using cache
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
