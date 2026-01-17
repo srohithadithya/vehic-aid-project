@@ -1,66 +1,130 @@
-# 🚀 Vehic-Aid Quick Start Guide
+# 🚀 VehicAid - Quick Start Guide
 
-## Overview
-
-This guide provides instructions for starting the Vehic-Aid platform using the recommended Docker environment.
+**Get VehicAid running in 5 minutes!**
 
 ---
 
-## ⚡ Method 1: Docker (Recommended)
+## ⚡ Prerequisites
 
-This method ensures all services (Django, PostgreSQL, Redis, Celery) are configured correctly.
-
-1. **Navigate to the setup directory:**
-   ```powershell
-   cd infrastructure
-   ```
-
-2. **Start the environment:**
-   ```powershell
-   docker-compose -f docker-compose.verify.yml up --build -d
-   ```
-
-3. **Access Services:**
-   - **Web Admin Panel:** [http://localhost:3002/login](http://localhost:3002/login)
-   - **Backend Admin:** [http://localhost:8001/admin/](http://localhost:8001/admin/)
-   - **API Docs:** [http://localhost:8001/api/docs/](http://localhost:8001/api/docs/)
+- Docker Desktop installed
+- Git installed
+- 5 minutes of your time
 
 ---
 
-## 🐢 Method 2: Legacy Scripts (Windows)
+## 🎯 Quick Deploy (Recommended)
 
-*Note: These scripts may be outdated compared to the Docker setup.*
+### **Step 1: Clone Repository**
+```bash
+git clone https://github.com/srohithadithya/vehic-aid-project.git
+cd vehic-aid-project
+```
 
-```powershell
-# From project root
-.\start-dev.ps1
+### **Step 2: Start All Services**
+```bash
+cd infrastructure
+docker-compose up -d
+```
+
+### **Step 3: Access Applications**
+
+| Application | URL | Credentials |
+|-------------|-----|-------------|
+| **Admin Panel** | http://localhost:3000 | admin_mobile / password123 |
+| **Provider App** | http://localhost:3001 | provider@example.com / testpass123 |
+| **Booker App** | http://localhost:3003 | customer@example.com / testpass123 |
+| **Backend API** | http://localhost:8001 | - |
+| **API Docs** | http://localhost:8001/api/schema/swagger-ui/ | - |
+
+---
+
+## 🚗 Supported Vehicles
+
+VehicAid supports **7 vehicle types**:
+- 🏍️ Two Wheeler (Bikes, Scooters)
+- 🛺 Three Wheeler (Auto Rickshaws)
+- 🚗 Four Wheeler (Cars, Sedans)
+- 🚙 SUV (Sport Utility Vehicles)
+- 🚐 Van (Minivans, Cargo Vans)
+- 🚛 Truck (Commercial Vehicles)
+- 🚌 Heavy Vehicle (Buses, Heavy Trucks)
+
+**See**: [VEHICLE_TYPES.md](VEHICLE_TYPES.md) for complete pricing and details
+
+---
+
+## 📱 Features Available
+
+### **For Customers**:
+- ✅ Book roadside assistance (all vehicle types)
+- ✅ Real-time tracking
+- ✅ In-app chat with providers
+- ✅ Payment processing
+- ✅ Service history
+- ✅ Vehicle management
+- ✅ Subscription plans
+
+### **For Providers**:
+- ✅ Receive service requests
+- ✅ In-app chat with customers
+- ✅ Earnings analytics
+- ✅ Document upload
+- ✅ Performance tracking
+- ✅ Multi-vehicle type support
+
+### **For Admins**:
+- ✅ Dashboard analytics
+- ✅ User management
+- ✅ Service monitoring
+- ✅ Payment tracking
+- ✅ Advanced reporting
+- ✅ Email template management
+
+---
+
+## 🔧 Common Commands
+
+### **View Logs**
+```bash
+docker-compose logs -f
+```
+
+### **Stop Services**
+```bash
+docker-compose down
+```
+
+### **Restart Services**
+```bash
+docker-compose restart
+```
+
+### **Clean Restart**
+```bash
+docker-compose down -v
+docker-compose up -d
 ```
 
 ---
 
-## 🛠️ Verification
+## 📚 Next Steps
 
-To verify the Docker deployment, observe the container status:
-
-```powershell
-docker ps
-```
-
-You should see containers for:
-- `vehicaid_web_verify` (Backend 8001)
-- `vehicaid_admin_verify` (Frontend 3002)
-- `vehicaid_db_verify` (Postgres)
-- `vehicaid_redis_verify` (Redis)
+1. **Explore Features**: Try booking a service
+2. **Read Documentation**: Check [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+3. **Vehicle Types**: See [VEHICLE_TYPES.md](VEHICLE_TYPES.md)
+4. **API Integration**: Visit http://localhost:8001/api/schema/swagger-ui/
+5. **Customize**: Update environment variables in `.env`
 
 ---
 
-## ❓ FAQ
+## 🆘 Need Help?
 
-**Q: Default Credentials?**
-A: `admin` / `admin123`
+- **Full Guide**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+- **Vehicle Info**: [VEHICLE_TYPES.md](VEHICLE_TYPES.md)
+- **API Docs**: http://localhost:8001/api/schema/swagger-ui/
+- **Issues**: https://github.com/srohithadithya/vehic-aid-project/issues
 
-**Q: How to view logs?**
-A: `docker logs vehicaid_web_verify`
+---
 
-**Q: How to reset data?**
-A: `docker-compose -f infrastructure/docker-compose.verify.yml down -v`
+**Last Updated**: January 17, 2026  
+**Version**: 2.0.0
