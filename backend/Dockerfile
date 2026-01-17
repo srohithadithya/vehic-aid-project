@@ -1,45 +1,38 @@
-# Use official Python runtime as a parent image
 FROM python:3.12-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive
 
-# Set work directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     libpq-dev \
     postgresql-client \
+    redis-tools \
+    curl \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Upgrade pip and install dependencies with verbose output
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt --verbose
+# Copy entrypoint and make it executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-# Copy project
+# Copy application code
 COPY . .
-
-# Ensure entrypoint is executable
-RUN chmod +x /app/entrypoint.sh || true
-
-# Create necessary directories
-RUN mkdir -p /app/staticfiles /app/media /app/logs
-
-# Collect static files (will run again in entrypoint)
-RUN python manage.py collectstatic --noinput || true
 
 # Expose port
 EXPOSE 8000
 
-# Use entrypoint script
+# Set entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Default command
