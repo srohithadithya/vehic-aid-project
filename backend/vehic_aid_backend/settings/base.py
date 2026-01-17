@@ -367,3 +367,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='VehicAid <noreply@vehicaid.com>')
 SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 EMAIL_TIMEOUT = 10  # seconds
+
+# SMS Configuration
+SMS_PROVIDER = env('SMS_PROVIDER', default='fast2sms')
+FAST2SMS_API_KEY = env('FAST2SMS_API_KEY', default='')
