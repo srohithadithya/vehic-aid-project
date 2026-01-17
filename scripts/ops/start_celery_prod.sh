@@ -1,5 +1,5 @@
 # scripts/ops/start_celery_prod.sh
-#!/bin.bash
+#!/bin/bash
 # Script to start all necessary background services for the Production environment.
 
 # Exit immediately if a command exits with a non-zero status

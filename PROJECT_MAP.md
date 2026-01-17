@@ -135,7 +135,21 @@ vehic-aid-project/
 ├── PROJECT_MAP.md                    # This file
 ├── ROADMAP.md                        # Development roadmap
 ├── BACKEND_COMPLETE.md               # Backend completion summary
-└── deploy-production.ps1             # Production deployment script
+├── CLEANUP_REPORT.md                 # Cleanup report
+└── scripts/                          # Utility & DevOps scripts
+    ├── ops/                          # Operational scripts
+    │   ├── deploy_production.ps1
+    │   ├── deploy_linux.sh
+    │   ├── build_backend.sh
+    │   ├── reset_local_db.sh
+    │   └── start_celery_prod.sh
+    ├── ci_cd/                        # CI/CD scripts
+    │   ├── deploy_staging.sh
+    │   └── run_tests_ci.sh
+    ├── sync-repo.ps1                 # Git sync script
+    ├── start-dev.ps1                 # Dev start script
+    ├── check-setup.ps1               # Setup check script
+    └── simulate_iot.py               # IoT simulation script
 ```
 
 ---
@@ -470,11 +484,11 @@ kubectl delete -f infrastructure/k8s/
 ```
 
 ### **Production Deployment**
-
-```powershell
-# Full production deployment
-.\deploy-production.ps1
-
+ 
+ ```powershell
+ # Full production deployment
+ .\scripts\ops\deploy_production.ps1
+ ```
 # This will:
 # 1. Pull latest code
 # 2. Install dependencies

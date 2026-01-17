@@ -3,7 +3,7 @@ import time
 import random
 import sys
 
-BASE_URL = "http://localhost:8000/api/v1/iot/data-ingest/"
+BASE_URL = "http://localhost:8001/api/v1/iot/data-ingest/"
 
 def send_iot_data(device_id, latitude, longitude, button_pressed=None, battery=100):
     payload = {

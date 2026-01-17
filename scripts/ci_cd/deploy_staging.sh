@@ -27,7 +27,7 @@ echo "Tests Passed."
 
 # 2. Build Docker Image (Assumes Dockerfile is in the root backend directory)
 echo "Building Docker image..."
-docker build -t ${ECR_REPO}:${IMAGE_TAG} ../01_backend/
+docker build -t ${ECR_REPO}:${IMAGE_TAG} ../backend/
 
 # 3. Authenticate Docker to AWS ECR (Credentials usually passed via CI Secrets)
 echo "Authenticating with AWS ECR..."

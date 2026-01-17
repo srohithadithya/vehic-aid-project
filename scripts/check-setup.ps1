@@ -68,11 +68,11 @@ Write-Host "   Testing backend connectivity..."
 
 # Test backend admin
 try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8000/admin/" -UseBasicParsing -ErrorAction SilentlyContinue
-    Write-CheckResult "Backend Admin Panel (http://localhost:8000/admin/)" ($response.StatusCode -eq 200)
+    $response = Invoke-WebRequest -Uri "http://localhost:8001/admin/" -UseBasicParsing -ErrorAction SilentlyContinue
+    Write-CheckResult "Backend Admin Panel (http://localhost:8001/admin/)" ($response.StatusCode -eq 200)
 }
 catch {
-    Write-CheckResult "Backend Admin Panel" $false "Cannot reach http://localhost:8000"
+    Write-CheckResult "Backend Admin Panel" $false "Cannot reach http://localhost:8001"
 }
 
 # Test backend API
@@ -102,8 +102,8 @@ Write-Host ""
 Write-Host "4. Configuration Files" -ForegroundColor Magenta
 Write-Host "   Checking required configuration files..."
 
-$backend_env = Test-Path "backend\.env.dev"
-Write-CheckResult "Backend Environment (.env.dev)" $backend_env
+$backend_env = Test-Path "backend\.env"
+Write-CheckResult "Backend Environment (.env)" $backend_env
 
 $frontend_env = Test-Path "web\admin\.env.local"
 Write-CheckResult "Frontend Environment (.env.local)" $frontend_env
@@ -124,7 +124,7 @@ Write-CheckResult "Backend Directory" $backend_exists
 $frontend_exists = Test-Path "web\admin"
 Write-CheckResult "Frontend Directory" $frontend_exists
 
-$docs_exists = Test-Path "docs\integration.md"
+$docs_exists = Test-Path "docs\INTEGRATION_GUIDE.md"
 Write-CheckResult "Integration Documentation" $docs_exists
 
 Write-Host ""
@@ -148,9 +148,9 @@ else {
     Write-Host "⚠️  Please fix the above issues before deploying" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Troubleshooting:" -ForegroundColor Cyan
-    Write-Host "  1. Start backend: cd 01_backend && docker-compose up -d" -ForegroundColor White
+    Write-Host "  1. Start backend: cd backend && docker-compose up -d" -ForegroundColor White
     Write-Host "  2. Start frontend: cd web\admin && npm run dev" -ForegroundColor White
-    Write-Host "  3. Check status: ./check-setup.ps1" -ForegroundColor White
+    Write-Host "  3. Check status: .\scripts\check-setup.ps1" -ForegroundColor White
 }
 
 Write-Host ""
