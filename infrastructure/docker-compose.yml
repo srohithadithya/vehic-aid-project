@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # PostgreSQL Database
   db:
     image: postgres:14-alpine
     container_name: vehicaid_db
@@ -15,7 +18,10 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - vehicaid-network
 
+  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: vehicaid_redis
@@ -26,20 +32,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - vehicaid-network
 
-  web:
+  # Backend API
+  backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
-    container_name: vehicaid_web
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 vehic_aid_backend.asgi:application"
+    container_name: vehicaid_backend
+    ports:
+      - "8001:8000"
     volumes:
       - ../backend:/app
       - static_files:/app/staticfiles
       - media_files:/app/media
-    ports:
-      - "8001:8000"
-    environment: &backend_env
+    environment:
       - DEBUG=True
       - SECRET_KEY=dev-secret-key-change-in-production-12345
       - DB_NAME=vehic_aid
@@ -58,7 +66,10 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - vehicaid-network
 
+  # Celery Worker
   celery:
     build:
       context: ../backend
@@ -67,73 +78,95 @@ services:
     command: celery -A vehic_aid_backend worker -l info
     volumes:
       - ../backend:/app
-    environment: *backend_env
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-change-in-production-12345
+      - DB_NAME=vehic_aid
+      - DB_USER=vehic_aid
+      - DB_PASSWORD=vehic_aid123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid
     depends_on:
       - db
       - redis
-      - web
+      - backend
     restart: unless-stopped
+    networks:
+      - vehicaid-network
 
-  celery-beat:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
-    container_name: vehicaid_beat
-    command: celery -A vehic_aid_backend beat -l info
-    volumes:
-      - ../backend:/app
-    environment: *backend_env
-    depends_on:
-      - db
-      - redis
-      - web
-    restart: unless-stopped
-
-  web-booker:
-    build:
-      context: ../web/booker
-      dockerfile: Dockerfile
-    container_name: vehicaid_booker
-    ports:
-      - "3003:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://web:8000/api/v1
-      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY:-}
-      - NODE_ENV=production
-    depends_on:
-      - web
-    restart: unless-stopped
-
-  web-provider:
-    build:
-      context: ../web/provider
-      dockerfile: Dockerfile
-    container_name: vehicaid_provider
-    ports:
-      - "3001:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://web:8000/api/v1
-      - NODE_ENV=production
-    depends_on:
-      - web
-    restart: unless-stopped
-
-  web-admin:
+  # Admin Panel (Next.js)
+  admin:
     build:
       context: ../web/admin
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:8000/api/v1
     container_name: vehicaid_admin
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://web:8000/api/v1
-      - API_URL=http://web:8000/api
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
       - NODE_ENV=production
     depends_on:
-      - web
+      - backend
     restart: unless-stopped
+    networks:
+      - vehicaid-network
+
+  # Provider App (Next.js)
+  provider:
+    build:
+      context: ../web/provider
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:8000/api/v1
+    container_name: vehicaid_provider
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8001/ws
+      - NEXT_PUBLIC_GOOGLE_MAPS_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - vehicaid-network
+
+  # Booker App (Next.js)
+  booker:
+    build:
+      context: ../web/booker
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:8000/api/v1
+    container_name: vehicaid_booker
+    ports:
+      - "3003:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8001/ws
+      - NEXT_PUBLIC_GOOGLE_MAPS_KEY=AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_Rv8j6Dfc25hqRt
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - vehicaid-network
 
 volumes:
   db_data:
   static_files:
   media_files:
+
+
+networks:
+  vehicaid-network:
+    driver: bridge
