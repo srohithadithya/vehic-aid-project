@@ -1,0 +1,128 @@
+# Web Applications Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicaid-web-admin
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vehicaid-web-admin
+  template:
+    metadata:
+      labels:
+        app: vehicaid-web-admin
+    spec:
+      containers:
+      - name: web-admin
+        image: vehicaid/web-admin:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://vehicaid-backend-service:8000/api/v1"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicaid-web-admin
+spec:
+  selector:
+    app: vehicaid-web-admin
+  ports:
+  - port: 3000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicaid-web-provider
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vehicaid-web-provider
+  template:
+    metadata:
+      labels:
+        app: vehicaid-web-provider
+    spec:
+      containers:
+      - name: web-provider
+        image: vehicaid/web-provider:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://vehicaid-backend-service:8000/api/v1"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicaid-web-provider
+spec:
+  selector:
+    app: vehicaid-web-provider
+  ports:
+  - port: 3000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicaid-web-booker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vehicaid-web-booker
+  template:
+    metadata:
+      labels:
+        app: vehicaid-web-booker
+    spec:
+      containers:
+      - name: web-booker
+        image: vehicaid/web-booker:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://vehicaid-backend-service:8000/api/v1"
+        - name: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vehicaid-secrets
+              key: google-maps-key
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicaid-web-booker
+spec:
+  selector:
+    app: vehicaid-web-booker
+  ports:
+  - port: 3000
+  type: LoadBalancer
