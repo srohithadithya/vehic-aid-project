@@ -239,15 +239,15 @@ PostgreSQL:
   Host: localhost (dev) / postgres (docker) / postgres.vehicaid.svc.cluster.local (k8s)
   Port: 5432
   Database: vehic_aid
-  Username: vehic_aid
-  Password: vehic_aid123
-  Connection String: postgres://vehic_aid:vehic_aid123@localhost:5432/vehic_aid
+  Username: <your-db-username>
+  Password: <your-db-password>
+  Connection String: postgres://<username>:<password>@localhost:5432/vehic_aid
 
 Redis:
   Host: localhost (dev) / redis (docker) / redis.vehicaid.svc.cluster.local (k8s)
   Port: 6379
   Database: 1 (cache) / 0 (celery)
-  Password: (none for local)
+  Password: <your-redis-password> (or none for local)
   URL: redis://localhost:6379/1
 ```
 
@@ -255,23 +255,23 @@ Redis:
 ```
 Django Admin:
   URL: http://localhost:8001/admin/
-  Username: admin_mobile
-  Password: password123
+  Username: <your-admin-username>
+  Password: <your-admin-password>
 
 Test Customer:
-  Email: customer@test.com
-  Password: testpass123
-  Phone: +919876543210
+  Email: customer@example.com
+  Password: <your-password>
+  Phone: +91XXXXXXXXXX
 
 Test Provider:
-  Email: provider@test.com
-  Password: testpass123
-  Phone: +919876543211
-  Provider ID: PRO-001
+  Email: provider@example.com
+  Password: <your-password>
+  Phone: +91XXXXXXXXXX
+  Provider ID: PRO-XXX
 
 Admin User:
   Email: admin@vehicaid.com
-  Password: admin123
+  Password: <your-admin-password>
 ```
 
 ### **Third-Party Service Credentials**
@@ -281,34 +281,34 @@ Gmail SMTP:
   Host: smtp.gmail.com
   Port: 587
   TLS: True
-  Username: techflixtelugu@gmail.com
-  Password: odef xcec xohg woup (App Password)
-  From: VehicAid <techflixtelugu@gmail.com>
+  Username: <your-email@gmail.com>
+  Password: <your-app-password> (16-digit App Password)
+  From: VehicAid <<your-email@gmail.com>>
 
 Fast2SMS:
   Provider: Fast2SMS
-  API Key: 83gDaZcwo9QnFdV7frOKSMEjUCkJh6eu1vTHm05pXyNLtPBYqI...
+  API Key: <your-fast2sms-api-key>
   Limit: 50 SMS/day (Free tier)
   Route: Quick (q)
 
 Razorpay:
   Mode: Test
-  Key ID: rzp_test_Rv8j6Dfc25hqRt
-  Key Secret: U0rUURLVYbnijMi5GcgEAn91
-  Webhook Secret: (configure in Razorpay dashboard)
+  Key ID: <your-razorpay-key-id>
+  Key Secret: <your-razorpay-key-secret>
+  Webhook Secret: <configure-in-dashboard>
 
 Google Maps:
-  API Key: AIzaSyBm_uKQ1V_ef79p7-LB86T6QtCZ-E73el0
+  API Key: <your-google-maps-api-key>
   Enabled APIs: Maps JavaScript API, Geocoding API, Places API
 
 Firebase:
-  Project ID: studio-7524834929-49622
-  API Key: AIzaSyDIF6XTIFj478ejVaBecEvJSThXmanQbHI
-  Auth Domain: studio-7524834929-49622.firebaseapp.com
-  Storage Bucket: studio-7524834929-49622.firebasestorage.app
+  Project ID: <your-firebase-project-id>
+  API Key: <your-firebase-api-key>
+  Auth Domain: <your-project-id>.firebaseapp.com
+  Storage Bucket: <your-project-id>.firebasestorage.app
 
 Upstash Redis (Production):
-  URL: redis://default:AcEAAAIncDEyNjViODM3ZjJiZjY0YTc1ODM2MzkxNTJlNDYxMTZlMHAxNDk0MDg@exotic-skunk-49408.upstash.io:6379
+  URL: redis://<your-upstash-url>
 ```
 
 ### **Monitoring Credentials**
