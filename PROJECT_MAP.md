@@ -2,6 +2,8 @@
 
 **Complete project structure, architecture, and execution guide**
 
+> **🚗 Multi-Vehicle Platform**: Supports 7 vehicle types - Two Wheeler, Three Wheeler, Four Wheeler, SUV, Van, Truck, and Heavy Vehicle with dynamic pricing.
+
 ---
 
 ## 📁 Project Structure

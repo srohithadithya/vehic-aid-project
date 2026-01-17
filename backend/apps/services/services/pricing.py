@@ -37,6 +37,15 @@ class PricingService:
                 "LOCKOUT": Decimal("120.00"),
                 "GENERAL": Decimal("100.00"),
             },
+            # Three-wheeler (Auto Rickshaw) - slightly higher than two-wheeler
+            "THREE_WHEELER": {
+                "TOWING": Decimal("200.00"),
+                "JUMPSTART": Decimal("100.00"),
+                "TIRE_CHANGE": Decimal("120.00"),
+                "FUEL_DELIVERY": Decimal("90.00"),
+                "LOCKOUT": Decimal("150.00"),
+                "GENERAL": Decimal("130.00"),
+            },
             # Four-wheeler (sedan/hatchback) - mid-range
             "FOUR_WHEELER": {
                 "TOWING": Decimal("300.00"),
@@ -46,8 +55,8 @@ class PricingService:
                 "LOCKOUT": Decimal("250.00"),
                 "GENERAL": Decimal("250.00"),
             },
-            # SUV/Luxury - premium pricing
-            "SUV_LUXURY": {
+            # SUV - premium pricing
+            "SUV": {
                 "TOWING": Decimal("500.00"),
                 "JUMPSTART": Decimal("250.00"),
                 "TIRE_CHANGE": Decimal("350.00"),
@@ -55,13 +64,44 @@ class PricingService:
                 "LOCKOUT": Decimal("400.00"),
                 "GENERAL": Decimal("400.00"),
             },
+            # Van - commercial vehicle pricing
+            "VAN": {
+                "TOWING": Decimal("600.00"),
+                "JUMPSTART": Decimal("300.00"),
+                "TIRE_CHANGE": Decimal("400.00"),
+                "FUEL_DELIVERY": Decimal("300.00"),
+                "LOCKOUT": Decimal("450.00"),
+                "GENERAL": Decimal("450.00"),
+            },
+            # Truck - light/medium commercial
+            "TRUCK": {
+                "TOWING": Decimal("800.00"),
+                "JUMPSTART": Decimal("400.00"),
+                "TIRE_CHANGE": Decimal("500.00"),
+                "FUEL_DELIVERY": Decimal("400.00"),
+                "LOCKOUT": Decimal("550.00"),
+                "GENERAL": Decimal("600.00"),
+            },
+            # Heavy Vehicle - highest pricing
+            "HEAVY_VEHICLE": {
+                "TOWING": Decimal("1200.00"),
+                "JUMPSTART": Decimal("600.00"),
+                "TIRE_CHANGE": Decimal("800.00"),
+                "FUEL_DELIVERY": Decimal("600.00"),
+                "LOCKOUT": Decimal("800.00"),
+                "GENERAL": Decimal("1000.00"),
+            },
         }
         
         # Affordable per km rates (in INR)
         self.per_km_rates = {
             "TWO_WHEELER": Decimal("5.00"),
+            "THREE_WHEELER": Decimal("6.00"),
             "FOUR_WHEELER": Decimal("10.00"),
-            "SUV_LUXURY": Decimal("15.00"),
+            "SUV": Decimal("15.00"),
+            "VAN": Decimal("18.00"),
+            "TRUCK": Decimal("25.00"),
+            "HEAVY_VEHICLE": Decimal("35.00"),
         }
         
         # Subscription discounts (encouraging subscriptions)

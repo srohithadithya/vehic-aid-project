@@ -183,13 +183,19 @@ class Vehicle(models.Model):
     fuel_type = models.CharField(max_length=10, choices=FUEL_CHOICES)
     
     VEHICLE_TYPE_CHOICES = [
-        ("TWO_WHEELER", "Two Wheeler"),
-        ("FOUR_WHEELER", "Four Wheeler"),
+        ("TWO_WHEELER", "Two Wheeler (Bike/Scooter)"),
+        ("THREE_WHEELER", "Three Wheeler (Auto Rickshaw)"),
+        ("FOUR_WHEELER", "Four Wheeler (Car/Sedan/Hatchback)"),
+        ("SUV", "SUV (Sport Utility Vehicle)"),
+        ("VAN", "Van (Minivan/Cargo Van)"),
+        ("TRUCK", "Truck (Light/Medium Commercial)"),
+        ("HEAVY_VEHICLE", "Heavy Vehicle (Bus/Heavy Truck)"),
     ]
     vehicle_type = models.CharField(
         max_length=20, 
         choices=VEHICLE_TYPE_CHOICES, 
-        default="FOUR_WHEELER"
+        default="FOUR_WHEELER",
+        help_text="Type of vehicle for appropriate service and pricing"
     )
 
     insurance_expiry = models.DateField(null=True, blank=True)
