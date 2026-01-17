@@ -41,7 +41,16 @@ Write-Host "✅ Migrations completed" -ForegroundColor Green
 
 # Step 5: Create superuser if needed
 Write-Host "`n👤 Checking for superuser..." -ForegroundColor Yellow
-python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@vehicaid.com', 'admin123') if not User.objects.filter(username='admin').exists() else print('Superuser exists')" 2>$null
+$createSuperuser = @'
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(username="admin").exists():
+    User.objects.create_superuser("admin", "admin@vehicaid.com", "admin123")
+    print("Superuser created")
+else:
+    print("Superuser exists")
+'@
+$createSuperuser | python manage.py shell 2>$null
 Write-Host "✅ Superuser ready (admin/admin123)" -ForegroundColor Green
 
 Set-Location ..
