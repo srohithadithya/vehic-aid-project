@@ -117,9 +117,39 @@ def generate_automated_quote(service_request, provider):
     )
     
     # Calculate total
-    base_price = Decimal("250.00")
-    price_per_km = Decimal("40.00")
-    total = base_price + (Decimal(str(dist)) * price_per_km)
+    # Define pricing configuration (Base Price, Included Km, Per Km Rate)
+    # Matches Frontend "Society Friendly" Prices
+    PRICING_CONFIG = {
+        # Backend IDs
+        'TOWING': {'base': Decimal("199.00"), 'included_km': 5, 'per_km': Decimal("20.00")},
+        'FLATBED_TOWING': {'base': Decimal("349.00"), 'included_km': 5, 'per_km': Decimal("25.00")},
+        'MECHANIC': {'base': Decimal("79.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'FUEL_DELIVERY': {'base': Decimal("49.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'BATTERY_JUMP': {'base': Decimal("119.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'LOCKOUT': {'base': Decimal("149.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'FLAT_TIRE': {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        
+        # Frontend Aliases
+        'basic_tow': {'base': Decimal("199.00"), 'included_km': 5, 'per_km': Decimal("20.00")},
+        'flatbed_tow': {'base': Decimal("349.00"), 'included_km': 5, 'per_km': Decimal("25.00")},
+        'mechanic': {'base': Decimal("79.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'fuel_delivery': {'base': Decimal("49.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'battery_jump': {'base': Decimal("119.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'lockout': {'base': Decimal("149.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+        'tire_change': {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
+    }
+
+    # Get config or default
+    config = PRICING_CONFIG.get(service_request.service_type, {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")})
+    
+    base_price = config['base']
+    
+    # Calculate extra km charge (Distance - Included Limit)
+    dist_decimal = Decimal(str(dist))
+    chargable_dist = max(Decimal("0.00"), dist_decimal - Decimal(config['included_km']))
+    distance_charge = chargable_dist * config['per_km']
+    
+    total = base_price + distance_charge
 
     # 1. Automation: Apply Subscription Discounts
     # Check if user has an active subscription

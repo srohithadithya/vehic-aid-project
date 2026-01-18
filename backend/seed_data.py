@@ -51,7 +51,7 @@ plan_defs = [
     ('FREE', 'Free Access', 0, 0, 'Pay-per-use services'),
     ('BASIC', 'Basic Plan', 99, 30, 'Discounted towing, Priority'),
     ('PREMIUM', 'Premium Plan', 199, 30, 'Free towing (50km), Helpline'),
-    ('ELITE', 'Elite Plan', 499, 30, 'Unlimited towing, VIP support, Exchange'),
+    ('ELITE', 'Elite Plan', 399, 30, 'Unlimited towing, VIP support, Exchange'),
 ]
 
 for code, name, price, days, feats in plan_defs:
@@ -146,13 +146,13 @@ for i, booker in enumerate(bookers):
 print("\nCreating Providers...")
 providers = []
 prov_defs = [
-    ('prov_tow', 'Towing Expert', 'TOWING'),
-    ('prov_mech', 'Mechanic Pro', 'FLAT_TIRE'),
-    ('prov_bat', 'Battery King', 'BATTERY_JUMP'),
-    ('prov_gen', 'General Aid', 'FUEL_DELIVERY'),
+    ('prov_tow', 'Towing Expert', 'TOWING', 'TOW'),
+    ('prov_mech', 'Mechanic Pro', 'MECHANIC', 'MECHANIC'),
+    ('prov_fuel', 'Fuel Runner', 'FUEL_DELIVERY', 'FUEL'),
+    ('prov_student', 'Student Partner', 'BATTERY_JUMP', 'STUDENT'),
 ]
 
-for i, (username, name, service) in enumerate(prov_defs):
+for i, (username, name, service, role_id) in enumerate(prov_defs):
     u = User.objects.create_user(
         username=username,
         email=f'{username}@test.com',
@@ -206,9 +206,9 @@ for i, (booker, vehicle, provider, service, status) in enumerate(req_defs):
             service_request=req,
             booker=booker,
             provider=provider,
-            amount=Decimal('500.00'),
+            amount=Decimal('299.00'),
             platform_commission=Decimal('50.00'),
-            provider_payout_amount=Decimal('450.00'),
+            provider_payout_amount=Decimal('249.00'),
             status='SUCCESS',
             payment_method='UPI'
         )

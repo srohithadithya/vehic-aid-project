@@ -232,14 +232,30 @@ class ProviderJobSerializer(serializers.ModelSerializer):
     booker_name = serializers.CharField(source="booker.username", read_only=True)
     booker_phone = serializers.CharField(source="booker.phone_number", read_only=True)
     vehicle_details = serializers.CharField(source="vehicle.__str__", read_only=True)
+    amount = serializers.SerializerMethodField()
     
     class Meta:
         model = ServiceRequest
         fields = [
             "id", "service_type", "status", "priority", 
             "latitude", "longitude", "customer_notes", 
-            "created_at"
+            "created_at", "booker_name", "booker_phone", "vehicle_details",
+            "amount"
         ]
+
+    def get_amount(self, obj):
+        # Try to find a successful transaction first
+        from apps.payments.models import Transaction
+        tx = Transaction.objects.filter(service_request=obj, status='SUCCESS').first()
+        if tx:
+            return float(tx.amount)
+        
+        # Fallback to accepted quote
+        quote = obj.quotes.filter(status="ACCEPTED").first()
+        if quote:
+            return float(quote.dynamic_total)
+            
+        return 0.0
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
@@ -248,7 +264,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatMessage
-        fields = ["id", "request", "sender", "sender_name", "message", "is_read", "is_me", "created_at"]
+        fields = ["id", "request", "sender", "sender_name", "message", "image", "is_read", "is_me", "created_at"]
         read_only_fields = ["id", "sender", "created_at"]
 
     def get_is_me(self, obj):

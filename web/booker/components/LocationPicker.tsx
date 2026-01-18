@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
 
 interface LocationPickerProps {
@@ -23,32 +23,40 @@ export function LocationPicker({ onLocationSelect, initialLat = 19.0760, initial
     const [currentAddress, setCurrentAddress] = useState('');
     const [usingCurrentLocation, setUsingCurrentLocation] = useState(false);
 
-    useEffect(() => {
-        loadGoogleMaps();
-    }, []);
-
-    const loadGoogleMaps = () => {
-        // Check if Google Maps is already loaded
-        if (window.google && window.google.maps) {
-            initializeMap();
-            return;
+    const getAddressFromLatLng = useCallback(async (lat: number, lng: number) => {
+        try {
+            const geocoder = new window.google.maps.Geocoder();
+            geocoder.geocode(
+                { location: { lat, lng } },
+                (results: any[], status: string) => {
+                    if (status === 'OK' && results[0]) {
+                        const address = results[0].formatted_address;
+                        setCurrentAddress(address);
+                        onLocationSelect(lat, lng, address);
+                    } else {
+                        setCurrentAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                        onLocationSelect(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Geocoding error:', error);
+            setCurrentAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+            onLocationSelect(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
         }
+    }, [onLocationSelect]);
 
-        // Load Google Maps script
-        const script = document.createElement('script');
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // Replace with your API key
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        script.onload = () => initializeMap();
-        script.onerror = () => {
-            console.error('Failed to load Google Maps');
-            setLoading(false);
-        };
-        document.head.appendChild(script);
-    };
+    const updateMarkerPosition = useCallback((latLng: any, markerInstance: any, mapInstance: any) => {
+        const lat = latLng.lat();
+        const lng = latLng.lng();
 
-    const initializeMap = () => {
+        markerInstance.setPosition(latLng);
+        mapInstance.panTo(latLng);
+
+        getAddressFromLatLng(lat, lng);
+    }, [getAddressFromLatLng]);
+
+    const initializeMap = useCallback(() => {
         if (!mapRef.current) return;
 
         const mapInstance = new window.google.maps.Map(mapRef.current, {
@@ -82,40 +90,32 @@ export function LocationPicker({ onLocationSelect, initialLat = 19.0760, initial
 
         // Get initial address
         getAddressFromLatLng(initialLat, initialLng);
-    };
+    }, [initialLat, initialLng, updateMarkerPosition, getAddressFromLatLng]);
 
-    const updateMarkerPosition = (latLng: any, markerInstance: any, mapInstance: any) => {
-        const lat = latLng.lat();
-        const lng = latLng.lng();
-
-        markerInstance.setPosition(latLng);
-        mapInstance.panTo(latLng);
-
-        getAddressFromLatLng(lat, lng);
-    };
-
-    const getAddressFromLatLng = async (lat: number, lng: number) => {
-        try {
-            const geocoder = new window.google.maps.Geocoder();
-            geocoder.geocode(
-                { location: { lat, lng } },
-                (results: any[], status: string) => {
-                    if (status === 'OK' && results[0]) {
-                        const address = results[0].formatted_address;
-                        setCurrentAddress(address);
-                        onLocationSelect(lat, lng, address);
-                    } else {
-                        setCurrentAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                        onLocationSelect(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                    }
-                }
-            );
-        } catch (error) {
-            console.error('Geocoding error:', error);
-            setCurrentAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-            onLocationSelect(lat, lng, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+    const loadGoogleMaps = useCallback(() => {
+        // Check if Google Maps is already loaded
+        if (window.google && window.google.maps) {
+            initializeMap();
+            return;
         }
-    };
+
+        // Load Google Maps script
+        const script = document.createElement('script');
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // Replace with your API key
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => initializeMap();
+        script.onerror = () => {
+            console.error('Failed to load Google Maps');
+            setLoading(false);
+        };
+        document.head.appendChild(script);
+    }, [initializeMap]);
+
+    useEffect(() => {
+        loadGoogleMaps();
+    }, [loadGoogleMaps]);
 
     const getCurrentLocation = () => {
         if (!navigator.geolocation) {

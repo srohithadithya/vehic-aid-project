@@ -15,12 +15,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     redis-tools \
     curl \
     netcat-traditional \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy entrypoint and make it executable
 COPY entrypoint.sh .
@@ -28,6 +29,9 @@ RUN chmod +x entrypoint.sh
 
 # Copy application code
 COPY . .
+
+# Create logs directory if it doesn't exist
+RUN mkdir -p logs && chmod 777 logs
 
 # Expose port
 EXPOSE 8000

@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
 import { MapPin, Phone, User, CheckCircle, Navigation, ArrowLeft, MessageSquare } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
-import { Chat } from '@/components/Chat';
+import Chat from '@/components/Chat';
 import { clsx } from 'clsx';
 
 interface ServiceRequest {
@@ -32,23 +32,34 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
     const [updating, setUpdating] = useState(false);
     const [activeTab, setActiveTab] = useState<'details' | 'chat'>('details');
 
+    const fetchJobDetails = useCallback(async () => {
+        try {
+            const response = await apiClient.get(`/provider/jobs/${id}/`);
+            setJob(response.data);
+        } catch (error) {
+            console.error('Failed to fetch job', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
+    const updateLocation = useCallback(async (lat: number, lng: number) => {
+        try {
+            await apiClient.post('/provider/location-update/', {
+                latitude: lat,
+                longitude: lng
+            });
+        } catch (err) {
+            console.error("Failed to update location", err);
+        }
+    }, []);
+
     useEffect(() => {
         fetchJobDetails();
-    }, [id]);
+    }, [fetchJobDetails]);
 
     useEffect(() => {
         if (!job || (job.status !== 'DISPATCHED' && job.status !== 'ARRIVED' && job.status !== 'SERVICE_IN_PROGRESS')) return;
-
-        const updateLocation = async (lat: number, lng: number) => {
-            try {
-                await apiClient.post('/provider/location-update/', {
-                    latitude: lat,
-                    longitude: lng
-                });
-            } catch (err) {
-                console.error("Failed to update location", err);
-            }
-        };
 
         // Initial update
         if (navigator.geolocation) {
@@ -66,18 +77,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
         }, 30000); // 30 seconds
 
         return () => clearInterval(interval);
-    }, [job?.status]);
-
-    const fetchJobDetails = async () => {
-        try {
-            const response = await apiClient.get(`/provider/jobs/${id}/`);
-            setJob(response.data);
-        } catch (error) {
-            console.error('Failed to fetch job', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [job?.status, updateLocation, job]);
 
     const updateStatus = async (newStatus: string) => {
         setUpdating(true);
@@ -190,7 +190,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
                                 </div>
                                 <div className="pt-6 border-t dark:border-white/10">
                                     <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{t('job.notes')}</p>
-                                    <p className="text-gray-600 dark:text-gray-400 italic bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">"{job.customer_notes || t('job.no_notes')}"</p>
+                                    <p className="text-gray-600 dark:text-gray-400 italic bg-gray-50 dark:bg-white/5 p-4 rounded-2xl">&quot;{job.customer_notes || t('job.no_notes')}&quot;</p>
                                 </div>
                             </div>
 

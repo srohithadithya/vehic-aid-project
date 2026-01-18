@@ -667,7 +667,8 @@ class ChatMessage(models.Model):
     """Real-time chat messages between booker and provider."""
     request = models.ForeignKey(ServiceRequest, on_delete=models.CASCADE, related_name="chat_messages")
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    message = models.TextField()
+    message = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to="chat_attachments/", blank=True, null=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

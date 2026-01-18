@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, DollarSign, FileText, Download } from 'lucide-react';
@@ -10,11 +10,7 @@ export default function ServiceHistoryPage() {
     const [history, setHistory] = useState([]);
     const [filter, setFilter] = useState('all'); // all, completed, cancelled
 
-    useEffect(() => {
-        fetchHistory();
-    }, [filter]);
-
-    const fetchHistory = async () => {
+    const fetchHistory = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
@@ -28,7 +24,11 @@ export default function ServiceHistoryPage() {
         } catch (error) {
             console.error('Failed to fetch history:', error);
         }
-    };
+    }, [filter]);
+
+    useEffect(() => {
+        fetchHistory();
+    }, [fetchHistory]);
 
     const getStatusColor = (status: string) => {
         const colors: any = {

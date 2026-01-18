@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehic-Aid Enterprise System</title>
-    <link rel="icon" href="/static/img/logo/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/img/logo/vehic_aid_logo.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -86,17 +86,20 @@
         }
 
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
             gap: 2rem;
-            max-width: 1000px;
             width: 100%;
+            margin-top: 2rem;
         }
 
         .card {
             background: rgba(30, 41, 59, 0.5);
             backdrop-filter: blur(10px);
             padding: 2rem;
+            width: 100%;
+            max-width: 380px;
             border-radius: 1.5rem;
             text-decoration: none;
             color: var(--text-light);
@@ -180,14 +183,12 @@
         </p>
 
         <div class="grid">
-            <a href="/admin/" class="card"
-                style="grid-column: 1 / -1; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                <img src="/static/img/logo/vehic_aid_logo.png" alt="Admin Logo"
-                    style="height: 60px; margin-bottom: 1rem;">
-                <h3 style="justify-content: center;">Command Center</h3>
-                <p>Administrative access for user management, service dispatch, and financial settlements.</p>
+            <a href="/admin/" class="card">
+                <h3 style="justify-content: center;">Django Administration</h3>
+                <p>System-level configuration, database management, and user permissions.</p>
             </a>
         </div>
+
     </main>
 
     <footer>

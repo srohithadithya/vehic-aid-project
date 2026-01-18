@@ -20,6 +20,33 @@ import {
 export default function Dashboard() {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const [deviceStatus, setDeviceStatus] = useState<any>(null);
+    const [activePlan, setActivePlan] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch IoT Status
+                const iotResponse = await apiClient.get('/iot/status/');
+                setDeviceStatus(iotResponse.data);
+            } catch (err) {
+                console.log("No IoT device linked or error fetching status.");
+                setDeviceStatus(null);
+            }
+
+            try {
+                // Fetch Active Subscription
+                const subResponse = await apiClient.get('/services/subscriptions/current/');
+                setActivePlan(subResponse.data);
+            } catch (err) {
+                // 404 means no active subscription
+                setActivePlan(null);
+            }
+        };
+        if (user) {
+            fetchData();
+        }
+    }, [user]);
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-background">
@@ -28,29 +55,10 @@ export default function Dashboard() {
     );
 
     if (!user) {
+        // Only redirect if not loading to avoid race conditions
         router.push('/auth/login?redirect=/dashboard');
         return null;
     }
-
-    const [deviceStatus, setDeviceStatus] = useState<any>(null);
-
-    useEffect(() => {
-        const fetchIoTStatus = async () => {
-            try {
-                // Use the backend endpoint: /api/v1/iot/status/
-                // Note: The client logic might need /iot/status/ mapping or direct call
-                // Based on api.ts baseURL, we just call /iot/status/
-                const response = await apiClient.get('/iot/status/');
-                setDeviceStatus(response.data);
-            } catch (err) {
-                console.log("No IoT device linked or error fetching status.");
-                setDeviceStatus(null);
-            }
-        };
-        if (user) {
-            fetchIoTStatus();
-        }
-    }, [user]);
 
     // Fallback if no device found
     const displayStatus = deviceStatus ? {
@@ -154,15 +162,32 @@ export default function Dashboard() {
                     <motion.div variants={item} className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col justify-between">
                         <div>
                             <h3 className="font-semibold text-lg mb-2">Active Plan</h3>
-                            <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
-                                Free Access
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Upgrade to Premium for 24/7 priority support and unlimited towing.
-                            </p>
+                            {activePlan ? (
+                                <>
+                                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
+                                        {activePlan?.plan_details?.name || 'Active Plan'}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        {activePlan?.plan_details?.name === 'Elite Plan'
+                                            ? 'You have full VIP access and unlimited towing.'
+                                            : activePlan?.plan_details?.name === 'Premium Plan'
+                                                ? 'Great choice! You have priority support.'
+                                                : 'Upgrade to Elite for VIP support and unlimited towing.'}
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-4">
+                                        Free Access
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Upgrade to Premium for 24/7 priority support and unlimited towing.
+                                    </p>
+                                </>
+                            )}
                         </div>
-                        <Button variant="outline" onClick={() => router.push('/subscription')} className="w-full">
-                            View Plans
+                        <Button variant="outline" onClick={() => router.push(activePlan ? '/billing' : '/subscription')} className="w-full">
+                            {activePlan ? 'Manage Subscription' : 'View Plans'}
                         </Button>
                     </motion.div>
                 </motion.div>

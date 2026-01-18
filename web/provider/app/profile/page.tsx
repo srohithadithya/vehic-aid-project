@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { apiClient } from '@/lib/api';
 import {
@@ -10,9 +10,25 @@ import {
 import { clsx } from "clsx";
 import AuthGuard from '@/components/AuthGuard';
 
+interface UserData {
+    name: string;
+    title: string;
+    id: string;
+    email: string;
+    phone: string;
+    vehicle: string;
+    plate: string;
+    joined: string;
+    rating: number;
+    jobs: number;
+    bankAccount: string;
+    bankIfsc: string;
+    serverTime?: string;
+}
+
 export default function ProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
-    const [userData, setUserData] = useState({
+    const [userData, setUserData] = useState<UserData>({
         name: "Loading...",
         title: "Provider",
         id: "---",
@@ -32,16 +48,16 @@ export default function ProfilePage() {
         const fetchProfile = async () => {
             try {
                 const response = await apiClient.get('/users/profile/');
-                const u = response.data; // Response is the user object directly
+                const u = response.data.user; // Correctly access nested user object
                 setUserData({
-                    name: u.full_name,
+                    name: u.full_name || "Valued Partner",
                     title: u.service_types && u.service_types.length > 0 ? `${u.service_types[0].replace('_', ' ')} Expert` : "Authorized Provider",
-                    id: u.provider_id || `PRO-${u.id.toString().padStart(6, '0')}`,
-                    email: u.email,
-                    phone: u.phone,
-                    vehicle: u.is_provider ? "Service Vehicle" : "N/A",
-                    plate: u.vehicles && u.vehicles.length > 0 ? u.vehicles[0] : "Verified",
-                    joined: "Jan 2024",
+                    id: u.provider_id || `PRO-${u.id ? u.id.toString().padStart(6, '0') : '000'}`,
+                    email: u.email || "",
+                    phone: u.phone || "",
+                    vehicle: (u.vehicles && u.vehicles.length > 0) ? "Service Vehicle" : "No Vehicle Linked",
+                    plate: u.vehicles && u.vehicles.length > 0 ? u.vehicles[0] : "Pending",
+                    joined: "Jan 2024", // Placeholder as 'date_joined' might not be in response
                     rating: u.average_rating || 5.0,
                     jobs: u.jobs_completed || 0,
                     serverTime: u.server_time,
@@ -57,9 +73,29 @@ export default function ProfilePage() {
         fetchProfile();
     }, []);
 
-    const handleSave = () => {
-        setIsEditing(false);
-        // API Call to save would go here
+    const handleSave = async () => {
+        try {
+            await apiClient.patch('/users/profile/', {
+                email: userData.email,
+                phone: userData.phone
+            });
+            setIsEditing(false);
+            alert("Profile updated successfully.");
+
+            // Refresh
+            const response = await apiClient.get('/users/profile/');
+            const u = response.data.user;
+            setUserData(prev => ({
+                ...prev,
+                email: u.email || prev.email,
+                phone: u.phone || prev.phone,
+                serverTime: u.server_time
+            }));
+
+        } catch (error) {
+            console.error("Failed to update profile", error);
+            alert("Failed to update profile. Please try again.");
+        }
     };
 
     return (

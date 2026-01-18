@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { AdminSidebar } from './admin-sidebar';
 import { useLanguage } from '@/context/LanguageContext';
 import { Globe } from 'lucide-react';
+import { Notifications } from '@/components/notifications';
 
 export function AdminHeader() {
     const { language, setLanguage } = useLanguage();
@@ -46,10 +47,7 @@ export function AdminHeader() {
                     <span className="text-xs font-bold uppercase">{language}</span>
                 </Button>
 
-                <Button variant="ghost" size="icon">
-                    <Bell className="h-5 w-5" />
-                    <span className="sr-only">Notifications</span>
-                </Button>
+                <Notifications />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

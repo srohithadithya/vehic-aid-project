@@ -116,7 +116,7 @@ function ServiceRequestWizardContent() {
                             <div className="space-y-4">
                                 <h2 className="text-2xl font-bold">Which vehicle?</h2>
                                 <div className="p-4 border rounded-xl bg-gray-50 text-gray-500 text-center">
-                                    No vehicles saved. Using "Unknown Vehicle".
+                                    No vehicles saved. Using &quot;Unknown Vehicle&quot;.
                                 </div>
                                 <textarea
                                     placeholder="Add notes for the provider (landmarks, vehicle color...)"

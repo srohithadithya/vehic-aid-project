@@ -39,7 +39,7 @@ class Transaction(models.Model):
         help_text="The request this payment fulfills.",
     )
     booker = models.ForeignKey(
-        ServiceBooker, on_delete=models.PROTECT, related_name="payments_made"
+        ServiceBooker, on_delete=models.PROTECT, related_name="payments_made", null=True, blank=True
     )
     provider = models.ForeignKey(
         ServiceProvider, on_delete=models.PROTECT, related_name="payments_received"

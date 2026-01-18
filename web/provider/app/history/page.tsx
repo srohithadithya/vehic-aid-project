@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
@@ -12,18 +12,45 @@ import {
 import { clsx } from 'clsx';
 import AuthGuard from '@/components/AuthGuard';
 
+interface APIJob {
+    id: number;
+    service_type: string;
+    created_at: string;
+    latitude: string;
+    longitude: string;
+    amount?: number;
+    status: string;
+}
+
+interface JobHistoryItem {
+    id: number;
+    type: string;
+    date: string;
+    location: string;
+    amount: number;
+    status: string;
+}
+
 export default function HistoryPage() {
     const { t } = useLanguage();
     const [filter, setFilter] = useState('ALL');
-    const [history, setHistory] = useState<any[]>([]);
+    const [history, setHistory] = useState<JobHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
                 const response = await apiClient.get('/services/provider/jobs/');
-                // Transform API data to match UI needs if necessary
-                setHistory(response.data);
+                // Transform API data to match UI needs
+                const mappedData = response.data.map((job: APIJob) => ({
+                    id: job.id,
+                    type: job.service_type,
+                    date: job.created_at,
+                    location: `${parseFloat(job.latitude).toFixed(4)}, ${parseFloat(job.longitude).toFixed(4)}`, // Basic Lat/Lng since we don't have reverse geocoding in API yet
+                    amount: job.amount || 0,
+                    status: job.status
+                }));
+                setHistory(mappedData);
             } catch (error) {
                 console.error("Failed to fetch history", error);
             } finally {

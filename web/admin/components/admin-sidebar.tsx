@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Wrench, DollarSign, Settings, LogOut, TrendingUp, Activity, Bot } from 'lucide-react';
+import { LayoutDashboard, Users, Wrench, IndianRupee, Settings, LogOut, TrendingUp, Activity, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { useLanguage } from '@/context/LanguageContext';
@@ -16,7 +16,7 @@ export function AdminSidebar() {
         { icon: LayoutDashboard, label: t('nav.dashboard'), href: '/dashboard' },
         { icon: Users, label: t('nav.users'), href: '/users' },
         { icon: Wrench, label: t('nav.bookings'), href: '/bookings' },
-        { icon: DollarSign, label: t('nav.payments'), href: '/payments' },
+        { icon: IndianRupee, label: t('nav.payments'), href: '/payments' },
         { icon: Activity, label: t('nav.iot'), href: '/iot-fleet' },
         { icon: Bot, label: t('nav.ai'), href: '/ai-monitor' },
         { icon: TrendingUp, label: t('nav.analytics'), href: '/analytics' },

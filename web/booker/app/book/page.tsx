@@ -14,11 +14,13 @@ interface Vehicle {
     model: string;
 }
 
+import { LocationPicker } from '@/components/LocationPicker';
+
 const SERVICE_TYPES = [
-    { id: 'TOWING', label: 'Towing Service', icon: Truck, description: 'Flatbed or wheel-lift towing for breakdowns.' },
-    { id: 'MECHANIC', label: 'On-site Mechanic', icon: Wrench, description: 'Minor repairs, battery jumpstart, or diagnosis.' },
-    { id: 'FUEL', label: 'Fuel Delivery', icon: Fuel, description: 'Emergency fuel delivery to your location.' },
-    { id: 'LOCKOUT', label: 'Lockout Service', icon: AlertTriangle, description: 'Help getting back into your locked vehicle.' },
+    { id: 'TOWING', label: 'Towing Service', icon: Truck, description: 'Includes 5km tow. Then ₹20/km.', price: 'Starts @ ₹199' },
+    { id: 'MECHANIC', label: 'On-site Mechanic', icon: Wrench, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹79' },
+    { id: 'FUEL', label: 'Fuel Delivery', icon: Fuel, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹49' },
+    { id: 'LOCKOUT', label: 'Lockout Service', icon: AlertTriangle, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹149' },
 ];
 
 export default function BookServicePage() {
@@ -27,6 +29,7 @@ export default function BookServicePage() {
     const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
     const [selectedService, setSelectedService] = useState<string | null>(null);
     const [notes, setNotes] = useState('');
+    const [location, setLocation] = useState<{ lat: number, lng: number, address: string } | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -36,8 +39,6 @@ export default function BookServicePage() {
 
     const fetchVehicles = async () => {
         try {
-            // Assuming we have a vehicle list endpoint. If not, we might need to mock or add it.
-            // Based on views.py: VehicleViewSet is registered at /vehicles/
             const response = await apiClient.get('/vehicles/');
             setVehicles(response.data);
             if (response.data.length > 0) {
@@ -45,8 +46,6 @@ export default function BookServicePage() {
             }
         } catch (error) {
             console.error('Failed to fetch vehicles', error);
-            // Fallback/Mock for demo without vehicle added
-            // setVehicles([{ id: 999, make: 'Toyota', model: 'Camry', license_plate: 'MH-12-AB-1234' }]);
         } finally {
             setLoading(false);
         }
@@ -54,42 +53,19 @@ export default function BookServicePage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedVehicle || !selectedService) return;
+        if (!selectedVehicle || !selectedService || !location) {
+            alert("Please select a vehicle, service, and location.");
+            return;
+        }
 
         setSubmitting(true);
-        try {
-            // Simulated location (Mumbai coordinates)
-            const location = { latitude: 19.0760, longitude: 72.8777 };
-
-            // Try getting real location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        submitRequest(pos.coords.latitude, pos.coords.longitude);
-                    },
-                    (err) => {
-                        console.log("Using default location", err);
-                        submitRequest(location.latitude, location.longitude);
-                    }
-                );
-            } else {
-                submitRequest(location.latitude, location.longitude);
-            }
-
-        } catch (error) {
-            console.error('Submission failed', error);
-            setSubmitting(false);
-        }
-    };
-
-    const submitRequest = async (lat: number, lng: number) => {
         try {
             const response = await apiClient.post('/request/', {
                 vehicle_id: selectedVehicle,
                 service_type: selectedService,
-                customer_notes: notes,
-                latitude: lat,
-                longitude: lng
+                customer_notes: `${notes} [Loc: ${location.address}]`,
+                latitude: location.lat,
+                longitude: location.lng
             });
 
             // Redirect to status page
@@ -99,7 +75,7 @@ export default function BookServicePage() {
             alert("Failed to submit request. Please try again.");
             setSubmitting(false);
         }
-    }
+    };
 
     if (loading) return <div className="p-8 text-center">Loading...</div>;
 
@@ -123,7 +99,6 @@ export default function BookServicePage() {
                         {vehicles.length === 0 ? (
                             <div className="text-center py-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
                                 <p className="text-sm text-gray-500 mb-2">No vehicles found.</p>
-                                {/* In a real app, link to add vehicle page */}
                                 <button type="button" className="text-blue-600 text-sm font-medium">Add a vehicle first</button>
                             </div>
                         ) : (
@@ -173,6 +148,7 @@ export default function BookServicePage() {
                                         <div>
                                             <h3 className="font-medium text-gray-900 dark:text-gray-200">{service.label}</h3>
                                             <p className="text-xs text-gray-500 mt-1">{service.description}</p>
+                                            <p className="text-xs font-semibold text-green-600 mt-1">{service.price}</p>
                                         </div>
                                     </div>
                                 )
@@ -180,11 +156,21 @@ export default function BookServicePage() {
                         </div>
                     </div>
 
-                    {/* Notes & Location */}
+                    {/* Location Selection - Interactive Map */}
                     <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                             <MapPin className="w-5 h-5 mr-2 text-blue-500" /> Location & Notes
                         </h2>
+
+                        <div className="mb-4">
+                            <LocationPicker
+                                onLocationSelect={(lat, lng, address) => {
+                                    setLocation({ lat, lng, address });
+                                    // Auto-append address to notes if empty
+                                    if (!notes) setNotes(`At: ${address || 'Selected Location'}`);
+                                }}
+                            />
+                        </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Additional Notes</label>
@@ -196,15 +182,12 @@ export default function BookServicePage() {
                                 onChange={(e) => setNotes(e.target.value)}
                             />
                         </div>
-                        <p className="mt-4 text-xs text-gray-500 flex items-center">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            Your location will be automatically shared with the provider.
-                        </p>
                     </div>
 
                     <button
                         type="submit"
-                        disabled={submitting || !selectedVehicle || !selectedService}
+
+                        disabled={submitting || !selectedVehicle || !selectedService || !location}
                         className="w-full rounded-lg bg-blue-600 px-3.5 py-4 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         {submitting ? 'Submitting Request...' : 'Send Help Request'}

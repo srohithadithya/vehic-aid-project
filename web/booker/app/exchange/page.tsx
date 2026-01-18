@@ -22,7 +22,7 @@ export default function VehicleExchangePage() {
                         <ArrowRightLeft size={32} />
                     </div>
                     <h1 className="text-2xl font-bold">Premium Exchange</h1>
-                    <p className="text-purple-100 mt-2 text-sm">Don't stop moving. Swap your broken vehicle for a rental instantly.</p>
+                    <p className="text-purple-100 mt-2 text-sm">Don&apos;t stop moving. Swap your broken vehicle for a rental instantly.</p>
                 </div>
 
                 <div className="p-8 space-y-6">

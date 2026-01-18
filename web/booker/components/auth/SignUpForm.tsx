@@ -232,18 +232,33 @@ export default function SignUpForm() {
 
                             <div className="space-y-2">
                                 <Label>Upload Document</Label>
-                                <div className="border-2 border-dashed border-input rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer group">
+                                <div className="border-2 border-dashed border-input rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer group relative">
+                                    <input
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] || null;
+                                            setFormData({ ...formData, licenseFile: file });
+                                        }}
+                                    />
                                     <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3 group-hover:bg-primary/10 transition-colors">
-                                        <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary" />
+                                        {formData.licenseFile ? (
+                                            <FileCheck className="w-6 h-6 text-green-500" />
+                                        ) : (
+                                            <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary" />
+                                        )}
                                     </div>
-                                    <p className="text-sm font-medium">Click to upload License Front</p>
+                                    <p className="text-sm font-medium">
+                                        {formData.licenseFile ? formData.licenseFile.name : "Click to upload License Front"}
+                                    </p>
                                     <p className="text-xs text-muted-foreground mt-1">JPG, PNG or PDF (Max 5MB)</p>
                                 </div>
                             </div>
 
                             <div className="flex gap-2 pt-4">
                                 <Button variant="ghost" onClick={handleBack} className="w-1/3">Back</Button>
-                                <Button className="flex-1 group" onClick={handleNext}>
+                                <Button className="flex-1 group" onClick={handleNext} disabled={!formData.licenseNumber || !formData.licenseFile}>
                                     Next Step
                                     <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                                 </Button>

@@ -9,13 +9,13 @@ import { ServiceType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const services: { id: ServiceType; title: string; icon: React.ComponentType<{ className?: string }>; desc: string; price: string }[] = [
-    { id: 'basic_tow', title: 'Basic Towing', icon: Car, desc: 'For standard sedans and hatchbacks.', price: '₹499+' },
-    { id: 'flatbed_tow', title: 'Flatbed Towing', icon: Car, desc: 'Secure transport for luxury/AWD vehicles.', price: '₹999+' },
-    { id: 'mechanic', title: 'Mobile Mechanic', icon: Wrench, desc: 'On-site minor repairs & diagnostics.', price: '₹299+' },
-    { id: 'fuel_delivery', title: 'Fuel Delivery', icon: Fuel, desc: 'Running on empty? We bring the fuel.', price: '₹149 + Fuel' },
-    { id: 'battery_jump', title: 'Battery Jump', icon: Battery, desc: 'Dead battery? We will get you started.', price: '₹199' },
-    { id: 'lockout', title: 'Lockout Service', icon: Lock, desc: 'Keys locked inside? We can open it.', price: '₹249' },
-    { id: 'tire_change', title: 'Tire Change', icon: Disc, desc: 'Flat tire replacement with your spare.', price: '₹199' },
+    { id: 'basic_tow', title: 'Basic Towing', icon: Car, desc: 'Standard towing. Includes 5km distance.', price: '₹199 + ₹20/km (after 5km)' },
+    { id: 'flatbed_tow', title: 'Flatbed Towing', icon: Car, desc: 'Safe for AWD/Luxury. Includes 5km distance.', price: '₹349 + ₹25/km (after 5km)' },
+    { id: 'mechanic', title: 'Mobile Mechanic', icon: Wrench, desc: 'Minor repairs. Includes 5km dedicated travel.', price: '₹79 + ₹15/km (after 5km)' },
+    { id: 'fuel_delivery', title: 'Fuel Delivery', icon: Fuel, desc: 'Delivery fee. Includes 5km dedicated travel.', price: '₹49 + ₹15/km (after 5km)' },
+    { id: 'battery_jump', title: 'Battery Jump', icon: Battery, desc: 'Jump start. Includes 5km dedicated travel.', price: '₹119 + ₹15/km (after 5km)' },
+    { id: 'lockout', title: 'Lockout Service', icon: Lock, desc: 'Unlock service. Includes 5km dedicated travel.', price: '₹149 + ₹15/km (after 5km)' },
+    { id: 'tire_change', title: 'Tire Change', icon: Disc, desc: 'Stepney change. Includes 5km dedicated travel.', price: '₹99 + ₹15/km (after 5km)' },
 ];
 
 export default function StepService() {
