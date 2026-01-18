@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .serializers import CustomTokenObtainPairSerializer
@@ -8,10 +9,15 @@ from .views import (
     ProviderRegisterView,
     UserProfileView,
     LanguagePreferenceView,
-    DeviceTokenView
+    DeviceTokenView,
+    NotificationViewSet
 )
 
+router = DefaultRouter()
+router.register(r'notifications', NotificationViewSet, basename='notification')
+
 urlpatterns = [
+    path('', include(router.urls)),
     # General Auth
     path(
         "token/",

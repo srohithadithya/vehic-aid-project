@@ -29,11 +29,39 @@ export default function ProviderSignupPage() {
         driverLicense: null
     });
 
-    const handleNext = () => setStep(step + 1);
+    const handleNext = () => {
+        if (validateStep(step)) {
+            setStep(step + 1);
+        }
+    };
     const handleBack = () => setStep(step - 1);
+
+    const validateStep = (currentStep: number) => {
+        if (currentStep === 1) {
+            if (!formData.role || !formData.fullName || !formData.email || !formData.phone || !formData.password) {
+                alert("Please fill in all Identity & Role fields.");
+                return false;
+            }
+        }
+        if (currentStep === 2) {
+            if (!formData.vehiclePlate) {
+                alert("Please enter Vehicle Registration Number.");
+                return false;
+            }
+        }
+        if (currentStep === 3) {
+            if (!formData.kycDoc || !formData.driverLicense) {
+                alert("Please upload both KYC Document and Driving License.");
+                return false;
+            }
+        }
+        return true;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validateStep(3)) return; // Optional: validate step 3 docs if strictly required
+
         setIsLoading(true);
         // Simulate API call
         setTimeout(() => {
@@ -240,48 +268,78 @@ export default function ProviderSignupPage() {
                                     </h3>
 
                                     <div className="space-y-4">
-                                        <div className="border border-dashed border-white/20 rounded-xl p-6 flex items-center justify-between hover:bg-white/5 transition-colors group cursor-pointer">
-                                            <div className="flex items-center gap-4">
+                                        {/* KYC Document Input */}
+                                        <div
+                                            className={clsx(
+                                                "border border-dashed rounded-xl p-6 flex items-center justify-between transition-colors cursor-pointer",
+                                                formData.kycDoc ? "border-green-500/50 bg-green-500/10" : "border-white/20 hover:bg-white/5"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4 flex-1">
                                                 <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-400">
                                                     <User className="w-6 h-6" />
                                                 </div>
-                                                <div>
-                                                    <p className="text-white font-medium">KYC Document</p>
-                                                    <p className="text-sm text-gray-500">Aadhar / PAN Card</p>
+                                                <div className="flex-1">
+                                                    <p className="text-white font-medium">KYC Document *</p>
+                                                    <p className="text-sm text-gray-500">{formData.kycDoc ? "File Selected" : "Aadhar / PAN Card"}</p>
                                                 </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*,.pdf"
+                                                    onChange={(e) => setFormData({ ...formData, kycDoc: e.target.files?.[0] || null })}
+                                                    className="w-24 text-transparent file:hidden"
+                                                />
                                             </div>
-                                            <Upload className="w-5 h-5 text-gray-600 group-hover:text-white" />
+                                            {formData.kycDoc ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Upload className="w-5 h-5 text-gray-600" />}
                                         </div>
 
-                                        <div className="border border-dashed border-white/20 rounded-xl p-6 flex items-center justify-between hover:bg-white/5 transition-colors group cursor-pointer">
-                                            <div className="flex items-center gap-4">
+                                        {/* Driving License Input */}
+                                        <div
+                                            className={clsx(
+                                                "border border-dashed rounded-xl p-6 flex items-center justify-between transition-colors cursor-pointer",
+                                                formData.driverLicense ? "border-green-500/50 bg-green-500/10" : "border-white/20 hover:bg-white/5"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4 flex-1">
                                                 <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center text-green-400">
                                                     <Truck className="w-6 h-6" />
                                                 </div>
-                                                <div>
-                                                    <p className="text-white font-medium">Driving License</p>
-                                                    <p className="text-sm text-gray-500">Commercial / Private DL</p>
+                                                <div className="flex-1">
+                                                    <p className="text-white font-medium">Driving License *</p>
+                                                    <p className="text-sm text-gray-500">{formData.driverLicense ? "File Selected" : "Commercial / Private DL"}</p>
                                                 </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*,.pdf"
+                                                    onChange={(e) => setFormData({ ...formData, driverLicense: e.target.files?.[0] || null })}
+                                                    className="w-24 text-transparent file:hidden"
+                                                />
                                             </div>
-                                            <Upload className="w-5 h-5 text-gray-600 group-hover:text-white" />
+                                            {formData.driverLicense ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Upload className="w-5 h-5 text-gray-600" />}
                                         </div>
 
+                                        {/* Mechanic Cert (Optional/Conditional) */}
                                         {formData.role === 'MECHANIC' && (
-                                            <div className="border border-dashed border-white/20 rounded-xl p-6 flex items-center justify-between hover:bg-white/5 transition-colors group cursor-pointer animate-in fade-in slide-in-from-bottom-2">
-                                                <div className="flex items-center gap-4">
+                                            <div className="border border-dashed border-white/20 rounded-xl p-6 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-2">
+                                                <div className="flex items-center gap-4 flex-1">
                                                     <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
                                                         <Wrench className="w-6 h-6" />
                                                     </div>
-                                                    <div>
+                                                    <div className="flex-1">
                                                         <p className="text-white font-medium">Mechanic Certificate</p>
                                                         <p className="text-sm text-gray-500">Local Provider / Trade Cert</p>
                                                     </div>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*,.pdf"
+                                                        onChange={(e) => setFormData({ ...formData, mechanicCert: e.target.files?.[0] || null })}
+                                                        className="w-24 text-transparent file:hidden"
+                                                    />
                                                 </div>
-                                                <Upload className="w-5 h-5 text-gray-600 group-hover:text-white" />
+                                                {formData.mechanicCert ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Upload className="w-5 h-5 text-gray-600" />}
                                             </div>
                                         )}
                                     </div>
-
                                     <div className="text-xs text-gray-500 text-center px-4">
                                         By submitting, you agree to background verification. False information may lead to blacklisting.
                                     </div>

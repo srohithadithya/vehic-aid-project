@@ -1,18 +1,40 @@
 from django.utils import timezone
-from rest_framework import status
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.users.models import ServiceProvider
-
-from .models import ServiceBooker, ServiceProvider
+from .models import ServiceBooker, ServiceProvider, Notification
 from .serializers import (
     BookerRegistrationSerializer,
     ProviderProfileUpdateSerializer,
     ProviderRegistrationSerializer,
-    ServiceBookerSerializer
+    ServiceBookerSerializer,
+    NotificationSerializer
 )
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    """ViewSet for user notifications."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = NotificationSerializer
+    queryset = Notification.objects.all()
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['post'], url_path='mark-all-read')
+    def mark_all_read(self, request):
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+        return Response({"status": "All notifications marked as read"})
+
+    @action(detail=True, methods=['post'], url_path='mark-read')
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response({"status": "Notification marked as read"})
 
 
 class BookerRegisterView(APIView):
@@ -164,6 +186,28 @@ class UserProfileView(APIView):
             )
 
         return Response({"user": response_data})
+
+    def patch(self, request):
+        """
+        Updates the authenticated user's basic profile information (email, phone).
+        """
+        user = request.user
+        data = request.data
+        
+        email = data.get('email')
+        phone = data.get('phone')
+        
+        if email:
+            user.email = email
+        if phone:
+            user.phone_number = phone
+            
+        user.save()
+        
+        # Determine if we need to update provider details (like banking)?
+        # Assuming banking is read-only for now via this endpoint.
+        
+        return self.get(request)
 
 
 class DeviceTokenView(APIView):

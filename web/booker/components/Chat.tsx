@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { apiClient } from '@/lib/api';
 import { Send, User, Wrench } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -26,21 +26,7 @@ export function Chat({ requestId }: ChatProps) {
     const [sending, setSending] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        fetchMessages();
-        // Poll for new messages every 3 seconds
-        const interval = setInterval(fetchMessages, 3000);
-        return () => clearInterval(interval);
-    }, [requestId]);
-
-    useEffect(() => {
-        // Auto-scroll to bottom when new messages arrive
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }, [messages]);
-
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
         try {
             const response = await apiClient.get(`/chat/?request_id=${requestId}`);
             setMessages(response.data);
@@ -49,7 +35,21 @@ export function Chat({ requestId }: ChatProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [requestId]);
+
+    useEffect(() => {
+        fetchMessages();
+        // Poll for new messages every 3 seconds
+        const interval = setInterval(fetchMessages, 3000);
+        return () => clearInterval(interval);
+    }, [fetchMessages]);
+
+    useEffect(() => {
+        // Auto-scroll to bottom when new messages arrive
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();

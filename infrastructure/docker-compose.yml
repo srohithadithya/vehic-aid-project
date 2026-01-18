@@ -1,25 +1,26 @@
 services:
-  # Database
+  # 1. Database
   db:
     image: postgres:14-alpine
     container_name: vehicaid_db
+    env_file: .env
     environment:
-      POSTGRES_DB: vehic_aid
-      POSTGRES_USER: vehic_aid
-      POSTGRES_PASSWORD: vehic_aid123
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U vehic_aid" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - vehicaid-net
 
-  # Redis
+  # 2. Redis
   redis:
     image: redis:7-alpine
     container_name: vehicaid_redis
@@ -33,29 +34,20 @@ services:
     networks:
       - vehicaid-net
 
-  # Backend API
+  # 3. Backend API
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: vehicaid_backend
-    environment:
-      DEBUG: "True"
-      SECRET_KEY: "dev-secret-key-change-in-production-12345"
-      DB_NAME: "vehic_aid"
-      DB_USER: "vehic_aid"
-      DB_PASSWORD: "vehic_aid123"
-      DB_HOST: "db"
-      DB_PORT: "5432"
-      REDIS_URL: "redis://redis:6379/1"
-      DATABASE_URL: "postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid"
-      CELERY_BROKER_URL: "redis://redis:6379/0"
-      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    env_file: .env
     ports:
       - "8001:8000"
     volumes:
+      - ../backend:/app
       - static_files:/app/staticfiles
       - media_files:/app/media
+      - ../backend/logs:/app/logs
     depends_on:
       db:
         condition: service_healthy
@@ -64,76 +56,75 @@ services:
     networks:
       - vehicaid-net
 
-  # Celery Worker
+  # 4. Celery Worker
   celery:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: vehicaid_celery
     command: celery -A vehic_aid_backend worker -l info
-    environment:
-      DEBUG: "True"
-      SECRET_KEY: "dev-secret-key-change-in-production-12345"
-      DB_NAME: "vehic_aid"
-      DB_USER: "vehic_aid"
-      DB_PASSWORD: "vehic_aid123"
-      DB_HOST: "db"
-      DB_PORT: "5432"
-      REDIS_URL: "redis://redis:6379/1"
-      DATABASE_URL: "postgres://vehic_aid:vehic_aid123@db:5432/vehic_aid"
-      CELERY_BROKER_URL: "redis://redis:6379/0"
-      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    env_file: .env
     depends_on:
       - backend
     networks:
       - vehicaid-net
 
-  # Admin Panel
+  # 5. Celery Beat
+  celery-beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: vehicaid_celery_beat
+    command: celery -A vehic_aid_backend beat -l info
+    env_file: .env
+    depends_on:
+      - backend
+    networks:
+      - vehicaid-net
+
+  # 6. Admin Panel
   admin:
     build:
       context: ../web/admin
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_admin
     ports:
       - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+    env_file: .env
     depends_on:
       - backend
     networks:
       - vehicaid-net
 
-  # Provider Panel
+  # 7. Provider Panel
   provider:
     build:
       context: ../web/provider
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_provider
     ports:
       - "3001:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+    env_file: .env
     depends_on:
       - backend
     networks:
       - vehicaid-net
 
-  # Booker Panel
+  # 8. Booker Panel
   booker:
     build:
       context: ../web/booker
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_booker
     ports:
       - "3003:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+    env_file: .env
     depends_on:
       - backend
     networks:

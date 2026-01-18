@@ -225,7 +225,7 @@ vehic-aid-project/
 
 | Service | Port | Internal URL | External URL |
 |---------|------|--------------|--------------|
-| **Backend** | 8000 | http://web:8000 | http://localhost:8000 |
+| **Backend** | 8001 | http://backend:8000 | http://localhost:8001 |
 | **Admin** | 3000 | http://web-admin:3000 | http://localhost:3000 |
 | **Provider** | 3001 | http://web-provider:3000 | http://localhost:3001 |
 | **Booker** | 3003 | http://web-booker:3000 | http://localhost:3003 |

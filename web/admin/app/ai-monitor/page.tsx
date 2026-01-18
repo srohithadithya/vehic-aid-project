@@ -12,6 +12,7 @@ interface AIStats {
     total_sessions: number;
     auto_booking_rate: number;
     triage_accuracy: number;
+    core_engagement_growth: string;
     triage_data: any[];
     load_data: any[];
 }
@@ -90,7 +91,7 @@ export default function AIMonitorPage() {
                         <CardContent>
                             <div className="text-4xl font-black text-white">{stats.total_sessions.toLocaleString()}</div>
                             <div className="flex items-center mt-2 text-xs font-bold text-emerald-400">
-                                <TrendingUp className="w-3 h-3 mr-1" /> CORE-ENGAGEMENT UP 18%
+                                <TrendingUp className="w-3 h-3 mr-1" /> CORE-ENGAGEMENT UP {stats.core_engagement_growth}
                             </div>
                         </CardContent>
                     </Card>

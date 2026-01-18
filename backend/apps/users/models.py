@@ -81,3 +81,21 @@ class ServiceProvider(models.Model):
 
     def __str__(self):
         return f"Provider: {self.user.username} ({'Verified' if self.is_verified else 'Unverified'})"
+
+
+class Notification(models.Model):
+    """Stores in-app notifications for users and admins."""
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.title}"

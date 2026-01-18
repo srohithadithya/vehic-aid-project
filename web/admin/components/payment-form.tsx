@@ -32,7 +32,7 @@ export default function PaymentForm({ initialData = {}, onSubmit, onCancel, load
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input name="user" placeholder="User" value={form.user} onChange={handleChange} required />
-      <Input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} required type="number" />
+      <Input name="amount" placeholder="Amount (₹)" value={form.amount} onChange={handleChange} required type="number" />
       <Input name="payment_method" placeholder="Payment Method" value={form.payment_method} onChange={handleChange} />
       <Input name="transaction_id" placeholder="Transaction ID" value={form.transaction_id} onChange={handleChange} />
       <Input name="service_request_id" placeholder="Service Request ID" value={form.service_request_id} onChange={handleChange} />

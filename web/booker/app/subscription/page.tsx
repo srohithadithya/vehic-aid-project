@@ -32,7 +32,7 @@ const plans = [
     },
     {
         name: "Elite",
-        price: "₹499/mo",
+        price: "₹399/mo",
         description: "Ultimate service and perks for enthusiasts.",
         features: ["Unlimited Towing (100 miles)", "Dedicated Advisor", "Vehicle Inspection Reports", "Rental Car Reimbursement", "All Premium Features"],
         popular: false,

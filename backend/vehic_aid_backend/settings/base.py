@@ -262,14 +262,16 @@ JAZZMIN_SETTINGS = {
     "search_model": "users.CustomUser",
     "topmenu_links": [
         {"name": "Command Center",  "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Web Dashboard", "url": "http://localhost:3002/dashboard", "new_window": True},
+        {"name": "Admin Panel", "url": "http://localhost:3000", "new_window": True},
+        {"name": "Provider Portal", "url": "http://localhost:3001", "new_window": True},
+        {"name": "Customer Portal", "url": "http://localhost:3003", "new_window": True},
         {"name": "API Console", "url": "swagger-ui", "new_window": True},
-        {"name": "Tech Specs", "url": "redoc", "new_window": True},
         {"name": "Return to Home", "url": "/", "new_window": False},
     ],
     "user_avatar": None, 
     "related_modal_active": True,
     "show_ui_builder": False,
+    "custom_css": "css/jazzmin_fix.css",
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -293,6 +295,7 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_drawer": True,
     "mobile_layout": "body-small",
 }
+
 
 # --- CORS Settings ---
 CORS_ALLOW_ALL_ORIGINS = True

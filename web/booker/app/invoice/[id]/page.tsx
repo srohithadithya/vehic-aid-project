@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Download, Printer, Mail } from 'lucide-react';
@@ -8,11 +8,7 @@ import { Download, Printer, Mail } from 'lucide-react';
 export default function InvoicePage({ params }: { params: { id: string } }) {
     const [invoice, setInvoice] = useState<any>(null);
 
-    useEffect(() => {
-        fetchInvoice();
-    }, []);
-
-    const fetchInvoice = async () => {
+    const fetchInvoice = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
@@ -26,7 +22,11 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         } catch (error) {
             console.error('Failed to fetch invoice:', error);
         }
-    };
+    }, [params.id]);
+
+    useEffect(() => {
+        fetchInvoice();
+    }, [fetchInvoice]);
 
     const downloadPDF = () => {
         window.print();

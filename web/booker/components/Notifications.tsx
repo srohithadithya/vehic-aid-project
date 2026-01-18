@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -22,6 +22,13 @@ interface NotificationProps {
 const NotificationItem = ({ notification, onClose }: NotificationProps) => {
     const [isExiting, setIsExiting] = useState(false);
 
+    const handleClose = useCallback(() => {
+        setIsExiting(true);
+        setTimeout(() => {
+            onClose(notification.id);
+        }, 300);
+    }, [notification.id, onClose]);
+
     useEffect(() => {
         if (notification.duration && notification.duration > 0) {
             const timer = setTimeout(() => {
@@ -30,14 +37,7 @@ const NotificationItem = ({ notification, onClose }: NotificationProps) => {
 
             return () => clearTimeout(timer);
         }
-    }, [notification]);
-
-    const handleClose = () => {
-        setIsExiting(true);
-        setTimeout(() => {
-            onClose(notification.id);
-        }, 300);
-    };
+    }, [notification, handleClose]);
 
     const getIcon = () => {
         switch (notification.type) {
@@ -115,7 +115,11 @@ export function NotificationContainer({ notifications, onClose }: NotificationCo
 export function useNotifications() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
-    const addNotification = (
+    const removeNotification = useCallback((id: string) => {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, []);
+
+    const addNotification = useCallback((
         type: NotificationType,
         title: string,
         message: string,
@@ -132,27 +136,23 @@ export function useNotifications() {
 
         setNotifications((prev) => [...prev, notification]);
         return id;
-    };
+    }, []);
 
-    const removeNotification = (id: string) => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-    };
-
-    const success = (title: string, message: string, duration?: number) => {
+    const success = useCallback((title: string, message: string, duration?: number) => {
         return addNotification('success', title, message, duration);
-    };
+    }, [addNotification]);
 
-    const error = (title: string, message: string, duration?: number) => {
+    const error = useCallback((title: string, message: string, duration?: number) => {
         return addNotification('error', title, message, duration);
-    };
+    }, [addNotification]);
 
-    const info = (title: string, message: string, duration?: number) => {
+    const info = useCallback((title: string, message: string, duration?: number) => {
         return addNotification('info', title, message, duration);
-    };
+    }, [addNotification]);
 
-    const warning = (title: string, message: string, duration?: number) => {
+    const warning = useCallback((title: string, message: string, duration?: number) => {
         return addNotification('warning', title, message, duration);
-    };
+    }, [addNotification]);
 
     return {
         notifications,

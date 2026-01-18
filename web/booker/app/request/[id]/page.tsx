@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, use } from 'react';
+import { useEffect, useState, useRef, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
@@ -28,6 +28,17 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
     const socketRef = useRef<WebSocket | null>(null);
     const { notifications, removeNotification, success, info, warning } = useNotifications();
 
+    const fetchRequestDetails = useCallback(async () => {
+        try {
+            const response = await apiClient.get(`/request/${id}/`);
+            setRequest(response.data);
+        } catch (error) {
+            console.error("Error fetching request", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
     useEffect(() => {
         fetchRequestDetails();
 
@@ -47,19 +58,19 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
             console.log("WS Message:", data);
 
             if (data.status) {
-                const oldStatus = request?.status;
-                setRequest(prev => prev ? { ...prev, status: data.status } : null);
-
-                // Show notification for status changes
-                if (oldStatus !== data.status) {
-                    if (data.status === 'DISPATCHED') {
-                        success('Provider Assigned!', 'A service provider is on the way to your location.');
-                    } else if (data.status === 'IN_PROGRESS') {
-                        info('Service Started', 'The provider has started working on your vehicle.');
-                    } else if (data.status === 'COMPLETED') {
-                        success('Service Completed', 'Your service has been completed successfully!');
+                setRequest(prev => {
+                    const oldStatus = prev?.status;
+                    if (oldStatus !== data.status) {
+                        if (data.status === 'DISPATCHED') {
+                            success('Provider Assigned!', 'A service provider is on the way to your location.');
+                        } else if (data.status === 'IN_PROGRESS') {
+                            info('Service Started', 'The provider has started working on your vehicle.');
+                        } else if (data.status === 'COMPLETED') {
+                            success('Service Completed', 'Your service has been completed successfully!');
+                        }
                     }
-                }
+                    return prev ? { ...prev, status: data.status } : null;
+                });
             }
             if (data.type === 'status_update' && data.message === 'location') {
                 console.log("Provider Location:", data.latitude, data.longitude);
@@ -73,18 +84,7 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
         return () => {
             if (ws.readyState === 1) ws.close();
         };
-    }, [id]);
-
-    const fetchRequestDetails = async () => {
-        try {
-            const response = await apiClient.get(`/request/${id}/`);
-            setRequest(response.data);
-        } catch (error) {
-            console.error("Error fetching request", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [id, fetchRequestDetails, success, info]);
 
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-blue-600" /></div>;
     if (!request) return <div className="p-8 text-center text-red-500">Request not found.</div>;

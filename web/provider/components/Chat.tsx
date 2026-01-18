@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Phone, Video, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -17,17 +17,7 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        fetchMessages();
-        const interval = setInterval(fetchMessages, 3000);
-        return () => clearInterval(interval);
-    }, [requestId]);
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
@@ -41,9 +31,19 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
         } catch (error) {
             console.error('Failed to fetch messages:', error);
         }
-    };
+    }, [requestId]);
 
-    const sendMessage = async () => {
+    useEffect(() => {
+        fetchMessages();
+        const interval = setInterval(fetchMessages, 3000);
+        return () => clearInterval(interval);
+    }, [fetchMessages]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    const sendMessage = useCallback(async () => {
         if (!newMessage.trim()) return;
 
         setLoading(true);
@@ -70,7 +70,7 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [newMessage, requestId, fetchMessages]);
 
     return (
         <div className="flex flex-col h-[600px] bg-white dark:bg-gray-900 rounded-xl shadow-lg">
@@ -107,8 +107,8 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
                     >
                         <div
                             className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.sender === 'provider'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                                 }`}
                         >
                             <p>{msg.message}</p>

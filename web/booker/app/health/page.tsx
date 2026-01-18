@@ -17,17 +17,6 @@ export default function HealthPage() {
     const [device, setDevice] = useState<any>(null);
     const [dataLoading, setDataLoading] = useState(true);
 
-    if (authLoading) return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
-        </div>
-    );
-
-    if (!user) {
-        router.push('/auth/login?redirect=/health');
-        return null;
-    }
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -39,8 +28,22 @@ export default function HealthPage() {
                 setDataLoading(false);
             }
         };
-        fetchData();
-    }, []);
+        // Only fetch if user loaded
+        if (user) {
+            fetchData();
+        }
+    }, [user]);
+
+    if (authLoading) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+        </div>
+    );
+
+    if (!user) {
+        router.push('/auth/login?redirect=/health');
+        return null;
+    }
 
     const healthStatus = device?.battery && device.battery > 30 ? 'HEALTHY' : 'ATTENTION';
 

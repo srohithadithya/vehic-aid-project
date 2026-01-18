@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
@@ -38,16 +38,7 @@ export default function ProviderDashboard() {
         rating: 5.0
     });
 
-    useEffect(() => {
-        if (!localStorage.getItem('provider_access_token')) {
-            router.push('/login');
-            return;
-        }
-        fetchJobs();
-        fetchStats();
-    }, [router]);
-
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             const response = await apiClient.get('/payments/dashboard/provider/');
             setStats({
@@ -58,9 +49,9 @@ export default function ProviderDashboard() {
         } catch (error) {
             console.error('Failed to fetch stats', error);
         }
-    };
+    }, []);
 
-    const fetchJobs = async () => {
+    const fetchJobs = useCallback(async () => {
         try {
             // Fetch jobs assigned to this provider (Active Jobs)
             const activeResponse = await apiClient.get('/services/provider/jobs/');
@@ -78,7 +69,16 @@ export default function ProviderDashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!localStorage.getItem('provider_access_token')) {
+            router.push('/login');
+            return;
+        }
+        fetchJobs();
+        fetchStats();
+    }, [router, fetchJobs, fetchStats]);
 
     const acceptJob = async (id: number) => {
         try {
@@ -135,7 +135,7 @@ export default function ProviderDashboard() {
                             <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                 <Wallet className="w-24 h-24" />
                             </div>
-                            <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Today's Earnings</p>
+                            <p className="text-gray-400 text-sm font-medium uppercase tracking-wider">Today&apos;s Earnings</p>
                             <h3 className="text-4xl font-bold text-white mt-2">₹ {stats.todays_earnings.toLocaleString()}</h3>
                             <div className="mt-4 flex items-center gap-2 text-green-400 text-xs font-mono">
                                 <Activity className="w-3 h-3" /> Real-time sync

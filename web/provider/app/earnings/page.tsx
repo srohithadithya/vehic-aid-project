@@ -29,6 +29,14 @@ import { Navbar } from '@/components/Navbar';
 
 // --- Components ---
 
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    trend?: number;
+    icon: React.ElementType; // Better type for icons
+    delay: number;
+}
+
 const GlassCard = ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div className={cn(
         "backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl overflow-hidden",
@@ -39,7 +47,7 @@ const GlassCard = ({ children, className }: { children: React.ReactNode; classNa
 );
 
 
-const StatCard = ({ title, value, trend, icon: Icon, delay }: any) => (
+const StatCard = ({ title, value, trend, icon: Icon, delay }: StatCardProps) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -93,20 +101,63 @@ const WeekChart = () => {
     );
 };
 
+interface Transaction {
+    id: string;
+    service: string;
+    customer: string;
+    method: string;
+    date: string;
+    amount: number;
+    status: string;
+    type: string;
+}
 
+interface Stats {
+    current_balance: number;
+    todays_earnings: number;
+    pending_payouts: number;
+    weekly_chart: {
+        values: number[];
+        labels: string[];
+    };
+    recent_transactions: Transaction[];
+}
+
+interface UserProfile {
+    full_name?: string;
+}
 
 export default function EarningsPage() {
     const [showWithdrawModal, setShowWithdrawModal] = useState(false);
     const [withdrawStatus, setWithdrawStatus] = useState<'idle' | 'processing' | 'success'>('idle');
-    const [stats, setStats] = useState({
+    const [stats, setStats] = useState<Stats>({
         current_balance: 0,
         todays_earnings: 0,
         pending_payouts: 0,
         weekly_chart: { values: [0, 0, 0, 0, 0, 0, 0], labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
         recent_transactions: []
     });
-    const [userProfile, setUserProfile] = useState<any>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const handleWithdraw = async () => {
+        setWithdrawStatus('processing');
+        try {
+            await apiClient.post('/payments/payout/initiate/');
+            setWithdrawStatus('success');
+            // Refresh data
+            const [dashRes, profRes] = await Promise.all([
+                apiClient.get('/payments/dashboard/provider/'),
+                apiClient.get('/users/profile/')
+            ]);
+            setStats(dashRes.data);
+            setUserProfile(profRes.data.user); // Adjusted to access .data.user as per ProfilePage logic if needed, but previously was profRes.data. UserProfileView returns {user: ...}
+        } catch (error) {
+            console.error("Withdrawal failed", error);
+            setWithdrawStatus('idle');
+            alert("Withdrawal failed or no funds available.");
+        }
+    };
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -116,7 +167,9 @@ export default function EarningsPage() {
                     apiClient.get('/users/profile/')
                 ]);
                 setStats(dashRes.data);
-                setUserProfile(profRes.data);
+                // UserProfileView returns: { "user": { ... } }
+                // So correct access is profRes.data.user
+                setUserProfile(profRes.data.user || profRes.data);
             } catch (error) {
                 console.error("Failed to fetch earnings data", error);
             } finally {
@@ -442,10 +495,7 @@ export default function EarningsPage() {
                                 </div>
                                 <Button
                                     className="w-full h-14 rounded-2xl text-lg font-bold shadow-xl shadow-primary/20"
-                                    onClick={() => {
-                                        setWithdrawStatus('processing');
-                                        setTimeout(() => setWithdrawStatus('success'), 2000);
-                                    }}
+                                    onClick={handleWithdraw}
                                 >
                                     Confirm Payout
                                 </Button>

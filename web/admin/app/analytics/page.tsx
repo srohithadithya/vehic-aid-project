@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, CreditCard, AlertTriangle } from 'lucide-react';
@@ -19,23 +19,23 @@ export default function AnalyticsPage() {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await apiClient.get('/services/subscriptions/analytics/');
-                setData(response.data);
-            } catch (error) {
-                console.error("Failed to fetch analytics", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchData = useCallback(async () => {
+        try {
+            const response = await apiClient.get('/services/subscriptions/analytics/');
+            setData(response.data);
+        } catch (error) {
+            console.error("Failed to fetch analytics", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
+    useEffect(() => {
         fetchData();
         // Real-time polling every 30 seconds
         const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchData]);
 
     if (loading) return <div className="p-8 text-primary">Loading Insights...</div>;
     if (!data) return <div className="p-8 text-destructive">Failed to load data.</div>;
@@ -95,24 +95,39 @@ export default function AnalyticsPage() {
                         <CardDescription>User preference breakdown</CardDescription>
                     </CardHeader>
                     <CardContent className="h-[300px] flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={data.plan_breakdown}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="active_users"
-                                >
-                                    {data.plan_breakdown.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        <div className="w-full h-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={data.plan_breakdown}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={70}
+                                        outerRadius={90}
+                                        paddingAngle={5}
+                                        dataKey="active_users"
+                                        stroke="none"
+                                    >
+                                        {data.plan_breakdown.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                        itemStyle={{ color: '#fff' }}
+                                        formatter={(value, name) => [value, `${name} Plan`]}
+                                    />
+                                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+                                        <tspan x="50%" dy="-0.5em" fontSize="24" fill="#fff" fontWeight="bold">
+                                            {data.total_active_subscriptions}
+                                        </tspan>
+                                        <tspan x="50%" dy="1.5em" fontSize="12" fill="rgba(255,255,255,0.5)">
+                                            Active
+                                        </tspan>
+                                    </text>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                         <div className="space-y-2 ml-4">
                             {data.plan_breakdown.map((plan, index) => (
                                 <div key={plan.name} className="flex items-center gap-2 text-sm">

@@ -221,6 +221,12 @@ export default function PaymentsPage() {
                                             <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
+                                    <XAxis dataKey="name" stroke="none" />
+                                    <YAxis stroke="none" tickFormatter={(value) => `₹${value}`} />
+                                    <Tooltip
+                                        formatter={(value: any) => [`₹${value}`, 'Revenue']}
+                                        contentStyle={{ backgroundColor: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                    />
                                     <Area type="monotone" dataKey="amount" stroke="#3b82f6" fillOpacity={1} fill="url(#colorAmount)" />
                                 </AreaChart>
                             </ResponsiveContainer>

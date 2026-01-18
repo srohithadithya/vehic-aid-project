@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import CustomUser, ServiceBooker, ServiceProvider
+from .models import CustomUser, ServiceBooker, ServiceProvider, Notification
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ("id", "title", "message", "is_read", "created_at")
+        read_only_fields = ("id", "created_at")
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

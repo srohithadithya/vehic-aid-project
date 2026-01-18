@@ -2,7 +2,7 @@
 
 import { BookingProvider } from "@/context/BookingContext";
 import BookingWizard from "@/components/booking/BookingWizard";
-// import { Navbar } from "@/components/Navbar";
+import { Navbar } from "@/components/Navbar";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -27,7 +27,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background overflow-hidden">
-// Navbar removed (handled in layout)
 
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 lg:py-32">
@@ -82,7 +81,7 @@ export default function Home() {
               <span className="text-primary">Reimagined.</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              India's most trusted roadside assistance platform. Get help within minutes,
+              India&apos;s most trusted roadside assistance platform. Get help within minutes,
               anytime, anywhere. Professional, verified, and affordable.
             </p>
           </motion.div>
@@ -133,7 +132,7 @@ export default function Home() {
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose VehicAid?</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              We're not just another roadside assistance service. We're your trusted partner on every journey.
+              We&apos;re not just another roadside assistance service. We&apos;re your trusted partner on every journey.
             </p>
           </motion.div>
 

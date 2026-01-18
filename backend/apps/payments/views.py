@@ -7,10 +7,12 @@ import razorpay
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 from apps.services.models import ServiceRequest
 from apps.users.models import ServiceBooker, ServiceProvider
@@ -245,6 +247,7 @@ class ProviderDashboardView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses={200: OpenApiTypes.OBJECT})
     def get(self, request, *args, **kwargs):
         # 1. Ensure user is a Service Provider
         if not getattr(request.user, 'is_service_provider', False):
@@ -308,12 +311,12 @@ class ProviderDashboardView(APIView):
         for tx in recent_txs:
             tx_data.append({
                 "id": f"TRX-{tx.id}",
-                "service": tx.service_request.service_type if tx.service_request else "General Credit",
-                "customer": tx.booker.user.first_name or tx.booker.user.username,
+                "service": tx.service_request.service_type if tx.service_request else "Wallet Withdrawal",
+                "customer": (tx.booker.user.first_name or tx.booker.user.username) if tx.booker else "Platform",
                 "amount": float(tx.provider_payout_amount),
                 "date": tx.created_at.isoformat(),
-                "status": tx.status, # SUCCESS, PENDING
-                "type": "Service Payout", # Static for now as most are service payouts
+                "status": tx.status,
+                "type": "Withdrawal" if tx.provider_payout_amount < 0 else "Earnings",
                 "method": tx.payment_method
             })
 
@@ -329,3 +332,96 @@ class ProviderDashboardView(APIView):
             },
             "recent_transactions": tx_data
         })
+
+
+class BookerBillingHistoryView(APIView):
+    """
+    Returns transaction history for the Booker (Billing Page).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'servicebooker'):
+             return Response({"error": "Access denied. Booker account required."}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Fetch transactions for this booker
+        transactions = Transaction.objects.filter(
+            booker=request.user.servicebooker
+        ).order_by('-created_at')
+
+        data = []
+        for tx in transactions:
+            description = "Top-up / Payment"
+            # distinct check
+            if tx.service_request:
+                description = f"Service: {tx.service_request.get_service_type_display()}"
+            elif hasattr(tx, 'subscription') and tx.subscription.exists():
+                # related_name='subscription' on UserSubscription FK
+                sub = tx.subscription.first()
+                description = f"Subscription: {sub.plan.name}"
+            
+            data.append({
+                "id": str(tx.id),
+                "amount": float(tx.amount),
+                "status": tx.status,
+                "date": tx.created_at,
+                "description": description,
+                "invoice_id": f"INV-{1000 + tx.id}",
+                "payment_method": tx.payment_method
+            })
+            
+        return Response(data)
+
+class PayoutInitiationView(APIView):
+    """
+    Endpoint for providers to request a payout/withdrawal.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        if not getattr(request.user, 'is_service_provider', False):
+             return Response({"error": "Access denied. Provider account required."}, status=status.HTTP_403_FORBIDDEN)
+        
+        provider = request.user.serviceprovider
+        from django.db.models import Sum
+
+        # Calculate available balance
+        balance_agg = Transaction.objects.filter(
+            provider=provider, 
+            status='SUCCESS', 
+            settled=False
+        ).aggregate(Sum('provider_payout_amount'))
+        current_balance = balance_agg['provider_payout_amount__sum'] or Decimal('0.00')
+
+        if current_balance <= 0:
+            return Response({"error": "No funds available for withdrawal."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create Withdrawal Transaction (Negative Amount or specific type)
+        # We'll create a new Transaction with type 'WITHDRAWAL' (if we had types, but here we can use status or custom handling)
+        # For MVP, we mark existing transactions as settled or create a 'Debit' record.
+        # Let's create a debit transaction
+        
+        with transaction.atomic():
+            # Create a "Withdrawal" transaction record
+            payout_tx = Transaction.objects.create(
+                provider=provider,
+                amount=current_balance, # Tracking the total withdrawal
+                provider_payout_amount=-current_balance, # Negative to show debit
+                status='SUCCESS',
+                payment_method='BANK_TRANSFER',
+                razorpay_order_id=f"PAYOUT-{timezone.now().timestamp()}",
+                settled=True # Mark this withdrawal as settled itself
+            )
+            
+            # Mark all pending credit transactions as settled
+            Transaction.objects.filter(
+                provider=provider, 
+                status='SUCCESS', 
+                settled=False
+            ).exclude(id=payout_tx.id).update(settled=True)
+
+        return Response({
+            "message": "Payout initiated successfully.",
+            "amount": float(current_balance),
+            "reference": payout_tx.razorpay_order_id
+        }, status=status.HTTP_200_OK)
