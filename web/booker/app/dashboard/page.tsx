@@ -165,12 +165,12 @@ export default function Dashboard() {
                             {activePlan ? (
                                 <>
                                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mb-4">
-                                        {activePlan?.plan_details?.name || 'Active Plan'}
+                                        {activePlan?.plan?.name || 'Active Plan'}
                                     </div>
                                     <p className="text-sm text-muted-foreground mb-4">
-                                        {activePlan?.plan_details?.name === 'Elite Plan'
+                                        {activePlan?.plan?.name === 'Elite'
                                             ? 'You have full VIP access and unlimited towing.'
-                                            : activePlan?.plan_details?.name === 'Premium Plan'
+                                            : activePlan?.plan?.name === 'Premium'
                                                 ? 'Great choice! You have priority support.'
                                                 : 'Upgrade to Elite for VIP support and unlimited towing.'}
                                     </p>

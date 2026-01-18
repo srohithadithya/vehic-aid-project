@@ -64,12 +64,12 @@ export default function BillingPage() {
                                 <CardTitle>Current Plan</CardTitle>
                                 <CardDescription>
                                     You are currently on the <span className="font-semibold text-foreground">
-                                        {subscription ? subscription.plan_details.name : 'Free Tier'}
+                                        {subscription && subscription.plan ? subscription.plan.name : 'Free Tier'}
                                     </span>
                                 </CardDescription>
                             </div>
                             <Badge variant={subscription ? "default" : "outline"} className="text-sm py-1 px-3">
-                                {subscription ? subscription.plan_details.name.replace(' Plan', '') : 'Free'}
+                                {subscription && subscription.plan ? subscription.plan.name.replace(' Plan', '') : 'Free'}
                             </Badge>
                         </div>
                     </CardHeader>
@@ -86,12 +86,12 @@ export default function BillingPage() {
                                     <div className="flex justify-between text-sm">
                                         <span>Renews On</span>
                                         <span className="font-medium">
-                                            {new Date(subscription.end_date).toLocaleDateString()}
+                                            {subscription.end_date ? new Date(subscription.end_date).toLocaleDateString() : 'N/A'}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span>Price</span>
-                                        <span className="font-medium">₹{subscription.plan_details.price}/mo</span>
+                                        <span className="font-medium">₹{subscription.plan ? subscription.plan.price : '0'}/mo</span>
                                     </div>
                                     <div className="w-full bg-secondary h-2 rounded-full mt-2 overflow-hidden">
                                         <div className="bg-primary h-full" style={{ width: '100%' }}></div>

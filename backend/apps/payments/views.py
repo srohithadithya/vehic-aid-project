@@ -200,11 +200,22 @@ class MockPaymentConfirmView(APIView):
                 service_request.status = 'COMPLETED'
                 service_request.save()
 
+                # Ensure booker profile is used
+                booker_profile = None
+                if service_request.booker and hasattr(service_request.booker, 'servicebooker'):
+                    booker_profile = service_request.booker.servicebooker
+
+                # Ensure provider profile is used
+                provider_profile = None
+                if service_request.provider and hasattr(service_request.provider, 'serviceprovider'):
+                    provider_profile = service_request.provider.serviceprovider
+
                 # Create transaction
                 Transaction.objects.get_or_create(
                     service_request=service_request,
                     defaults={
-                        'booker': service_request.booker,
+                        'booker': booker_profile,
+                        'provider': provider_profile,
                         'amount': Decimal(request.data.get('amount', '500.00')),
                         'status': 'SUCCESS',
                         'payment_method': request.data.get('payment_method', 'RAZORPAY'),
@@ -226,19 +237,34 @@ class MockPaymentConfirmView(APIView):
                     plan = SubscriptionPlan.objects.filter(id=plan_id).first()
                 
                 if plan:
+                    # Explicitly get profile
+                    from apps.users.models import ServiceBooker
+                    try:
+                        booker_profile = ServiceBooker.objects.get(user=request.user)
+                    except ServiceBooker.DoesNotExist:
+                         return Response({"error": "User does not have a Booker profile."}, status=status.HTTP_400_BAD_REQUEST)
+
                     # Create/Update Subscription
-                    UserSubscription.objects.create(
-                        user=request.user.servicebooker,
-                        plan=plan,
-                        start_date=timezone.now().date(),
-                        end_date=timezone.now().date() + timedelta(days=plan.duration_days),
-                        is_active=True,
-                        status='ACTIVE'
-                    )
+                    try:
+                        UserSubscription.objects.create(
+                            user_id=booker_profile.pk,
+                            plan=plan,
+                            start_date=timezone.now().date(),
+                            end_date=timezone.now().date() + timedelta(days=plan.duration_days),
+                            is_active=True,
+                            status='ACTIVE'
+                        )
+                    except Exception as e:
+                        print(f"DEBUG ERROR creating subscription: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
                     # Log Transaction (Optional for now, but good for completeness)
                     # We'd need a Transaction model update to support non-service_request payments (nullable)
                     # For now just confirming success is enough for UI.
+
+            return Response({"status": "Payment confirmed and processed."}, status=status.HTTP_200_OK)
 
 
 class ProviderDashboardView(APIView):

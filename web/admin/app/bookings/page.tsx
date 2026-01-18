@@ -85,9 +85,13 @@ export default function BookingsPage() {
         switch (status) {
             case 'COMPLETED':
                 return 'default'; // green-ish usually if customized, or default black
-            case 'PENDING':
+            case 'PENDING_DISPATCH':
                 return 'secondary'; // yellow-ish usually
-            case 'IN_PROGRESS':
+            case 'DISPATCHED':
+                return 'secondary';
+            case 'ARRIVED':
+                return 'default';
+            case 'SERVICE_IN_PROGRESS':
                 return 'default'; // blue-ish usually
             case 'CANCELLED':
                 return 'destructive';

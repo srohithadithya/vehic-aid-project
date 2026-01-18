@@ -136,7 +136,7 @@ class ProviderStatusUpdateView(APIView):
         new_status = request.data.get("status")
 
         service_request = get_object_or_404(
-            ServiceRequest, id=request_id, provider=provider
+            ServiceRequest, id=request_id, provider=request.user
         )
 
         if new_status not in dict(ServiceRequest.STATUS_CHOICES):
@@ -228,6 +228,13 @@ class SubscriptionViewSet(viewsets.ViewSet):
         if not sub:
             return Response({"detail": "No active subscription."}, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSubscriptionSerializer(sub)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="plans")
+    def plans(self, request):
+        """Return all available subscription plans."""
+        plans = SubscriptionPlan.objects.all().order_by('price')
+        serializer = SubscriptionPlanSerializer(plans, many=True)
         return Response(serializer.data)
 
 
@@ -723,7 +730,7 @@ class ProviderJobView(viewsets.ViewSet):
         if not provider:
              return Response({"error": "User is not a service provider."}, status=status.HTTP_403_FORBIDDEN)
         
-        jobs = ServiceRequest.objects.filter(provider=provider).order_by('-created_at')
+        jobs = ServiceRequest.objects.filter(provider=request.user).order_by('-created_at')
         from .serializers import ProviderJobSerializer
         serializer = ProviderJobSerializer(jobs, many=True)
         return Response(serializer.data)
@@ -749,7 +756,7 @@ class ProviderJobView(viewsets.ViewSet):
         if not provider:
              return Response({"error": "User is not a service provider."}, status=status.HTTP_403_FORBIDDEN)
 
-        job.provider = provider
+        job.provider = request.user
         job.status = 'DISPATCHED'
         job.save()
         
