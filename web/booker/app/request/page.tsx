@@ -22,6 +22,8 @@ function ServiceRequestWizardContent() {
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
+    const [vehicles, setVehicles] = useState([]);
+
     const [formData, setFormData] = useState({
         serviceType: searchParams.get('type') || 'TOWING',
         vehicleId: '',
@@ -29,6 +31,21 @@ function ServiceRequestWizardContent() {
         longitude: 77.5946,
         notes: '',
     });
+
+    React.useEffect(() => {
+        const fetchVehicles = async () => {
+            try {
+                const response = await apiClient.get('/services/vehicles/');
+                setVehicles(response.data);
+                if (response.data.length > 0) {
+                    setFormData(prev => ({ ...prev, vehicleId: response.data[0].id }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch vehicles", error);
+            }
+        };
+        if (user) fetchVehicles();
+    }, [user]);
 
     const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     const handleBack = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
@@ -41,6 +58,7 @@ function ServiceRequestWizardContent() {
                 latitude: formData.latitude,
                 longitude: formData.longitude,
                 customer_notes: formData.notes,
+                vehicle_id: formData.vehicleId,
             });
             router.push('/dashboard');
         } catch (error) {
@@ -115,9 +133,27 @@ function ServiceRequestWizardContent() {
                         {currentStep === 3 && (
                             <div className="space-y-4">
                                 <h2 className="text-2xl font-bold">Which vehicle?</h2>
-                                <div className="p-4 border rounded-xl bg-gray-50 text-gray-500 text-center">
-                                    No vehicles saved. Using &quot;Unknown Vehicle&quot;.
-                                </div>
+                                {vehicles.length > 0 ? (
+                                    <div className="grid gap-3">
+                                        {vehicles.map((v: any) => (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => setFormData({ ...formData, vehicleId: v.id })}
+                                                className={`p-4 rounded-xl border-2 text-left transition flex justify-between items-center ${formData.vehicleId === v.id ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
+                                            >
+                                                <div>
+                                                    <span className="font-bold block">{v.make} {v.model}</span>
+                                                    <span className="text-xs text-gray-500">{v.license_plate}</span>
+                                                </div>
+                                                {formData.vehicleId === v.id && <CheckCircle className="text-primary" size={20} />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-4 border rounded-xl bg-gray-50 text-gray-500 text-center">
+                                        No vehicles found. Please add a vehicle in Settings.
+                                    </div>
+                                )}
                                 <textarea
                                     placeholder="Add notes for the provider (landmarks, vehicle color...)"
                                     className="w-full p-4 border rounded-xl resize-none focus:ring-2 focus:ring-primary focus:outline-none"
