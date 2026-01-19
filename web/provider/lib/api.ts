@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
                 localStorage.removeItem('provider_access_token');
                 localStorage.removeItem('provider_refresh_token');
                 if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
+                    window.location.href = '/vehic-aid-project/provider/login';
                 }
             }
         }
