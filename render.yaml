@@ -3,11 +3,17 @@ services:
   - type: web
     name: vehic-aid-backend
     env: python
-    buildCommand: "pip install -r backend/requirements.txt && python backend/manage.py collectstatic --noinput"
-    startCommand: "cd backend && gunicorn vehic_aid_backend.wsgi:application"
+    buildCommand: "./backend/build.sh"
+    startCommand: "cd backend && gunicorn vehic_aid_backend.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: vehic_aid_backend.settings.production
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://srohithadithya.github.io"
       - key: DATABASE_URL
         fromDatabase:
           name: vehic-aid-db
@@ -26,9 +32,11 @@ services:
   - type: worker
     name: vehic-aid-worker
     env: python
-    buildCommand: "pip install -r backend/requirements.txt"
+    buildCommand: "./backend/build.sh"
     startCommand: "cd backend && celery -A vehic_aid_backend worker -l info"
     envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: vehic_aid_backend.settings.production
       - key: DATABASE_URL
         fromDatabase:
           name: vehic-aid-db
@@ -43,9 +51,11 @@ services:
   - type: worker
     name: vehic-aid-beat
     env: python
-    buildCommand: "pip install -r backend/requirements.txt"
+    buildCommand: "./backend/build.sh"
     startCommand: "cd backend && celery -A vehic_aid_backend beat -l info"
     envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: vehic_aid_backend.settings.production
       - key: DATABASE_URL
         fromDatabase:
           name: vehic-aid-db
@@ -56,11 +66,15 @@ services:
           name: vehic-aid-redis
           property: connectionString
 
+  # Redis Service
+  - type: redis
+    name: vehic-aid-redis
+    region: singapore # Optional, defaults to account region
+    plan: free # Note: Free Redis on Render is ephemeral (data lost on restart)
+
 databases:
   - name: vehic-aid-db
     databaseName: vehicaid
     user: vehicaid_user
     plan: free
 
-  - name: vehic-aid-redis
-    plan: free
