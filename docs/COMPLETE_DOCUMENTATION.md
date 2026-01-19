@@ -141,7 +141,7 @@ To democratize roadside assistance in India by making it accessible, affordable,
 | **Google Maps Distance Matrix API** | Distance calculation, routing | Provider dispatch, pricing |
 | **Razorpay** | Payment processing | Subscription payments, service fees |
 | **Firebase Cloud Messaging** | Push notifications | Real-time alerts to mobile apps |
-| **SMS Gateway** | OTP, alerts | Authentication, status updates |
+| **Fast2SMS** | SMS Gateway | OTP, alerts, notifications | Free tier (50/day), Indian market focused |
 
 ---
 
@@ -208,8 +208,8 @@ GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_secret
 FIREBASE_CREDENTIALS_PATH=path/to/firebase-credentials.json
-SMS_API_KEY=your_sms_gateway_key
-SMS_SENDER_ID=VEHICAID
+FAST2SMS_API_KEY=your_fast2sms_api_key
+SMS_PROVIDER=fast2sms
 ```
 
 #### 5. **Database Setup**
@@ -1214,7 +1214,8 @@ git push origin main
 - `RAZORPAY_KEY_ID`
 - `RAZORPAY_KEY_SECRET`
 - `FIREBASE_CREDENTIALS_PATH`
-- `SMS_API_KEY`
+- `FAST2SMS_API_KEY`
+- `SMS_PROVIDER`
 
 ---
 
