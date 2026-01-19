@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, use, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
 import { MapPin, Phone, User, CheckCircle, Navigation, ArrowLeft, MessageSquare } from 'lucide-react';
@@ -22,9 +22,10 @@ interface ServiceRequest {
     longitude: number;
 }
 
-export default function JobPage({ params }: { params: Promise<{ id: string }> }) {
+function JobContent() {
     const router = useRouter();
-    const { id } = use(params);
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const { t } = useLanguage();
 
     const [job, setJob] = useState<ServiceRequest | null>(null);
@@ -33,6 +34,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
     const [activeTab, setActiveTab] = useState<'details' | 'chat'>('details');
 
     const fetchJobDetails = useCallback(async () => {
+        if (!id) return;
         try {
             const response = await apiClient.get(`/provider/jobs/${id}/`);
             setJob(response.data);
@@ -55,8 +57,12 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
     }, []);
 
     useEffect(() => {
+        if (!id) {
+            setLoading(false);
+            return;
+        }
         fetchJobDetails();
-    }, [fetchJobDetails]);
+    }, [fetchJobDetails, id]);
 
     useEffect(() => {
         if (!job || (job.status !== 'DISPATCHED' && job.status !== 'ARRIVED' && job.status !== 'SERVICE_IN_PROGRESS')) return;
@@ -98,6 +104,7 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
         }
     };
 
+    if (!id) return <div className="p-8 text-center text-red-500 font-bold">No Job ID provided.</div>;
     if (loading) return <div className="p-8 text-center text-gray-500 animate-pulse">Loading job details...</div>;
     if (!job) return <div className="p-8 text-center text-red-500 font-bold">Job not found.</div>;
 
@@ -271,5 +278,13 @@ export default function JobPage({ params }: { params: Promise<{ id: string }> })
 
             </div>
         </div>
+    );
+}
+
+export default function JobPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500 animate-pulse">Loading job...</div>}>
+            <JobContent />
+        </Suspense>
     );
 }

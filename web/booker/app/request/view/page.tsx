@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef, use, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
 import { clsx } from 'clsx';
@@ -18,9 +18,10 @@ interface ServiceRequest {
     provider_location?: any;
 }
 
-export default function RequestStatusPage({ params }: { params: Promise<{ id: string }> }) {
+function RequestStatusContent() {
     const router = useRouter();
-    const { id } = use(params);
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
 
     const [request, setRequest] = useState<ServiceRequest | null>(null);
     const [loading, setLoading] = useState(true);
@@ -29,6 +30,7 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
     const { notifications, removeNotification, success, info, warning } = useNotifications();
 
     const fetchRequestDetails = useCallback(async () => {
+        if (!id) return;
         try {
             const response = await apiClient.get(`/request/${id}/`);
             setRequest(response.data);
@@ -40,10 +42,16 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
     }, [id]);
 
     useEffect(() => {
+        if (!id) {
+            setLoading(false);
+            return;
+        }
+
         fetchRequestDetails();
 
         // Setup WebSocket for real-time updates
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        // Need to ensure we don't use 'undefined' or 'null' in URL
         const wsUrl = `${wsProtocol}//localhost:8001/ws/service/${id}/`;
 
         const ws = new WebSocket(wsUrl);
@@ -86,6 +94,7 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
         };
     }, [id, fetchRequestDetails, success, info]);
 
+    if (!id) return <div className="p-8 text-center text-red-500">No request ID provided.</div>;
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-blue-600" /></div>;
     if (!request) return <div className="p-8 text-center text-red-500">Request not found.</div>;
 
@@ -214,5 +223,13 @@ export default function RequestStatusPage({ params }: { params: Promise<{ id: st
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function RequestStatusPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-blue-600" /></div>}>
+            <RequestStatusContent />
+        </Suspense>
     );
 }

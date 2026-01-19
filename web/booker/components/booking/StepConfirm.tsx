@@ -43,7 +43,7 @@ export default function StepConfirm() {
 
             // Success
             dispatch({ type: 'RESET' });
-            router.push(`/request/${requestRes.data.id}`);
+            router.push(`/request/view?id=${requestRes.data.id}`);
 
         } catch (error) {
             console.error("Booking failed:", error);

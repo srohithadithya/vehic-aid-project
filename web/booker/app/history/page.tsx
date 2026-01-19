@@ -128,13 +128,13 @@ export default function ServiceHistoryPage() {
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <Link href={`/request/${service.id}`}>
+                                <Link href={`/request/view?id=${service.id}`}>
                                     <Button variant="outline" size="sm" className="w-full">
                                         View Details
                                     </Button>
                                 </Link>
                                 {service.invoice_id && (
-                                    <Link href={`/invoice/${service.invoice_id}`}>
+                                    <Link href={`/invoice/view?id=${service.invoice_id}`}>
                                         <Button variant="outline" size="sm" className="w-full">
                                             <Download className="w-4 h-4 mr-2" />
                                             Invoice
