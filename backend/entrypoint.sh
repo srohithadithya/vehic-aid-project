@@ -4,24 +4,9 @@ set -e
 echo "🚀 Starting VehicAid Backend Entrypoint (Python 3.12)..."
 
 # Define connection parameters
-DB_HOST=${DB_HOST:-db}
-DB_PORT=${DB_PORT:-5432}
-REDIS_HOST=${REDIS_HOST:-redis}
-REDIS_PORT=${REDIS_PORT:-6379}
-
-# Wait for PostgreSQL
-echo "⏳ Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
-while ! nc -z $DB_HOST $DB_PORT; do
-  sleep 2
-done
-echo "✅ PostgreSQL is up!"
-
-# Wait for Redis
-echo "⏳ Waiting for Redis at $REDIS_HOST:$REDIS_PORT..."
-while ! nc -z $REDIS_HOST $REDIS_PORT; do
-  sleep 2
-done
-echo "✅ Redis is up!"
+# Cloud deployment: Skip netcat checks as they require complex URL parsing for DATABASE_URL
+# and managed services are high-availability.
+echo "🚀 Starting VehicAid Backend..."
 
 # Diagnostic: Check if django_redis is available
 echo "🔍 Checking for django_redis module..."
