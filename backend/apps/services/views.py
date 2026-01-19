@@ -230,10 +230,11 @@ class SubscriptionViewSet(viewsets.ViewSet):
         serializer = UserSubscriptionSerializer(sub)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path="plans")
+    @action(detail=False, methods=["get"], url_path="plans", permission_classes=[])
     def plans(self, request):
         """Return all available subscription plans."""
         plans = SubscriptionPlan.objects.all().order_by('price')
+        # Filter for public display if needed, currently showing all
         serializer = SubscriptionPlanSerializer(plans, many=True)
         return Response(serializer.data)
 
