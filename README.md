@@ -148,12 +148,34 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 - **Maps**: Google Maps API
 - **Charts**: Recharts
 
-### **Mobile**
-- **Framework**: React Native 0.72
-- **Navigation**: React Navigation
-- **State Management**: React Context
-- **Icons**: Expo Vector Icons
-- **Camera**: Expo Image Picker
+### **Mobile (Expo / React Native)**
+- **Framework**: React Native (Expo SDK 50+)
+- **Routing**: Expo Router v3 (File-based)
+- **Styling**: NativeWind (Tailwind CSS)
+- **State**: Zustand (Lightweight state management)
+- **Icons**: Lucide React Native
+- **Maps**: React Native Maps
+
+### **Mobile Apps Overview**
+
+#### 1. Vehic-Aid (User App)
+**Path**: `mobile/booker`
+- **Features**: 
+  - 🤖 **AI Booking Agent**: Diagnose issues via chat
+  - 🗺️ **Real-time Tracking**: Live status & map updates
+  - 💬 **In-App Chat**: Talk to providers directly
+  - 💳 **Payments & Subs**: Razorpay integration
+  - 🔔 **Notifications**: Real-time alerts center
+- **Stack**: Expo Router, NativeWind (Tailwind), Zustand
+
+#### 2. Vehic-Aid Partner (Provider App)
+**Path**: `mobile/provider`
+- **Features**: 
+  - 🌙 **Dark Mode Dashboard**: Optimized for drivers
+  - 🛎️ **Job Management**: Accept/Decline & Navigation
+  - 💰 **Earnings Tracker**: Daily/Weekly insights
+  - 📝 **Profile & History**: Manage vehicle & past jobs
+- **Stack**: Expo Router, NativeWind (Tailwind), Zustand
 
 ### **Infrastructure**
 - **Containerization**: Docker
