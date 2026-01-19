@@ -48,7 +48,6 @@ print("Created: admin/admin123")
 print("\nCreating Plans...")
 plans = {}
 plan_defs = [
-    ('FREE', 'Free Access', 0, 0, 'Pay-per-use services'),
     ('BASIC', 'Basic Plan', 99, 30, 'Discounted towing, Priority'),
     ('PREMIUM', 'Premium Plan', 199, 30, 'Free towing (50km), Helpline'),
     ('ELITE', 'Elite Plan', 399, 30, 'Unlimited towing, VIP support, Exchange'),
@@ -56,7 +55,7 @@ plan_defs = [
 
 for code, name, price, days, feats in plan_defs:
     plan = SubscriptionPlan.objects.create(
-        name=code,  # Using code as name match model choices
+        name=name,  # Use full name for 'name' field as per frontend expectation
         price=Decimal(price),
         duration_days=days,
         features=[feats],
