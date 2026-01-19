@@ -71,6 +71,7 @@ services:
     name: vehic-aid-redis
     region: singapore # Optional, defaults to account region
     plan: free # Note: Free Redis on Render is ephemeral (data lost on restart)
+    ipAllowList: [] # Allow internal connections only
 
 databases:
   - name: vehic-aid-db
