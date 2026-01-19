@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
                 localStorage.removeItem('customer_access_token');
                 localStorage.removeItem('customer_refresh_token');
                 if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
+                    window.location.href = '/vehic-aid-project/booker/login';
                 }
             }
         }
