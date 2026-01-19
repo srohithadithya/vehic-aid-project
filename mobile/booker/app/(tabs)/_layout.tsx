@@ -1,79 +1,28 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
-import { LucideShieldAlert, LucideHistory, LucideTruck, LucideBot, LucideActivity, LucideUser, LucideCar, LucideWrench } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import '../../src/i18n';
+import { Tabs } from 'expo-router';
+import { Home, ClipboardList, User } from 'lucide-react-native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? 'light'];
-  const { t } = useTranslation();
-
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: theme.tint,
-        tabBarInactiveTintColor: theme.tabIconDefault,
-        tabBarStyle: {
-          backgroundColor: theme.background,
-          borderTopColor: theme.border,
-          height: 60,
-          paddingBottom: 10,
-        },
-        headerStyle: {
-          backgroundColor: theme.background,
-        },
-        headerTintColor: theme.text,
-        headerShown: true,
-      }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#2563eb', headerShown: false }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: t('assistance'),
-          tabBarIcon: ({ color }) => <LucideTruck size={24} color={color} />,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Home size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
-          title: t('history'),
-          tabBarIcon: ({ color }) => <LucideHistory size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: 'Support',
-          tabBarIcon: ({ color }) => <LucideBot size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="iot"
-        options={{
-          title: t('diagnostic_status'),
-          tabBarIcon: ({ color }) => <LucideWrench size={24} color={color} />,
+          title: 'Activity',
+          tabBarIcon: ({ color }) => <ClipboardList size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Account',
-          tabBarIcon: ({ color }) => <LucideUser size={24} color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <User size={24} color={color} />,
         }}
       />
     </Tabs>
