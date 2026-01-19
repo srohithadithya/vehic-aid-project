@@ -233,12 +233,12 @@ npm run dev  # Runs on port 3003
 ### **4. Mobile Applications Setup**
 ```bash
 # Customer App
-cd mobile-booker
+cd mobile/booker
 npm install
 npx expo start
 
 # Provider App
-cd mobile-provider
+cd mobile/provider
 npm install
 npx expo start
 ```

@@ -224,7 +224,7 @@ const vehicleTypes = [
 
 ### **Mobile Provider - Vehicle Capabilities**
 
-**File**: `mobile-provider/src/screens/VehicleCapabilitiesScreen.tsx`
+**File**: `mobile/provider/src/screens/VehicleCapabilitiesScreen.tsx`
 
 **Features**:
 - Multi-select grid (2 columns)
