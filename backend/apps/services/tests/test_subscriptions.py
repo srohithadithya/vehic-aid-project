@@ -36,12 +36,9 @@ class TestSubscriptionSystem:
 
     def test_subscribe_to_plan(self):
         url = reverse("subscription-list")
-        print(f"DEBUG: Reversed URL is {url}")
+        # Subscribing
         data = {"plan": self.premium_plan.id, "auto_renew": True}
         response = self.client.post(url, data)
-        print(f"DEBUG: Response status: {response.status_code}")
-        print(f"DEBUG: Response content: {response.content}")
-        
         assert response.status_code == status.HTTP_201_CREATED
         assert UserSubscription.objects.filter(user=self.booker, plan=self.premium_plan).exists()
         

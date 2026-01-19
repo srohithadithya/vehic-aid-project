@@ -25,6 +25,14 @@ DATABASES = {
     }
 }
 
+# Override Cache to use Local Memory (avoid Redis in tests)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
+
 # Disable Celery for tests
 CELERY_BROKER_URL = "memory://"
 CELERY_RESULT_BACKEND = "db+sqlite:///results.sqlite"
