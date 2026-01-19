@@ -1,10 +1,17 @@
+# at top of file
+import logging
 import os
 import requests
 from django.conf import settings
 from decimal import Decimal
 from datetime import datetime
 
-class PricingService:
+logger = logging.getLogger(__name__)
+
+# ... (inside PricingService.calculate_distance) ...
+        except Exception as e:
+            logger.error(f"Error calculating distance: {e}")
+            return Decimal("10.0"), 30
     """
     Budget-friendly pricing service for Indian market.
     Tiered pricing based on vehicle type and service complexity.
@@ -165,7 +172,7 @@ class PricingService:
             ), 30
             
         except Exception as e:
-            print(f"Error calculating distance: {e}")
+            logger.error(f"Error calculating distance: {e}")
             return Decimal("10.0"), 30
     
     def _calculate_straight_line_distance(self, lat1, lon1, lat2, lon2):

@@ -63,7 +63,6 @@ export default function SubscriptionPage() {
             // Free plan logic - might need a direct subscribe API call here
             // For now, redirect to a confirmation or dashboard since no payment is needed
             // In a real app, you'd hit an endpoint to switch to free plan immediately
-            console.log("Switching to free plan");
             router.push('/dashboard');
             return;
         }

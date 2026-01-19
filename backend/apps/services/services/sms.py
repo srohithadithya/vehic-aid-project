@@ -61,7 +61,7 @@ class SMSService:
                 }
                 
         except Exception as e:
-            print(f"Error sending SMS: {e}")
+            logger.error(f"Error sending SMS: {e}")
             return {
                 "status": "FAILED",
                 "message": str(e),
