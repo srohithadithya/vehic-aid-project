@@ -48,6 +48,7 @@ print("Created: admin/admin123")
 print("\nCreating Plans...")
 plans = {}
 plan_defs = [
+    ('FREE', 'Free Plan', 0, 3650, 'Standard access, Pay-per-use'),
     ('BASIC', 'Basic Plan', 99, 30, 'Discounted towing, Priority'),
     ('PREMIUM', 'Premium Plan', 199, 30, 'Free towing (50km), Helpline'),
     ('ELITE', 'Elite Plan', 399, 30, 'Unlimited towing, VIP support, Exchange'),

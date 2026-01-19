@@ -50,6 +50,7 @@ export default function SubscriptionPage() {
         if (name.includes('Elite')) return Zap;
         if (name.includes('Premium')) return Star;
         if (name.includes('Basic')) return Shield;
+        if (name.includes('Free')) return User;
         return User;
     };
 
@@ -58,6 +59,14 @@ export default function SubscriptionPage() {
         // Assuming price is a string like "2999.00"
         const amount = plan.price;
         // Payment page expects planId as name or ID. We used name in mock, but lets use name here too as per mock view.
+        if (parseFloat(amount) === 0) {
+            // Free plan logic - might need a direct subscribe API call here
+            // For now, redirect to a confirmation or dashboard since no payment is needed
+            // In a real app, you'd hit an endpoint to switch to free plan immediately
+            console.log("Switching to free plan");
+            router.push('/dashboard');
+            return;
+        }
         router.push(`/payment?amount=${amount}&planId=${plan.name}`);
     };
 
