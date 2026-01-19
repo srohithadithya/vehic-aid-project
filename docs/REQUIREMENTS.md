@@ -458,31 +458,112 @@ Why: Cross-platform, native performance, rich ecosystem
 - Real-time alerts for job assignments
 - Status update notifications
 
-### 4. SMS Gateway (Optional)
+### 4. SMS Gateway - Fast2SMS (Implemented ✅)
 
-**Options**:
-- Twilio
-- MSG91
-- Fast2SMS
+**Current Implementation**: Fast2SMS
 
-**Setup (MSG91)**:
+**Setup**:
 ```bash
-1. Sign up at https://msg91.com
+1. Sign up at https://www.fast2sms.com
 2. Verify your account
 3. Get API key from dashboard
 4. Add to .env:
-   SMS_API_KEY=your_key_here
-   SMS_SENDER_ID=VEHICAID
+   FAST2SMS_API_KEY=your_api_key_here
+   SMS_PROVIDER=fast2sms
 ```
 
-**Pricing** (MSG91):
-- ₹0.15 - ₹0.25 per SMS
-- OTP: ₹0.10 per SMS
+**Pricing**:
+- **Free Tier**: 50 SMS/day
+- **Paid Plans**: Starting from ₹0.10 per SMS
+- No setup fee
+- Pay-as-you-go model
+
+**Features Used**:
+- Quick Route (route='q') for transactional messages
+- 160 character limit per SMS
+- 10-digit Indian mobile numbers
+- JSON API
+
+**Implementation Details**:
+```python
+# Location: backend/apps/services/utils/sms_utils.py
+
+class Fast2SMSService:
+    """Free SMS service using Fast2SMS (50 SMS/day free)"""
+    
+    def send_sms(self, phone_number, message):
+        """
+        Send SMS via Fast2SMS API
+        
+        Features:
+        - Automatic phone number cleaning (+91 removal)
+        - 10-digit validation
+        - 160 character truncation
+        - Timeout handling (10 seconds)
+        """
+        headers = {
+            'authorization': self.api_key,
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'route': 'q',  # Quick route for transactional
+            'message': message[:160],
+            'language': 'english',
+            'flash': 0,
+            'numbers': phone_number
+        }
+        
+        response = requests.post(
+            'https://www.fast2sms.com/dev/bulkV2',
+            json=payload,
+            headers=headers,
+            timeout=10
+        )
+```
 
 **Usage in VehicAid**:
-- Send OTP for authentication
-- Send booking confirmations
-- Send status updates
+1. **OTP Verification**: Send OTP codes for user authentication
+2. **Service Request Confirmation**: Notify when booking is received
+3. **Provider Assignment**: Alert when provider is assigned
+4. **Service Completion**: Confirmation when service is done
+5. **Subscription Alerts**: Expiry reminders, renewal confirmations
+
+**Testing**:
+```bash
+# Test SMS sending
+python manage.py test_sms 9876543210 --message "Test from VehicAid"
+```
+
+**Message Templates**:
+```python
+# Service Request
+"VehicAid: Request #42 received. Service: Towing. We'll notify you when assigned."
+
+# Provider Assigned
+"VehicAid: Provider John Doe assigned to request #42. They'll contact you soon."
+
+# Service Completed
+"VehicAid: Service request #42 completed! Thank you for using VehicAid."
+
+# OTP
+"Your VehicAid OTP: 123456. Valid for 10 min. Don't share."
+```
+
+**Rate Limiting**:
+- Free tier: 50 SMS/day
+- Recommended: Implement caching to avoid duplicate sends
+- Current implementation: No duplicate prevention (to be added)
+
+**Error Handling**:
+```python
+# Returns structured response
+{
+    'success': True/False,
+    'message_id': 'xxx',  # if successful
+    'error': 'error message'  # if failed
+}
+```
 
 ---
 
@@ -529,9 +610,9 @@ RAZORPAY_KEY_SECRET=XXXXXXXXXXXXXXXXXXXXXXXX
 # Firebase
 FIREBASE_CREDENTIALS_PATH=/path/to/serviceAccountKey.json
 
-# SMS Gateway
-SMS_API_KEY=your_sms_api_key
-SMS_SENDER_ID=VEHICAID
+# SMS Gateway (Fast2SMS)
+SMS_PROVIDER=fast2sms
+FAST2SMS_API_KEY=your_fast2sms_api_key_here
 
 # ============================================
 # STORAGE (Production)
