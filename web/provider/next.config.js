@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
+    output: 'export',
+    basePath: '/vehic-aid-project/provider',
+    images: {
+        unoptimized: true,
+    },
     eslint: {
         ignoreDuringBuilds: true,
     },
