@@ -84,7 +84,7 @@ vehic-aid-project/
 │       │   └── PaymentButton.tsx     # Razorpay payment
 │       └── package.json
 │
-├── mobile-booker/                    # Customer Mobile App (React Native)
+├── mobile/booker/                    # Customer Mobile App (React Native)
 │   ├── src/
 │   │   ├── screens/
 │   │   │   ├── HomeScreen.tsx
@@ -418,7 +418,7 @@ npx expo start --ios      # iOS
 npx expo build:android    # Build APK
 
 # Provider App
-cd mobile-provider
+cd mobile/provider
 npm install
 npx expo start
 npx expo start --android
