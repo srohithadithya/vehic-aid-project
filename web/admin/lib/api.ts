@@ -32,7 +32,10 @@ apiClient.interceptors.response.use(
             localStorage.removeItem('admin_access_token');
             // Redirect to login only if not already there
             if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-                window.location.href = '/vehic-aid-project/admin/login';
+                const basePath = window.location.pathname.startsWith('/vehic-aid-project/admin')
+                    ? '/vehic-aid-project/admin'
+                    : '';
+                window.location.href = `${basePath}/login`;
             }
         }
         return Promise.reject(error);

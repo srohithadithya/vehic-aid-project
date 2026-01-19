@@ -38,8 +38,13 @@ apiClient.interceptors.response.use(
 
                 localStorage.removeItem('provider_access_token');
                 localStorage.removeItem('provider_refresh_token');
+                // Dynamic redirect based on current path
+                const basePath = window.location.pathname.startsWith('/vehic-aid-project/provider')
+                    ? '/vehic-aid-project/provider'
+                    : '';
+
                 if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/vehic-aid-project/provider/login';
+                    window.location.href = `${basePath}/login`;
                 }
             }
         }
