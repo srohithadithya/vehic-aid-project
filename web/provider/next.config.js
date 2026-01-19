@@ -1,7 +1,8 @@
-﻿/** @type {import('next').NextConfig} */
+﻿const isGHPages = process.env.GH_PAGES === 'true';
+
 const nextConfig = {
-    output: 'export',
-    basePath: '/vehic-aid-project/provider',
+    output: isGHPages ? 'export' : 'standalone',
+    basePath: isGHPages ? '/vehic-aid-project/provider' : '',
     images: {
         unoptimized: true,
     },

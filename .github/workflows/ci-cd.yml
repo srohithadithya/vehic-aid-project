@@ -121,6 +121,7 @@ jobs:
     - name: Build
       run: |
         cd web/${{ matrix.app }}
+        export GH_PAGES=true
         npm run build
     
     - name: Log in to Container Registry
