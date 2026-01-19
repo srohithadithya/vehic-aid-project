@@ -2,9 +2,9 @@ services:
   # Django Backend (Free Web Service)
   - type: web
     name: vehic-aid-backend
-    env: python
-    buildCommand: "./backend/build.sh"
-    startCommand: "cd backend && gunicorn vehic_aid_backend.wsgi:application --bind 0.0.0.0:$PORT"
+    env: docker
+    dockerContext: "./backend"
+    startCommand: "daphne -b 0.0.0.0 -p $PORT vehic_aid_backend.asgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
