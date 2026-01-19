@@ -1,5 +1,5 @@
 services:
-  # Django Backend
+  # Django Backend (Free Web Service)
   - type: web
     name: vehic-aid-backend
     env: python
@@ -14,68 +14,16 @@ services:
         value: ".onrender.com"
       - key: CORS_ALLOWED_ORIGINS
         value: "https://srohithadithya.github.io"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vehic-aid-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vehic-aid-redis
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
       - key: DEBUG
         value: "false"
-
-  # Celery Worker
-  - type: worker
-    name: vehic-aid-worker
-    env: python
-    buildCommand: "./backend/build.sh"
-    startCommand: "cd backend && celery -A vehic_aid_backend worker -l info"
-    envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: vehic_aid_backend.settings.production
+      - key: SECRET_KEY
+        generateValue: true
+      # You must provide these manually in Render Dashboard:
       - key: DATABASE_URL
-        fromDatabase:
-          name: vehic-aid-db
-          property: connectionString
+        sync: false # User will input their Neon/Supabase URL
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vehic-aid-redis
-          property: connectionString
+        sync: false # User will input their Upstash URL
 
-  # Celery Beat
-  - type: worker
-    name: vehic-aid-beat
-    env: python
-    buildCommand: "./backend/build.sh"
-    startCommand: "cd backend && celery -A vehic_aid_backend beat -l info"
-    envVars:
-      - key: DJANGO_SETTINGS_MODULE
-        value: vehic_aid_backend.settings.production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vehic-aid-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vehic-aid-redis
-          property: connectionString
-
-  # Redis Service
-  - type: redis
-    name: vehic-aid-redis
-    region: singapore # Optional, defaults to account region
-    plan: free # Note: Free Redis on Render is ephemeral (data lost on restart)
-    ipAllowList: [] # Allow internal connections only
-
-databases:
-  - name: vehic-aid-db
-    databaseName: vehicaid
-    user: vehicaid_user
-    plan: free
+# Removed Managed Databases and Redis to avoid "Add Card" requirement
+# Removed Workers as they are paid on Render
 
