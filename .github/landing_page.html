@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VehicAid Project</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            color: #94a3b8;
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+        .card {
+            background-color: var(--surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        .card h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+        }
+        .card span {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VehicAid Project</h1>
+        <p>Select an application to launch</p>
+        
+        <div class="grid">
+            <a href="./booker/" class="card">
+                <div class="icon">🚗</div>
+                <h2>Service Booker</h2>
+                <span>For Customers</span>
+            </a>
+            
+            <a href="./provider/" class="card">
+                <div class="icon">🔧</div>
+                <h2>Service Provider</h2>
+                <span>For Mechanics</span>
+            </a>
+            
+            <a href="./admin/" class="card">
+                <div class="icon">🛡️</div>
+                <h2>Admin Panel</h2>
+                <span>For Administrators</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

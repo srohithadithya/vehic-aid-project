@@ -1,80 +1,64 @@
-name: Deploy Vehic-Aid
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ "main", "feat/admin-backend-docs" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  test-backend:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.12"
-        
-    - name: Install Dependencies
-      run: |
-        ls -la
-        ls -la backend
-        python -m pip install --upgrade pip
-        pip install -r backend/requirements-final.txt
-        
-    - name: Run Tests
-      working-directory: ./backend
-      env:
-        SECRET_KEY: test-key
-        DEBUG: True
-      run: |
-        # Use simple sqlite for CI testing
-        pytest
-
   build-and-deploy:
-    needs: test-backend
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/admin-backend-docs'
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            web/admin/package-lock.json
+            web/booker/package-lock.json
+            web/provider/package-lock.json
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Install and Build Admin
+        working-directory: ./web/admin
+        run: |
+          npm ci
+          npm run build
 
-    - name: Build Backend
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend
-        push: false
-        tags: vehic-aid/backend:latest
+      - name: Install and Build Booker
+        working-directory: ./web/booker
+        run: |
+          npm ci
+          npm run build
 
-    - name: Build Booker App
-      uses: docker/build-push-action@v5
-      with:
-        context: ./web/booker
-        push: false
-        tags: vehic-aid/booker:latest
+      - name: Install and Build Provider
+        working-directory: ./web/provider
+        run: |
+          npm ci
+          npm run build
 
-    - name: Build Provider App
-      uses: docker/build-push-action@v5
-      with:
-        context: ./web/provider
-        push: false
-        tags: vehic-aid/provider:latest
+      - name: Prepare Deployment
+        run: |
+          mkdir -p public/admin
+          mkdir -p public/booker
+          mkdir -p public/provider
+          # Copy build outputs
+          cp -r web/admin/out/* public/admin/
+          cp -r web/booker/out/* public/booker/
+          cp -r web/provider/out/* public/provider/
+          # Copy landing page
+          cp .github/landing_page.html public/index.html
+          # Create .nojekyll to allow files starting with _
+          touch public/.nojekyll
 
-    - name: Build Admin Panel
-      uses: docker/build-push-action@v5
-      with:
-        context: ./web/admin
-        push: false
-        tags: vehic-aid/admin:latest
-
-    - name: Simulate Deployment Check
-      run: |
-        echo "Docker images built successfully."
-        echo "Ready for deployment to staging/production."
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
