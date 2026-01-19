@@ -27,18 +27,24 @@ jobs:
 
       - name: Install and Build Admin
         working-directory: ./web/admin
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://api.vehicaid.com/api/v1' }}
         run: |
           npm ci
           npm run build
 
       - name: Install and Build Booker
         working-directory: ./web/booker
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://api.vehicaid.com/api/v1' }}
         run: |
           npm ci
           npm run build
 
       - name: Install and Build Provider
         working-directory: ./web/provider
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://api.vehicaid.com/api/v1' }}
         run: |
           npm ci
           npm run build
