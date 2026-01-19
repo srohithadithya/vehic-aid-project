@@ -4,11 +4,6 @@ const nextConfig = {
   basePath: '/vehic-aid-project/admin',
   images: {
     unoptimized: true,
-    remotePatterns: [
-      { hostname: 'localhost' },
-      { hostname: 'api.dicebear.com' },
-      { hostname: 'github.com' },
-    ],
   },
   optimizeFonts: false,
   eslint: {

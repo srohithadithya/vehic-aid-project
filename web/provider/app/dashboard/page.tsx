@@ -208,7 +208,7 @@ export default function ProviderDashboard() {
                                         </div>
 
                                         <Link
-                                            href={`/job/${job.id}`}
+                                            href={`/job/view?id=${job.id}`}
                                             className="block w-full text-center bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-all shadow-lg shadow-white/10"
                                         >
                                             Manage Mission

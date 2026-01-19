@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'export',
     basePath: '/vehic-aid-project/provider',
@@ -11,7 +11,6 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
-    optimizeFonts: false,
 };
 
 module.exports = nextConfig;

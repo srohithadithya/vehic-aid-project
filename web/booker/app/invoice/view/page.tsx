@@ -1,18 +1,22 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Download, Printer, Mail } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
-export default function InvoicePage({ params }: { params: { id: string } }) {
+function InvoiceContent() {
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const [invoice, setInvoice] = useState<any>(null);
 
     const fetchInvoice = useCallback(async () => {
+        if (!id) return;
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/invoices/${params.id}/`,
+                `${process.env.NEXT_PUBLIC_API_URL}/invoices/${id}/`,
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
             if (response.ok) {
@@ -22,7 +26,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         } catch (error) {
             console.error('Failed to fetch invoice:', error);
         }
-    }, [params.id]);
+    }, [id]);
 
     useEffect(() => {
         fetchInvoice();
@@ -32,6 +36,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         window.print();
     };
 
+    if (!id) return <div className="p-6 text-red-500">No Invoice ID provided</div>;
     if (!invoice) return <div className="p-6">Loading...</div>;
 
     return (
@@ -158,5 +163,13 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
                 </div>
             </Card>
         </div>
+    );
+}
+
+export default function InvoicePage() {
+    return (
+        <Suspense fallback={<div className="p-6">Loading invoice viewer...</div>}>
+            <InvoiceContent />
+        </Suspense>
     );
 }
