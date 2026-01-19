@@ -50,9 +50,20 @@ function RequestStatusContent() {
         fetchRequestDetails();
 
         // Setup WebSocket for real-time updates
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // Need to ensure we don't use 'undefined' or 'null' in URL
-        const wsUrl = `${wsProtocol}//localhost:8001/ws/service/${id}/`;
+
+        // Extract host from API URL or use window.location if API URL is relative/missing host
+        let wsHost = 'localhost:8001';
+        try {
+            const url = new URL(apiUrl);
+            wsHost = url.host;
+        } catch (e) {
+            // fallback if NEXT_PUBLIC_API_URL is just a path or invalid
+            console.warn("Invalid API URL for WS, falling back to localhost", e);
+        }
+
+        const wsUrl = `${wsProtocol}//${wsHost}/ws/service/${id}/`;
 
         const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
