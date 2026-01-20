@@ -13,6 +13,7 @@
 6. [Chat](#chat)
 7. [Provider Analytics](#provider-analytics)
 8. [Subscriptions](#subscriptions)
+9. [Public Stats](#public-stats)
 
 ---
 
@@ -154,7 +155,6 @@ Response: 201 Created
 - SUV: Sport Utility Vehicles
 - VAN: Minivans, Cargo Vans
 - TRUCK: Light/Medium Commercial
-- HEAVY_VEHICLE: Buses, Heavy Trucks
 ```
 
 ### **Update Vehicle**
@@ -319,14 +319,14 @@ Response: 200 OK
 
 ### **Pricing Matrix**
 
-| Service | 2W | 3W | 4W | SUV | Van | Truck | Heavy |
-|---------|----|----|----|----|-----|-------|-------|
-| Towing | ₹150 | ₹200 | ₹300 | ₹500 | ₹600 | ₹800 | ₹1,200 |
-| Jumpstart | ₹80 | ₹100 | ₹150 | ₹250 | ₹300 | ₹400 | ₹600 |
-| Tire Change | ₹100 | ₹120 | ₹200 | ₹350 | ₹400 | ₹500 | ₹800 |
-| Fuel Delivery | ₹70 | ₹90 | ₹150 | ₹250 | ₹300 | ₹400 | ₹600 |
-| Lockout | ₹120 | ₹150 | ₹250 | ₹400 | ₹450 | ₹550 | ₹800 |
-| General | ₹100 | ₹130 | ₹250 | ₹400 | ₹450 | ₹600 | ₹1,000 |
+| Service | 2W | 3W | 4W | SUV | Van | Truck |
+|---------|----|----|----|----|-----|-------|
+| Towing | ₹150 | ₹200 | ₹300 | ₹500 | ₹600 | ₹800 |
+| Jumpstart | ₹80 | ₹100 | ₹150 | ₹250 | ₹300 | ₹400 |
+| Tire Change | ₹100 | ₹120 | ₹200 | ₹350 | ₹400 | ₹500 |
+| Fuel Delivery | ₹70 | ₹90 | ₹150 | ₹250 | ₹300 | ₹400 |
+| Lockout | ₹120 | ₹150 | ₹250 | ₹400 | ₹450 | ₹550 |
+| General | ₹100 | ₹130 | ₹250 | ₹400 | ₹450 | ₹600 |
 
 ---
 
@@ -571,3 +571,24 @@ Response: 200 OK
 **Last Updated**: January 17, 2026  
 **API Version**: v1  
 **Base URL**: http://localhost:8001/api/v1
+ 
+ # #   � x `  P u b l i c   S t a t s  
+  
+ # # #   * * G e t   P l a t f o r m   S t a t i s t i c s * *  
+ R e t r i e v e s   r e a l - t i m e   c o u n t s   o f   h a p p y   c u s t o m e r s ,   v e r i f i e d   p r o v i d e r s ,   a n d   s a t i s f a c t i o n   r a t e s   f o r   t h e   p u b l i c   l a n d i n g   p a g e .  
+  
+ ` ` ` h t t p  
+ G E T   / s e r v i c e s / s t a t s / p u b l i c /  
+ #   N o   a u t h e n t i c a t i o n   r e q u i r e d  
+  
+ R e s p o n s e :   2 0 0   O K  
+ {  
+     " c u s t o m e r s " :   " 1 2 , 5 0 0 + " ,  
+     " p r o v i d e r s " :   " 4 5 0 + " ,  
+     " s a t i s f a c t i o n " :   " 9 8 % " ,  
+     " r e s p o n s e _ t i m e " :   " 1 2   m i n "  
+ }  
+ ` ` `  
+  
+ - - -  
+ 

@@ -15,7 +15,7 @@
 
 ## 🚗 Supported Vehicle Types
 
-VehicAid supports **7 comprehensive vehicle categories** covering all types of vehicles on the road:
+VehicAid supports **6 comprehensive vehicle categories** covering all types of vehicles on the road:
 
 ### **1. Two Wheeler (🏍️)**
 - **Code**: `TWO_WHEELER`
@@ -59,12 +59,6 @@ VehicAid supports **7 comprehensive vehicle categories** covering all types of v
 - **Base Price Range**: ₹400 - ₹800
 - **Per KM Rate**: ₹25/km
 
-### **7. Heavy Vehicle (🚌)**
-- **Code**: `HEAVY_VEHICLE`
-- **Examples**: Buses, Heavy Trucks, Construction Vehicles
-- **Market Share**: <1% in India
-- **Base Price Range**: ₹600 - ₹1,200
-- **Per KM Rate**: ₹35/km
 
 ---
 
@@ -72,14 +66,14 @@ VehicAid supports **7 comprehensive vehicle categories** covering all types of v
 
 ### **Complete Pricing Matrix**
 
-| Service Type | 2W | 3W | 4W | SUV | Van | Truck | Heavy |
-|--------------|----|----|----|----|-----|-------|-------|
-| **Towing** | ₹150 | ₹200 | ₹300 | ₹500 | ₹600 | ₹800 | ₹1,200 |
-| **Jumpstart** | ₹80 | ₹100 | ₹150 | ₹250 | ₹300 | ₹400 | ₹600 |
-| **Tire Change** | ₹100 | ₹120 | ₹200 | ₹350 | ₹400 | ₹500 | ₹800 |
-| **Fuel Delivery** | ₹70 | ₹90 | ₹150 | ₹250 | ₹300 | ₹400 | ₹600 |
-| **Lockout** | ₹120 | ₹150 | ₹250 | ₹400 | ₹450 | ₹550 | ₹800 |
-| **General** | ₹100 | ₹130 | ₹250 | ₹400 | ₹450 | ₹600 | ₹1,000 |
+| Service Type | 2W | 3W | 4W | SUV | Van | Truck |
+|--------------|----|----|----|----|-----|-------|
+| **Towing** | ₹150 | ₹200 | ₹300 | ₹500 | ₹600 | ₹800 |
+| **Jumpstart** | ₹80 | ₹100 | ₹150 | ₹250 | ₹300 | ₹400 |
+| **Tire Change** | ₹100 | ₹120 | ₹200 | ₹350 | ₹400 | ₹500 |
+| **Fuel Delivery** | ₹70 | ₹90 | ₹150 | ₹250 | ₹300 | ₹400 |
+| **Lockout** | ₹120 | ₹150 | ₹250 | ₹400 | ₹450 | ₹550 |
+| **General** | ₹100 | ₹130 | ₹250 | ₹400 | ₹450 | ₹600 |
 
 ### **Distance Charges**
 
@@ -91,7 +85,6 @@ VehicAid supports **7 comprehensive vehicle categories** covering all types of v
 | SUV | ₹15 |
 | Van | ₹18 |
 | Truck | ₹25 |
-| Heavy Vehicle | ₹35 |
 
 ### **Pricing Calculation Formula**
 
@@ -128,16 +121,6 @@ Tax (18%): ₹87.75
 Total: ₹575.25
 ```
 
-**Example 3: Heavy Vehicle Towing (10 km) during Peak Hours**
-```
-Base Price: ₹1,200
-Distance: 10 km × ₹35 = ₹350
-Subtotal: ₹1,550
-Surge (20%): ₹310
-After Surge: ₹1,860
-Tax (18%): ₹334.80
-Total: ₹2,194.80
-```
 
 ---
 
@@ -155,7 +138,6 @@ VEHICLE_TYPE_CHOICES = [
     ("SUV", "SUV (Sport Utility Vehicle)"),
     ("VAN", "Van (Minivan/Cargo Van)"),
     ("TRUCK", "Truck (Light/Medium Commercial)"),
-    ("HEAVY_VEHICLE", "Heavy Vehicle (Bus/Heavy Truck)"),
 ]
 
 vehicle_type = models.CharField(
@@ -170,7 +152,7 @@ vehicle_type = models.CharField(
 
 **File**: `backend/apps/services/services/pricing.py`
 
-All 7 vehicle types are configured with:
+All 6 vehicle types are configured with:
 - Base prices for 6 service types
 - Per-kilometer rates
 - Subscription discounts
@@ -200,7 +182,7 @@ Migration automatically updates existing vehicles to new schema.
 ```tsx
 const vehicleTypes = [
   { value: 'TWO_WHEELER', label: 'Two Wheeler', icon: '🏍️', desc: 'Bike/Scooter' },
-  // ... all 7 types
+  // ... all 6 types
 ];
 ```
 
@@ -375,6 +357,6 @@ For vehicle type related questions:
 
 ---
 
-**Last Updated**: January 17, 2026  
-**Version**: 2.0.0  
+**Last Updated**: January 20, 2026  
+**Version**: 2.6.0  
 **Coverage**: 100% of vehicle market ✅

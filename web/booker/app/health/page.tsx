@@ -20,8 +20,14 @@ export default function HealthPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await apiClient.get('/iot/status/');
-                setDevice(response.data);
+                // IoT endpoint might not be ready, defaulting to null/mock instead of erroring
+                try {
+                    const response = await apiClient.get('/iot/status/');
+                    setDevice(response.data);
+                } catch (e) {
+                    console.warn("IoT Service unavailable, using mock/null status");
+                    setDevice(null);
+                }
             } catch (error) {
                 console.error("Failed to fetch IoT status", error);
             } finally {

@@ -24,7 +24,6 @@ export default function VehiclesPage() {
         { value: 'SUV', label: 'SUV', icon: '🚙', desc: 'Sport Utility Vehicle' },
         { value: 'VAN', label: 'Van', icon: '🚐', desc: 'Minivan/Cargo' },
         { value: 'TRUCK', label: 'Truck', icon: '🚛', desc: 'Commercial Vehicle' },
-        { value: 'HEAVY_VEHICLE', label: 'Heavy Vehicle', icon: '🚌', desc: 'Bus/Heavy Truck' },
     ];
 
     useEffect(() => {
@@ -116,8 +115,8 @@ export default function VehiclesPage() {
                                         type="button"
                                         onClick={() => setFormData({ ...formData, vehicle_type: type.value })}
                                         className={`p-4 border-2 rounded-lg transition-all ${formData.vehicle_type === type.value
-                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
                                             }`}
                                     >
                                         <div className="text-3xl mb-2">{type.icon}</div>

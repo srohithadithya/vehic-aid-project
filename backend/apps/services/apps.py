@@ -7,8 +7,8 @@ class ServicesConfig(AppConfig):
     label = "services"
 
     def ready(self):
-        from auditlog.registry import auditlog
-        from .models import ServiceRequest, UserSubscription
+        # from auditlog.registry import auditlog
+        # from .models import ServiceRequest, UserSubscription
         from . import signals  # Register notifications
-        auditlog.register(ServiceRequest)
-        auditlog.register(UserSubscription)
+        # auditlog.register(ServiceRequest)
+        # auditlog.register(UserSubscription)

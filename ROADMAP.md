@@ -1,8 +1,8 @@
 # 🗺️ VehicAid Development Roadmap
 
 **Project Status**: Production Ready ✅  
-**Current Version**: 2.0.0  
-**Last Updated**: January 17, 2026
+**Current Version**: 2.6.0  
+**Last Updated**: January 20, 2026
 
 ---
 
@@ -324,7 +324,13 @@ Phase 6: Production Deployment        ██████████████
 
 ## 🎯 Release History
 
-### **Version 2.0.0** (January 17, 2026) - Current
+### **Version 2.6.0** (January 20, 2026) - Current
+- ✅ Real-time Landing Page Stats
+- ✅ Public Stats API Endpoint
+- ✅ Provider Login Fixes
+- ✅ Documentation Updates
+
+### **Version 2.0.0** (January 17, 2026)
 - ✅ Complete infrastructure setup
 - ✅ Kubernetes manifests
 - ✅ CI/CD pipelines
@@ -404,7 +410,7 @@ Phase 6: Production Deployment        ██████████████
 
 ---
 
-**Last Updated**: January 17, 2026  
+**Last Updated**: January 20, 2026  
 **Next Review**: February 2026  
-**Version**: 2.0.0  
+**Version**: 2.6.0  
 **Status**: Production Ready ✅

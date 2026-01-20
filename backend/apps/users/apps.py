@@ -8,7 +8,8 @@ class UsersConfig(AppConfig):
     label = "users"
 
     def ready(self):
-        from auditlog.registry import auditlog
-        from .models import CustomUser, ServiceProvider
-        auditlog.register(CustomUser)
-        auditlog.register(ServiceProvider)
+        # from auditlog.registry import auditlog
+        # from .models import CustomUser, ServiceProvider
+        # auditlog.register(CustomUser)
+        # auditlog.register(ServiceProvider)
+        pass

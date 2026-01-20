@@ -9,11 +9,20 @@ import { apiClient } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
 const steps = [
-    { id: 1, title: 'Location', icon: MapPin },
-    { id: 2, title: 'Service', icon: Wrench },
-    { id: 3, title: 'Vehicle', icon: Truck },
+    { id: 1, title: 'Service', icon: Wrench },
+    { id: 2, title: 'Vehicle', icon: Truck },
+    { id: 3, title: 'Location', icon: MapPin },
     { id: 4, title: 'Review', icon: CreditCard },
 ];
+
+const PRICING_MAP: Record<string, Record<string, number>> = {
+    'TWO_WHEELER': { 'TOWING': 199, 'FUEL': 49, 'JUMPSTART': 149, 'LOCKOUT': 149, 'MECHANIC': 99 },
+    'THREE_WHEELER': { 'TOWING': 249, 'FUEL': 49, 'JUMPSTART': 199, 'LOCKOUT': 199, 'MECHANIC': 149 },
+    'FOUR_WHEELER': { 'TOWING': 249, 'FUEL': 49, 'JUMPSTART': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
+    'SUV': { 'TOWING': 299, 'FUEL': 49, 'JUMPSTART': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
+    'VAN': { 'TOWING': 349, 'FUEL': 49, 'JUMPSTART': 299, 'LOCKOUT': 299, 'MECHANIC': 399 },
+    'TRUCK': { 'TOWING': 499, 'FUEL': 69, 'JUMPSTART': 349, 'LOCKOUT': 299, 'MECHANIC': 399 },
+};
 
 function ServiceRequestWizardContent() {
     const router = useRouter();
@@ -103,6 +112,68 @@ function ServiceRequestWizardContent() {
                     <div className="flex-1">
                         {currentStep === 1 && (
                             <div className="space-y-4">
+                                <div className="text-center mb-6">
+                                    <h2 className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">Select Service</h2>
+                                    <p className="text-gray-500 mt-2">Choose the assistance you need today.</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {['TOWING', 'FUEL', 'JUMPSTART', 'LOCKOUT', 'MECHANIC'].map((type) => (
+                                        <button
+                                            key={type}
+                                            onClick={() => setFormData({ ...formData, serviceType: type })}
+                                            className={`p-4 rounded-xl border-2 text-left transition ${formData.serviceType === type ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
+                                        >
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-bold block text-lg">{type}</span>
+                                                <div className="text-right">
+                                                    <span className="text-[10px] text-gray-400 block uppercase">Starts at</span>
+                                                    <span className="text-sm font-bold text-primary">₹{PRICING_MAP['TWO_WHEELER'][type] || 99}</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-gray-500 block leading-tight">Base charge for standard assistance.</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {currentStep === 2 && (
+                            <div className="space-y-4">
+                                <div className="text-center mb-6">
+                                    <h2 className="text-2xl font-bold">Select Vehicle for <span className="text-primary">{formData.serviceType}</span></h2>
+                                    <p className="text-gray-500 text-sm">Prices are calculated based on vehicle type.</p>
+                                </div>
+                                {vehicles.length > 0 ? (
+                                    <div className="grid gap-3">
+                                        {vehicles.map((v: any) => {
+                                            const price = PRICING_MAP[v.vehicle_type]?.[formData.serviceType] || 'Variable';
+                                            return (
+                                                <button
+                                                    key={v.id}
+                                                    onClick={() => setFormData({ ...formData, vehicleId: v.id })}
+                                                    className={`p-4 rounded-xl border-2 text-left transition flex justify-between items-center ${formData.vehicleId === v.id ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
+                                                >
+                                                    <div>
+                                                        <span className="font-bold text-lg block">{v.make} {v.model}</span>
+                                                        <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-600 font-medium border border-gray-200">{v.vehicle_type.replace('_', ' ')}</span>
+                                                        <p className="text-[10px] text-gray-400 mt-1">{v.license_plate}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <span className="text-lg font-black text-primary">₹{price}</span>
+                                                        <span className="block text-[10px] text-gray-400">Base Charge</span>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="p-4 border rounded-xl bg-gray-50 text-gray-500 text-center">
+                                        No vehicles found. Please add a vehicle in Settings.
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {currentStep === 3 && (
+                            <div className="space-y-4">
                                 <h2 className="text-2xl font-bold">Where are you stuck?</h2>
                                 <div className="h-64 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
                                     <div className="text-center text-gray-400">
@@ -111,49 +182,6 @@ function ServiceRequestWizardContent() {
                                         <p className="text-xs mt-1">Lat: {formData.latitude}, Lng: {formData.longitude}</p>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                        {currentStep === 2 && (
-                            <div className="space-y-4">
-                                <h2 className="text-2xl font-bold">What service do you need?</h2>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {['TOWING', 'FUEL', 'JUMPSTART', 'LOCKOUT'].map((type) => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setFormData({ ...formData, serviceType: type })}
-                                            className={`p-4 rounded-xl border-2 text-left transition ${formData.serviceType === type ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
-                                        >
-                                            <span className="font-bold block mb-1">{type}</span>
-                                            <span className="text-xs text-gray-500">Standard rates apply</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {currentStep === 3 && (
-                            <div className="space-y-4">
-                                <h2 className="text-2xl font-bold">Which vehicle?</h2>
-                                {vehicles.length > 0 ? (
-                                    <div className="grid gap-3">
-                                        {vehicles.map((v: any) => (
-                                            <button
-                                                key={v.id}
-                                                onClick={() => setFormData({ ...formData, vehicleId: v.id })}
-                                                className={`p-4 rounded-xl border-2 text-left transition flex justify-between items-center ${formData.vehicleId === v.id ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
-                                            >
-                                                <div>
-                                                    <span className="font-bold block">{v.make} {v.model}</span>
-                                                    <span className="text-xs text-gray-500">{v.license_plate}</span>
-                                                </div>
-                                                {formData.vehicleId === v.id && <CheckCircle className="text-primary" size={20} />}
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="p-4 border rounded-xl bg-gray-50 text-gray-500 text-center">
-                                        No vehicles found. Please add a vehicle in Settings.
-                                    </div>
-                                )}
                                 <textarea
                                     placeholder="Add notes for the provider (landmarks, vehicle color...)"
                                     className="w-full p-4 border rounded-xl resize-none focus:ring-2 focus:ring-primary focus:outline-none"
@@ -170,20 +198,12 @@ function ServiceRequestWizardContent() {
                                 </div>
                                 <h2 className="text-2xl font-bold">Ready to Request?</h2>
                                 <p className="text-gray-500">
-                                    A provider will be assigned immediately.
-                                    Estimated arrival: <span className="text-gray-900 font-bold">15-20 mins</span>
+                                    Initial Service Charge: <span className="text-primary font-black text-xl">₹{(() => {
+                                        const v: any = vehicles.find((v: any) => v.id === formData.vehicleId);
+                                        return PRICING_MAP[v?.vehicle_type]?.[formData.serviceType] || 0;
+                                    })()}</span>
                                 </p>
-
-                                <div className="bg-gray-50 p-4 rounded-xl text-left text-sm space-y-2">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Service</span>
-                                        <span className="font-medium">{formData.serviceType}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Location</span>
-                                        <span className="font-medium">{formData.latitude?.toFixed(4)}, {formData.longitude?.toFixed(4)}</span>
-                                    </div>
-                                </div>
+                                <p className="text-xs text-gray-400">* Final fare may include spare parts and distance charges.</p>
                             </div>
                         )}
                     </div>

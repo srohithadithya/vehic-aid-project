@@ -147,6 +147,19 @@ export default function SubscriptionPage() {
                     })}
                 </div>
             </div>
+
+            <div className="mt-16 bg-slate-50/50 p-8 rounded-2xl border border-dashed border-indigo-200 text-center space-y-4 backdrop-blur-sm">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Premium Benefit: Vehicle Exchange</h3>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                    Stuck with a breakdown? Premium and Elite members can instantly request a replacement vehicle to continue their journey while we handle the repairs.
+                </p>
+                <Button
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-8"
+                    onClick={() => router.push('/exchange')}
+                >
+                    Access Vehicle Exchange
+                </Button>
+            </div>
         </div>
     );
 }

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/lib/api';
 import Link from 'next/link';
 import { clsx } from 'clsx';
-import { CheckCircle2, Clock, MapPin, Loader2, ArrowLeft, MessageSquare } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, Loader2, ArrowLeft, MessageSquare, CreditCard } from 'lucide-react';
 import { Chat } from '@/components/Chat';
 import { NotificationContainer, useNotifications } from '@/components/Notifications';
 
@@ -16,6 +16,55 @@ interface ServiceRequest {
     provider_id: number | null;
     created_at: string;
     provider_location?: any;
+}
+
+function FareBreakup({ id, onAccept }: { id: string; onAccept: () => void }) {
+    const [quote, setQuote] = useState<any>(null);
+
+    useEffect(() => {
+        const fetch = async () => {
+            const res = await apiClient.get(`/quotes/?request_id=${id}`);
+            setQuote(res.data.find((q: any) => q.is_final));
+        };
+        fetch();
+    }, [id]);
+
+    if (!quote) return null;
+
+    return (
+        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-xl ring-1 ring-blue-600/20 space-y-4 border-l-4 border-blue-600">
+            <h3 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-blue-600" />
+                Final Fare Review
+            </h3>
+            <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                    <span className="text-gray-500">Service Base Charge</span>
+                    <span className="font-bold">₹{quote.base_price}</span>
+                </div>
+                {quote.spare_parts_details?.map((p: any, i: number) => (
+                    <div key={i} className="flex justify-between text-xs">
+                        <span className="text-gray-400 capitalize">{p.name.replace(/_/g, ' ')}</span>
+                        <span className="text-gray-600 font-medium">₹{p.price}</span>
+                    </div>
+                ))}
+                <div className="flex justify-between p-2 bg-gray-50 dark:bg-black/20 rounded-lg">
+                    <span className="text-gray-500">Platform Fee & Taxes</span>
+                    <span className="font-bold">₹{(parseFloat(quote.platform_fee) + parseFloat(quote.tax_amount)).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xl font-black pt-2 border-t dark:border-white/10">
+                    <span>Total Amount</span>
+                    <span className="text-blue-600">₹{quote.dynamic_total}</span>
+                </div>
+            </div>
+            <button
+                onClick={onAccept}
+                className="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-transform"
+            >
+                Approve & Pay ₹{quote.dynamic_total}
+            </button>
+        </div>
+    );
 }
 
 function RequestStatusContent() {
@@ -105,14 +154,31 @@ function RequestStatusContent() {
         };
     }, [id, fetchRequestDetails, success, info]);
 
+    const handleAcceptFinalFare = async () => {
+        try {
+            const quotesRes = await apiClient.get(`/quotes/?request_id=${id}`);
+            const quote = quotesRes.data.find((q: any) => q.is_final);
+            if (!quote) return;
+
+            await apiClient.post(`/quotes/${quote.id}/accept/`);
+            success("Payment Successful", "Your service is complete. Thank you!");
+            fetchRequestDetails();
+        } catch (error) {
+            console.error("Accept failed", error);
+            warning("Payment Failed", "Please try again.");
+        }
+    };
+
     if (!id) return <div className="p-8 text-center text-red-500">No request ID provided.</div>;
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-blue-600" /></div>;
     if (!request) return <div className="p-8 text-center text-red-500">Request not found.</div>;
 
     const steps = [
-        { id: 'REQUESTED', label: 'Request Received' },
+        { id: 'PENDING_DISPATCH', label: 'Request Received' },
         { id: 'DISPATCHED', label: 'Provider Dispatched' },
-        { id: 'IN_PROGRESS', label: 'Service In Progress' },
+        { id: 'ARRIVED', label: 'Provider Arrived' },
+        { id: 'SERVICE_IN_PROGRESS', label: 'Service In Progress' },
+        { id: 'FINAL_FARE_PENDING', label: 'Review Final Fare' },
         { id: 'COMPLETED', label: 'Service Completed' },
     ];
 
@@ -215,6 +281,10 @@ function RequestStatusContent() {
                                             })}
                                         </ol>
                                     </nav>
+                                )}
+
+                                {request.status === 'FINAL_FARE_PENDING' && (
+                                    <FareBreakup id={id} onAccept={handleAcceptFinalFare} />
                                 )}
 
                                 {/* Map Placeholder */}

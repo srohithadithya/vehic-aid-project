@@ -14,7 +14,7 @@ export default function BookingForm({ initialData = {}, onSubmit, onCancel, load
     customer: initialData.customer || "",
     provider: initialData.provider || "",
     service_type: initialData.service_type || "",
-    status: initialData.status || "PENDING",
+    status: initialData.status || "PENDING_DISPATCH",
     location: initialData.location || "",
     description: initialData.description || ""
   });
@@ -35,9 +35,12 @@ export default function BookingForm({ initialData = {}, onSubmit, onCancel, load
       <Input name="provider" placeholder="Provider" value={form.provider} onChange={handleChange} />
       <Input name="service_type" placeholder="Service Type" value={form.service_type} onChange={handleChange} required />
       <Input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
-      <select name="status" value={form.status} onChange={handleChange} className="w-full border rounded p-2">
-        <option value="PENDING">Pending</option>
-        <option value="IN_PROGRESS">In Progress</option>
+      <select name="status" value={form.status} onChange={handleChange} className="w-full border rounded p-2 text-sm">
+        <option value="PENDING_DISPATCH">Pending Dispatch</option>
+        <option value="DISPATCHED">Dispatched</option>
+        <option value="ARRIVED">Arrived</option>
+        <option value="SERVICE_IN_PROGRESS">Service In Progress</option>
+        <option value="FINAL_FARE_PENDING">Final Fare Pending</option>
         <option value="COMPLETED">Completed</option>
         <option value="CANCELLED">Cancelled</option>
       </select>

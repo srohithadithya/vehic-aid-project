@@ -8,6 +8,7 @@ import { MapPin, Phone, User, CheckCircle, Navigation, ArrowLeft, MessageSquare 
 import { Navbar } from '@/components/Navbar';
 import { useLanguage } from '@/context/LanguageContext';
 import Chat from '@/components/Chat';
+import SparePartExplorer from '@/components/SparePartExplorer';
 import { clsx } from 'clsx';
 
 interface ServiceRequest {
@@ -99,6 +100,33 @@ function JobContent() {
             console.error("Failed to update status", err);
             // Even if it fails, try to fetch job again to stay synced
             fetchJobDetails();
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleFinalizeFare = async (parts: any[]) => {
+        setUpdating(true);
+        try {
+            // First, find the quote for this request
+            const quotesRes = await apiClient.get(`/quotes/?request_id=${id}`);
+            const quoteId = quotesRes.data[0]?.id; // Simple assumption for MVP
+
+            if (!quoteId) {
+                alert("No active quote found for this request.");
+                return;
+            }
+
+            await apiClient.post(`/quotes/${quoteId}/finalize/`, {
+                spare_parts: parts,
+                platform_fee: 25.00
+            });
+
+            alert("Fare finalized! Waiting for user approval.");
+            fetchJobDetails();
+        } catch (err) {
+            console.error("Failed to finalize fare", err);
+            alert("Error finalizing fare.");
         } finally {
             setUpdating(false);
         }
@@ -252,14 +280,16 @@ function JobContent() {
                                     </button>
                                 )}
 
-                                {isJobActive && (
-                                    <button
-                                        onClick={() => updateStatus('COMPLETED')}
-                                        disabled={updating}
-                                        className="bg-green-600 hover:bg-green-500 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-green-600/20 flex items-center justify-center transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        <CheckCircle className="w-6 h-6 mr-3" /> {t('job.complete')}
-                                    </button>
+                                {job.status === 'SERVICE_IN_PROGRESS' && (
+                                    <div className="sm:col-span-2 space-y-6">
+                                        <SparePartExplorer requestId={job.id} onFinalize={handleFinalizeFare} />
+                                    </div>
+                                )}
+
+                                {job.status === 'FINAL_FARE_PENDING' && (
+                                    <div className="sm:col-span-2 w-full text-center py-6 text-blue-600 font-black uppercase tracking-widest bg-blue-500/10 rounded-2xl border-2 border-blue-500/20 animate-pulse">
+                                        Awaiting User Approval of Final Fare
+                                    </div>
                                 )}
 
                                 {job.status === 'COMPLETED' && (

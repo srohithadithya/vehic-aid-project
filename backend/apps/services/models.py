@@ -21,7 +21,7 @@ class SubscriptionPlan(models.Model):
 
     name = models.CharField(max_length=50, choices=PLAN_CHOICES, unique=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
-    duration_days = models.IntegerField(default=30)
+    duration_days = models.IntegerField(default=45)
     is_exchange_eligible = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
     features = models.JSONField(
@@ -189,7 +189,6 @@ class Vehicle(models.Model):
         ("SUV", "SUV (Sport Utility Vehicle)"),
         ("VAN", "Van (Minivan/Cargo Van)"),
         ("TRUCK", "Truck (Light/Medium Commercial)"),
-        ("HEAVY_VEHICLE", "Heavy Vehicle (Bus/Heavy Truck)"),
     ]
     vehicle_type = models.CharField(
         max_length=20, 
@@ -213,7 +212,8 @@ class ServiceRequest(models.Model):
         ("DISPATCHED", "Provider En Route"),
         ("ARRIVED", "Provider Arrived"),
         ("SERVICE_IN_PROGRESS", "Service in Progress"),
-        ("QUOTE_PENDING", "Quote Pending User Approval"),
+        ("AWAITING_FINAL_FARE", "Provider Finalizing Fare"),
+        ("FINAL_FARE_PENDING", "Waiting for User Approval of Final Fare"),
         ("COMPLETED", "Completed & Paid"),
         ("CANCELLED", "Cancelled"),
     ]
@@ -249,6 +249,7 @@ class ServiceRequest(models.Model):
 
     latitude = models.DecimalField(max_digits=10, decimal_places=8)
     longitude = models.DecimalField(max_digits=10, decimal_places=8)
+    location_name = models.CharField(max_length=255, blank=True, null=True, help_text="Readable address for the incident location")
     customer_notes = models.TextField(blank=True, null=True)
     placement_details = models.JSONField(
         default=dict, blank=True, null=True, 
@@ -283,7 +284,54 @@ class ServiceQuote(models.Model):
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     valid_until = models.DateTimeField(help_text="Quote expiration time")
+    
+    # New fields for Final Fare logic
+    spare_parts_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    platform_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    is_final = models.BooleanField(default=False, help_text="True if this is the final fare after service")
+    spare_parts_details = models.JSONField(default=list, blank=True, help_text="List of spare parts used: [{'name': '...', 'price': 100}]")
+    
+    # Financial Breakup (Calculated on save/finalize)
+    provider_payout = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    expenses_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    platform_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def finalize_quote(self, spare_parts=None, platform_fee=Decimal("20.00"), tax_rate=Decimal("0.05")):
+        """
+        Finalizes the fare after service completion.
+        spare_parts: list of {'name': '...', 'price': 100}
+        """
+        if spare_parts:
+            self.spare_parts_details = spare_parts
+            self.spare_parts_total = sum(Decimal(str(p['price'])) for p in spare_parts)
+        
+        # Service Portion = Base + Distance
+        service_portion = self.base_price + self.distance_km * Decimal("15.00") # simplified for now
+        
+        self.platform_fee = platform_fee
+        # Tax on everything except spare parts? Or everything? Let's say everything.
+        subtotal = service_portion + self.spare_parts_total + self.platform_fee
+        self.tax_amount = (subtotal * tax_rate).quantize(Decimal("0.01"))
+        
+        self.dynamic_total = subtotal + self.tax_amount
+        
+        # Financial Breakup as per user suggestion:
+        # Provider gets 70% of service portion + 100% of spare parts
+        self.provider_payout = (service_portion * Decimal("0.70")) + self.spare_parts_total
+        # Expenses is 8% of service portion
+        self.expenses_amount = (service_portion * Decimal("0.08"))
+        # Platform profit is the rest (taxes + platform fee + remaining service portion)
+        self.platform_profit = self.dynamic_total - self.provider_payout - self.expenses_amount
+        
+        self.is_final = True
+        self.status = "PENDING" # Reset to pending for user approval of final bill
+        self.save()
+        
+        # Update Request Status
+        self.request.status = "FINAL_FARE_PENDING"
+        self.request.save()
 
     def __str__(self):
         return f"Quote for Request {self.request.id} - {self.status}"
@@ -338,6 +386,18 @@ class VehicleExchange(models.Model):
         verbose_name_plural = "Vehicle Exchanges"
         ordering = ["-created_at"]
 
+
+class SparePartStore(models.Model):
+    """Stores information about nearby spare part stores for providers to fetch."""
+    name = models.CharField(max_length=255)
+    location_name = models.CharField(max_length=255)
+    latitude = models.DecimalField(max_digits=10, decimal_places=8)
+    longitude = models.DecimalField(max_digits=10, decimal_places=8)
+    inventory = models.JSONField(default=dict, help_text="Available parts and prices: {'accelerator_wire': 349}")
+    contact_number = models.CharField(max_length=15, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 class VehiclePlacement(models.Model):
     """Request to move a vehicle to a specified location after service."""
@@ -594,6 +654,30 @@ class RewardsProgram(models.Model):
             return True
         return False
     
+    def reward_for_service(self, service_request):
+        """
+        Calculate and add reward points for a completed service.
+        Formula: (Base 10 + 1 per km) * Tier Multiplier
+        """
+        base_points = 10
+        distance_km = 0
+        
+        # Try to get distance from an accepted quote
+        quote = service_request.quotes.filter(status="ACCEPTED").first()
+        if quote:
+            distance_km = float(quote.distance_km)
+        
+        multipliers = {
+            'BRONZE': 1.0,
+            'SILVER': 1.5,
+            'GOLD': 2.0
+        }
+        multiplier = multipliers.get(self.tier, 1.0)
+        
+        points_to_add = int((base_points + distance_km) * multiplier)
+        self.add_points(points_to_add, f"Service #{service_request.id} ({service_request.service_type}) completed")
+        return points_to_add
+
     def update_tier(self):
         """Update user tier based on points."""
         if self.points >= 1500:

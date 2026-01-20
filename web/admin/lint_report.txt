@@ -1,9 +1,0 @@
-
-> admin@0.1.0 lint
-> next lint
-
-
-./app/dashboard/page.tsx
-121:8  Warning: React Hook useEffect has a missing dependency: 'loading'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-
-info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

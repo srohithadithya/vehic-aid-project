@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = async (credentials: any) => {
         try {
-            const response = await apiClient.post('/users/token/', credentials);
+            const response = await apiClient.post('/token/', credentials);
             const { access, refresh } = response.data;
 
             localStorage.setItem('provider_access_token', access);
