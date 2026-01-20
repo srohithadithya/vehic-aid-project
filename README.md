@@ -294,7 +294,7 @@ docker-compose up -d
 ### **Docker Deployment**
 | Service | Port | URL | Description |
 |---------|------|-----|-------------|
-| Backend API | 8000 | http://localhost:8000 | Django REST API |
+| Backend API | 8001 | http://localhost:8001 | Django REST API |
 | Admin Panel | 3000 | http://localhost:3000 | Web Admin Dashboard |
 | Provider App | 3001 | http://localhost:3001 | Web Provider Dashboard |
 | Booker App | 3003 | http://localhost:3003 | Web Customer Portal |
@@ -681,7 +681,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Development**: VehicAid Team
 - **Contact**: support@vehicaid.com
-- **Website**: https://vehicaid.com
+- **Website**: https://vehicaid.xxx
 
 ---
 
