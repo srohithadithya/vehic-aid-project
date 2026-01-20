@@ -37,7 +37,6 @@ VehicAid supports **ALL types of vehicles** with customized pricing and services
 - 🚙 **SUVs** - Sport Utility Vehicles, Crossovers
 - 🚐 **Vans** - Minivans, Cargo Vans, Passenger Vans
 - 🚛 **Trucks** - Light/Medium Commercial Vehicles
-- 🚌 **Heavy Vehicles** - Buses, Heavy Trucks, Construction Vehicles
 
 ### **Customer Features**
 - 🚗 Real-time service request booking (all vehicle types)
@@ -114,7 +113,6 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 | 🚙 **SUV** | Sport Utility Vehicles, Crossovers | ₹250 - ₹500 | ₹15/km |
 | 🚐 **Van** | Minivans, Cargo Vans, Passenger Vans | ₹300 - ₹600 | ₹18/km |
 | 🚛 **Truck** | Light/Medium Commercial Vehicles | ₹400 - ₹800 | ₹25/km |
-| 🚌 **Heavy Vehicle** | Buses, Heavy Trucks, Construction | ₹600 - ₹1,200 | ₹35/km |
 
 ### **Service Types (All Vehicles)**
 - 🚗 **Towing** - Emergency vehicle towing to nearest garage
@@ -127,7 +125,7 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 ### **Pricing Features**
 - ✅ **Dynamic Pricing** - Based on vehicle type and service
 - ✅ **Distance-Based** - Fair per-kilometer charges
-- ✅ **Subscription Discounts** - 15-25% off for members
+- ✅ **Subscription Discounts** - 10-30% off for members
 - ✅ **Transparent Pricing** - No hidden charges
 - ✅ **Peak Hour Surge** - Minimal 20% during rush hours
 - ✅ **Budget-Friendly** - Designed for Indian market
