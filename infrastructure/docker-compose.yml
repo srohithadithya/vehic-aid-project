@@ -87,11 +87,18 @@ services:
     build:
       context: ../web/admin
       dockerfile: Dockerfile
+      target: development
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_admin
     ports:
       - "3000:3000"
+    volumes:
+      - ../web/admin:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     env_file: .env
     depends_on:
       - backend
@@ -103,11 +110,18 @@ services:
     build:
       context: ../web/provider
       dockerfile: Dockerfile
+      target: development
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_provider
     ports:
       - "3001:3000"
+    volumes:
+      - ../web/provider:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     env_file: .env
     depends_on:
       - backend
@@ -119,11 +133,18 @@ services:
     build:
       context: ../web/booker
       dockerfile: Dockerfile
+      target: development
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: vehicaid_web_booker
     ports:
       - "3003:3000"
+    volumes:
+      - ../web/booker:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     env_file: .env
     depends_on:
       - backend

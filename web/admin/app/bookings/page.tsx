@@ -84,15 +84,17 @@ export default function BookingsPage() {
     const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
             case 'COMPLETED':
-                return 'default'; // green-ish usually if customized, or default black
+                return 'default';
             case 'PENDING_DISPATCH':
-                return 'secondary'; // yellow-ish usually
+                return 'secondary';
             case 'DISPATCHED':
                 return 'secondary';
             case 'ARRIVED':
-                return 'default';
+                return 'secondary';
             case 'SERVICE_IN_PROGRESS':
-                return 'default'; // blue-ish usually
+                return 'secondary';
+            case 'FINAL_FARE_PENDING':
+                return 'secondary';
             case 'CANCELLED':
                 return 'destructive';
             default:
@@ -172,8 +174,11 @@ export default function BookingsPage() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="ALL">All Status</SelectItem>
-                        <SelectItem value="PENDING">Pending</SelectItem>
-                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                        <SelectItem value="PENDING_DISPATCH">Pending Dispatch</SelectItem>
+                        <SelectItem value="DISPATCHED">Dispatched</SelectItem>
+                        <SelectItem value="ARRIVED">Arrived</SelectItem>
+                        <SelectItem value="SERVICE_IN_PROGRESS">In Progress</SelectItem>
+                        <SelectItem value="FINAL_FARE_PENDING">Pending Final Fare</SelectItem>
                         <SelectItem value="COMPLETED">Completed</SelectItem>
                         <SelectItem value="CANCELLED">Cancelled</SelectItem>
                     </SelectContent>

@@ -522,8 +522,8 @@ LOGGING = {
 
 ---
 
-**Next**: [Twilio SMS Setup Guide](./TWILIO_SETUP.md)
+**Next**: [Free SMS Setup Guide](./FREE_SMS_SETUP.md)
 
 ---
 
-*Last Updated: January 17, 2026*
+*Last Updated: January 20, 2026*

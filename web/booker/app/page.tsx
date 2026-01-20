@@ -7,6 +7,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Shield, Clock, MapPin, Phone, Star, Zap, Users, Award } from "lucide-react";
+import { apiClient } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -18,12 +20,32 @@ export default function Home() {
     { icon: Zap, title: "Fast Response", desc: "Average 15-min arrival time" },
   ];
 
-  const stats = [
-    { value: "50K+", label: "Happy Customers" },
-    { value: "1000+", label: "Verified Providers" },
+  const [stats, setStats] = useState([
+    { value: "12,500+", label: "Happy Customers" },
+    { value: "450+", label: "Verified Provider" },
     { value: "98%", label: "Satisfaction Rate" },
-    { value: "15 min", label: "Avg Response Time" },
-  ];
+    { value: "12 min", label: "Avg Response Time" },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await apiClient.get('/services/stats/public/');
+        const data = response.data;
+        if (data) {
+          setStats([
+            { value: data.customers, label: "Happy Customers" },
+            { value: data.providers, label: "Verified Provider" },
+            { value: data.satisfaction, label: "Satisfaction Rate" },
+            { value: data.response_time, label: "Avg Response Time" },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch public stats", error);
+      }
+    };
+    fetchStats();
+  }, []);
 
   return (
     <main className="min-h-screen bg-background overflow-hidden">

@@ -23,9 +23,9 @@ from apps.payments.models import Transaction
 
 User = get_user_model()
 
-print("🧹 Flushing database...")
-call_command('flush', interactive=False)
-print("✅ Database flushed.")
+# print("🧹 Flushing database...")
+# call_command('flush', interactive=False)
+# print("✅ Database flushed.")
 
 # ------------------------------------------------------------------
 # 1. Create Superuser
@@ -48,22 +48,27 @@ print("Created: admin/admin123")
 print("\nCreating Plans...")
 plans = {}
 plan_defs = [
-    ('FREE', 'Free Plan', 0, 3650, 'Standard access, Pay-per-use'),
-    ('BASIC', 'Basic Plan', 99, 30, 'Discounted towing, Priority'),
-    ('PREMIUM', 'Premium Plan', 199, 30, 'Free towing (50km), Helpline'),
-    ('ELITE', 'Elite Plan', 399, 30, 'Unlimited towing, VIP support, Exchange'),
+    ('FREE', 'Free Plan', 0, 3650, ["Pay-per-use", "Standard rates"]),
+    ('BASIC', 'Basic Plan', 99, 45, ["10% discount", "Priority support"]),
+    ('PREMIUM', 'Premium Plan', 199, 45, ["30% discount", "Free towing (10km)", "Helpline access", "Vehicle exchange (limited)"]),
+    ('ELITE', 'Elite Plan', 399, 45, ["Unlimited free service charges", "VIP support", "Full vehicle exchange"]),
 ]
 
 for code, name, price, days, feats in plan_defs:
-    plan = SubscriptionPlan.objects.create(
-        name=name,  # Use full name for 'name' field as per frontend expectation
-        price=Decimal(price),
-        duration_days=days,
-        features=[feats],
-        description=name
+    plan, created = SubscriptionPlan.objects.get_or_create(
+        name=name,
+        defaults={
+            'price': Decimal(price),
+            'duration_days': days,
+            'features': feats,
+            'description': name
+        }
     )
     plans[code] = plan
-    print(f"Plan Created: {name} (₹{price})")
+    if created:
+        print(f"Plan Created: {name} (₹{price})")
+    else:
+        print(f"Plan Exists: {name}")
 
 # ------------------------------------------------------------------
 # 3. Create Bookers (1 per plan)
@@ -78,31 +83,35 @@ booker_defs = [
 ]
 
 for i, (username, full_name, plan_code) in enumerate(booker_defs):
-    user = User.objects.create_user(
-        username=username,
-        email=f'{username}@test.com',
-        password='password123',
-        phone_number=f'+91900000000{i+1}',
-        first_name=full_name.split()[0],
-        last_name=full_name.split()[1],
-        is_service_booker=True
-    )
-    booker = ServiceBooker.objects.create(user=user)
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        print(f"User Exists: {username}")
+    else:
+        user = User.objects.create_user(
+            username=username,
+            email=f'{username}@test.com',
+            password='password123',
+            phone_number=f'+91900000000{i+1}',
+            first_name=full_name.split()[0],
+            last_name=full_name.split()[1],
+            is_service_booker=True
+        )
+    
+    booker, _ = ServiceBooker.objects.get_or_create(user=user)
     bookers.append(booker)
     
     # Subscription
     if plan_code != 'FREE':
-        UserSubscription.objects.create(
+        UserSubscription.objects.get_or_create(
             user=booker,
-            plan=plans[plan_code],
-            start_date=timezone.now().date(),
-            end_date=timezone.now().date() + timedelta(days=30),
-            is_active=True,
-            status='ACTIVE'
+            defaults={
+                'plan': plans[plan_code],
+                'start_date': timezone.now().date(),
+                'end_date': timezone.now().date() + timedelta(days=45),
+                'is_active': True,
+                'status': 'ACTIVE'
+            }
         )
-        print(f"User Created: {username} -> {plan_code}")
-    else:
-        print(f"User Created: {username} -> FREE (No Sub)")
 
 # ------------------------------------------------------------------
 # 4. Create Vehicles (7 vehicles covering all types)
@@ -122,20 +131,20 @@ vehicle_data = [
     ('Tata', 'Winger', 'VAN', 'MH01AB1005'),
     # Truck
     ('Ashok Leyland', 'Dost', 'TRUCK', 'MH01AB1006'),
-    # Heavy Vehicle
-    ('Tata', 'LPT 1613', 'HEAVY_VEHICLE', 'MH01AB1007'),
 ]
 
 for i, booker in enumerate(bookers):
     if i < len(vehicle_data):
         make, model, vtype, plate = vehicle_data[i]
-        v = Vehicle.objects.create(
-            owner=booker.user,
-            make=make,
-            model=model,
+        v, _ = Vehicle.objects.get_or_create(
             license_plate=plate,
-            fuel_type='DIESEL' if vtype in ['TRUCK', 'HEAVY_VEHICLE', 'VAN'] else 'PETROL',
-            vehicle_type=vtype
+            defaults={
+                'owner': booker.user,
+                'make': make,
+                'model': model,
+                'fuel_type': 'DIESEL' if vtype in ['TRUCK', 'VAN'] else 'PETROL',
+                'vehicle_type': vtype
+            }
         )
         vehicles.append(v)
         print(f"Vehicle: {v.license_plate} ({v.vehicle_type}) -> {booker.user.username}")
@@ -153,27 +162,34 @@ prov_defs = [
 ]
 
 for i, (username, name, service, role_id) in enumerate(prov_defs):
-    u = User.objects.create_user(
-        username=username,
-        email=f'{username}@test.com',
-        password='password123',
-        phone_number=f'+91910000000{i+1}',
-        first_name=name.split()[0],
-        last_name=name.split()[1],
-        is_service_provider=True
-    )
-    p = ServiceProvider.objects.create(
+    if User.objects.filter(username=username).exists():
+        u = User.objects.get(username=username)
+        print(f"Provider User Exists: {username}")
+    else:
+        u = User.objects.create_user(
+            username=username,
+            email=f'{username}@test.com',
+            password='password123',
+            phone_number=f'+91910000000{i+1}',
+            first_name=name.split()[0],
+            last_name=name.split()[1],
+            is_service_provider=True
+        )
+    p, created = ServiceProvider.objects.get_or_create(
         user=u,
-        is_verified=True,
-        is_available=True,
-        service_types=[service],
-        latitude=12.9716 + (i * 0.01),
-        longitude=77.5946 + (i * 0.01),
-        average_rating=4.5 + (i * 0.1),
-        jobs_completed=12 + (i * 5)
+        defaults={
+            'is_verified': True,
+            'is_available': True,
+            'service_types': [service],
+            'latitude': 12.9716 + (i * 0.01),
+            'longitude': 77.5946 + (i * 0.01),
+            'average_rating': 4.5 + (i * 0.1),
+            'jobs_completed': 12 + (i * 5)
+        }
     )
     providers.append(p)
-    print(f"Provider: {username} ({service})")
+    if created:
+        print(f"Provider Profile Created: {username}")
 
 # ------------------------------------------------------------------
 # 6. Create Service Requests (1 per Booker -> 1 Provider)
@@ -213,5 +229,44 @@ for i, (booker, vehicle, provider, service, status) in enumerate(req_defs):
             payment_method='UPI'
         )
         print("   -> Payment Created")
+
+# ------------------------------------------------------------------
+# 7. Create Spare Part Stores
+# ------------------------------------------------------------------
+print("\nCreating Spare Part Stores...")
+from apps.services.models import SparePartStore
+stores = [
+    ("City Auto Spares", "MG Road, Bangalore", 12.9716, 77.5946, {
+        "accelerator_wire": 349,
+        "clutch_cable": 249,
+        "brake_pads": 599,
+        "engine_oil_1l": 450
+    }),
+    ("Elite Motors Parts", "Indiranagar, Bangalore", 12.9784, 77.6408, {
+        "battery_7ah": 1200,
+        "spark_plug": 150,
+        "headlight_bulb": 200,
+        "tyre_tube_2w": 400
+    }),
+    ("Royal Truck Parts", "Peenya Industrial Area", 13.0329, 77.5273, {
+        "truck_filter": 899,
+        "wiper_blade_set": 450,
+        "coolant_5l": 1500,
+        "fan_belt": 650
+    })
+]
+
+for name, loc, lat, lng, inventory in stores:
+    SparePartStore.objects.get_or_create(
+        name=name,
+        defaults={
+            'location_name': loc,
+            'latitude': lat,
+            'longitude': lng,
+            'inventory': inventory,
+            'contact_number': "+919876543210"
+        }
+    )
+    print(f"Store: {name}")
 
 print("\n✅ SEEDING COMPLETE")

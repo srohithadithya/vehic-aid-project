@@ -1,423 +1,187 @@
-# VehicAid - Complete Deployment Guide
+# 🚀 VehicAid Deployment Guide
+
+This guide covers the deployment of the complete VehicAid platform using Docker and Kubernetes.
+
+---
 
 ## 📋 Table of Contents
 1. [Prerequisites](#prerequisites)
-2. [Environment Setup](#environment-setup)
-3. [Docker Deployment](#docker-deployment)
-4. [Development Setup](#development-setup)
-5. [Configuration](#configuration)
+2. [Ports & Endpoints](#ports--endpoints)
+3. [Docker Compose (Development)](#docker-compose-development)
+4. [Kubernetes (Production)](#kubernetes-production)
+5. [Environment Variables](#environment-variables)
 6. [Troubleshooting](#troubleshooting)
 
 ---
 
-## 🔧 Prerequisites
+## ⚡ Prerequisites
 
-### Required Software
-- **Docker Desktop** (Windows/Mac) or Docker Engine (Linux)
-- **Docker Compose** v2.0+
-- **Git** for version control
-- **Node.js** 18+ (for local development)
-- **Python** 3.11+ (for local development)
-
-### API Keys & Services
-- **Google Maps API Key** (Required for location features)
-  - Enable: Maps JavaScript API
-  - Enable: Geocoding API
-  - Get key from: https://console.cloud.google.com/
-
-- **Razorpay Account** (Optional - for payments)
-  - Sign up at: https://razorpay.com/
+- **Docker Desktop**: 4.0+
+- **Kubernetes (Minikube/EKS/GKE)**: 1.25+
+- **Helm**: 3.0+
+- **Git**: 2.30+
+- **RAM**: 8GB+ (Recommended)
 
 ---
 
-## 🌍 Environment Setup
+## 🔌 Ports & Endpoints
 
-### 1. Clone the Repository
+| Service | Internal Port | Host Port | URL |
+|---------|---------------|-----------|-----|
+| **Backend API** | 8000 | **8001** | http://localhost:8001/api/v1 |
+| **Admin Panel** | 3000 | **3000** | http://localhost:3000 |
+| **Provider App** | 3000 | **3001** | http://localhost:3001 |
+| **Booker App** | 3000 | **3003** | http://localhost:3003 |
+| **PostgreSQL** | 5432 | 5432 | localhost:5432 |
+| **Redis** | 6379 | 6379 | localhost:6379 |
+| **Prometheus** | 9090 | 9090 | http://localhost:9090 |
+| **Grafana** | 3000 | 3002 | http://localhost:3002 |
+
+---
+
+## 🐳 Docker Compose (Development)
+
+The easiest way to run VehicAid locally.
+
+### 1. Launch All Services
 ```bash
-git clone https://github.com/srohithadithya/vehic-aid-project.git
 cd vehic-aid-project
+./launch.ps1
 ```
-
-### 2. Configure Environment Variables
+*Or manually:*
 ```bash
 cd infrastructure
-cp .env.example .env
+docker-compose up -d --build
 ```
 
-### 3. Edit `.env` File
-Open `.env` and update the following **required** variables:
-
-```env
-# REQUIRED: Google Maps API Key
-GOOGLE_MAPS_API_KEY=your_actual_google_maps_api_key_here
-
-# Database (default values work for Docker)
-POSTGRES_DB=vehic_aid
-POSTGRES_USER=vehic_aid
-POSTGRES_PASSWORD=vehic_aid123
-
-# Django Secret (CHANGE IN PRODUCTION!)
-SECRET_KEY=your-super-secret-key-change-this-in-production
-
-# Debug Mode (False in production)
-DEBUG=True
-```
-
----
-
-## 🐳 Docker Deployment
-
-### Quick Start (All Services)
+### 2. Verify Services
 ```bash
-cd infrastructure
-docker-compose up --build -d
-```
-
-### Service URLs
-After deployment, access the applications at:
-
-| Service | URL | Port |
-|---------|-----|------|
-| **Admin Panel** | http://localhost:3000 | 3000 |
-| **Provider App** | http://localhost:3001 | 3001 |
-| **Booker App** | http://localhost:3003 | 3003 |
-| **Backend API** | http://localhost:8001 | 8001 |
-| **PostgreSQL** | localhost:5432 | 5432 |
-| **Redis** | localhost:6379 | 6379 |
-
-### Default Credentials
-- **Admin Username**: `admin_mobile`
-- **Admin Password**: `password123`
-
-### Verify Deployment
-```bash
-# Check all containers are running
 docker-compose ps
+```
+You should see 8 healthy containers:
+- `vehicaid_db`
+- `vehicaid_redis`
+- `vehicaid_backend`
+- `vehicaid_celery`
+- `vehicaid_celery_beat`
+- `vehicaid_web_admin`
+- `vehicaid_web_provider`
+- `vehicaid_web_booker`
 
-# View logs
-docker-compose logs -f
-
-# Check specific service
-docker-compose logs -f web-booker
+### 3. Apply Migrations & Seed Data
+```bash
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python seed_data.py
 ```
 
-### Stop Services
+### 4. Shut Down
 ```bash
 docker-compose down
-
-# Stop and remove volumes (clean slate)
+# For clean wipe:
 docker-compose down -v
 ```
 
 ---
 
-## 💻 Development Setup
+## ☸️ Kubernetes (Production)
 
-### Backend (Django)
+Deploy to a scalable cluster.
+
+### 1. Build & Push Images
 ```bash
-cd backend
+# Backend
+docker build -t your-registry/vehicaid-backend:latest ./backend
+docker push your-registry/vehicaid-backend:latest
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Setup database
-python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Run development server
-python manage.py runserver 8001
+# Web Apps
+docker build -t your-registry/vehicaid-web-admin:latest ./web/admin
+docker push your-registry/vehicaid-web-admin:latest
+# ... repeat for provider/booker
 ```
 
-### Web Admin Panel
+### 2. Apply Configs & Secrets
 ```bash
-cd web/admin
-
-# Install dependencies
-npm install
-
-# Create .env.local
-echo "NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1" > .env.local
-
-# Run development server
-npm run dev
+cd infrastructure/k8s
+kubectl apply -f secrets.yaml
 ```
 
-### Web Provider App
+### 3. Deploy Database & Redis
 ```bash
-cd web/provider
-
-# Install dependencies
-npm install
-
-# Create .env.local
-echo "NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1" > .env.local
-
-# Run development server
-npm run dev
+kubectl apply -f database-deployment.yaml
 ```
 
-### Web Booker App
+### 4. Deploy Backend
 ```bash
-cd web/booker
+kubectl apply -f backend-deployment.yaml
+```
 
-# Install dependencies
-npm install
+### 5. Deploy Web Apps
+```bash
+kubectl apply -f web-deployments.yaml
+```
 
-# Create .env.local
-cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
-EOF
-
-# Run development server
-npm run dev
+### 6. Verify Deployment
+```bash
+kubectl get pods
+kubectl get services
 ```
 
 ---
 
-## ⚙️ Configuration
+## 🔐 Environment Variables
 
-### Google Maps Setup
+### Core Variables (`.env`)
+```ini
+# Backend
+DEBUG=False
+SECRET_KEY=production_secret_key
+ALLOWED_HOSTS=api.vehicaid.com
+CORS_ALLOWED_ORIGINS=https://admin.vehicaid.com,https://app.vehicaid.com
 
-1. **Go to Google Cloud Console**
-   - Visit: https://console.cloud.google.com/
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/db
 
-2. **Create a New Project** (or select existing)
+# Redis
+REDIS_URL=redis://host:6379/1
+CELERY_BROKER_URL=redis://host:6379/0
 
-3. **Enable Required APIs**
-   - Maps JavaScript API
-   - Geocoding API
+# External Keys
+GOOGLE_MAPS_API_KEY=AIza...
+RAZORPAY_KEY_ID=rzp_...
+SMS_PROVIDER=textlocal
+EMAIL_HOST_USER=support@vehicaid.com
+fireBASE_CREDENTIALS_PATH=/secrets/firebase.json
+```
 
-4. **Create API Key**
-   - Navigate to: APIs & Services > Credentials
-   - Click: Create Credentials > API Key
-   - Copy the key
-
-5. **Restrict API Key** (Recommended)
-   - Application restrictions: HTTP referrers
-   - Add: `http://localhost:3003/*`
-   - API restrictions: Select Maps JavaScript API and Geocoding API
-
-6. **Add to Environment**
-   ```env
-   GOOGLE_MAPS_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-   ```
-
-### Payment Gateway Setup (Optional)
-
-#### Razorpay
-1. Sign up at https://razorpay.com/
-2. Get API keys from Dashboard
-3. Add to `.env`:
-   ```env
-   RAZORPAY_KEY_ID=rzp_test_XXXXXXXXXXXX
-   RAZORPAY_KEY_SECRET=XXXXXXXXXXXXXXXXXXXX
-   ```
-
-### Email Configuration (Optional)
-
-For Gmail:
-```env
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=your_email@gmail.com
-EMAIL_HOST_PASSWORD=your_app_password
-EMAIL_USE_TLS=True
+### Web App Variables (`.env.local`)
+```ini
+NEXT_PUBLIC_API_URL=https://api.vehicaid.com/api/v1
+NEXT_PUBLIC_WS_URL=wss://api.vehicaid.com/ws
 ```
 
 ---
 
-## 🔍 Troubleshooting
+## 🛠️ Troubleshooting
 
-### Docker Issues
+### 1. Backend not reachable on 8001
+- Check if port 8001 is already in use.
+- Ensure `docker-compose` mapped paths correctly: `8001:8000`.
+- Logs: `docker-compose logs -f backend`
 
-**Problem**: Containers won't start
-```bash
-# Check logs
-docker-compose logs
+### 2. "Module not found" errors
+- Rebuild containers: `docker-compose up -d --build`
+- Check `requirements.txt` consistency.
 
-# Rebuild from scratch
-docker-compose down -v
-docker-compose build --no-cache
-docker-compose up -d
-```
+### 3. Database connection failure
+- Ensure Postgres container is healthy.
+- Check `DATABASE_URL` in `.env`.
+- Wait for DB to initialize (up to 30s on first run).
 
-**Problem**: Port already in use
-```bash
-# Find process using port (Windows)
-netstat -ano | findstr :3000
-
-# Kill process
-taskkill /PID <PID> /F
-
-# Or change port in docker-compose.yml
-```
-
-### Database Issues
-
-**Problem**: Database connection refused
-```bash
-# Check if PostgreSQL is running
-docker-compose ps db
-
-# Restart database
-docker-compose restart db
-
-# Check database logs
-docker-compose logs db
-```
-
-**Problem**: Migrations not applied
-```bash
-# Run migrations manually
-docker-compose exec web python manage.py migrate
-
-# Or rebuild web container
-docker-compose up --build web
-```
-
-### Frontend Issues
-
-**Problem**: API connection errors
-- Check `NEXT_PUBLIC_API_URL` in `.env.local`
-- Verify backend is running: http://localhost:8001
-- Check browser console for CORS errors
-
-**Problem**: Google Maps not loading
-- Verify API key is correct
-- Check browser console for errors
-- Ensure APIs are enabled in Google Cloud Console
-
-**Problem**: Build errors
-```bash
-# Clear Next.js cache
-rm -rf .next
-npm run build
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### WebSocket Issues
-
-**Problem**: Real-time updates not working
-- Check WebSocket connection in browser DevTools (Network tab)
-- Verify Redis is running: `docker-compose ps redis`
-- Check backend logs for Channels errors
+### 4. WebSocket connection failed
+- Ensure `daphne` or `uvicorn` is running (default in Dockerfile).
+- Check Redis connection for Channel layers.
 
 ---
 
-## 📊 Monitoring
-
-### View Logs
-```bash
-# All services
-docker-compose logs -f
-
-# Specific service
-docker-compose logs -f web
-docker-compose logs -f celery
-docker-compose logs -f web-booker
-```
-
-### Database Access
-```bash
-# Connect to PostgreSQL
-docker-compose exec db psql -U vehic_aid -d vehic_aid
-
-# Common queries
-SELECT * FROM auth_user;
-SELECT * FROM services_servicerequest;
-```
-
-### Redis Access
-```bash
-# Connect to Redis
-docker-compose exec redis redis-cli
-
-# Check keys
-KEYS *
-
-# Monitor commands
-MONITOR
-```
-
----
-
-## 🚀 Production Deployment
-
-### Security Checklist
-- [ ] Change `SECRET_KEY` to a strong random value
-- [ ] Set `DEBUG=False`
-- [ ] Update `ALLOWED_HOSTS` with your domain
-- [ ] Configure HTTPS/SSL certificates
-- [ ] Restrict Google Maps API key to your domain
-- [ ] Use strong database passwords
-- [ ] Enable firewall rules
-- [ ] Set up backup strategy
-- [ ] Configure monitoring (Sentry, etc.)
-
-### Performance Optimization
-- [ ] Enable Redis caching
-- [ ] Configure CDN for static files
-- [ ] Set up load balancer
-- [ ] Optimize database queries
-- [ ] Enable Gzip compression
-- [ ] Configure proper logging
-
----
-
-## 📞 Support
-
-For issues or questions:
-- **GitHub Issues**: https://github.com/srohithadithya/vehic-aid-project/issues
-- **Documentation**: Check `docs/` folder
-- **Logs**: Always check `docker-compose logs` first
-
----
-
-## 🎯 Quick Reference
-
-### Common Commands
-```bash
-# Start all services
-docker-compose up -d
-
-# Stop all services
-docker-compose down
-
-# Rebuild specific service
-docker-compose up --build web-booker
-
-# View logs
-docker-compose logs -f
-
-# Execute command in container
-docker-compose exec web python manage.py shell
-
-# Database backup
-docker-compose exec db pg_dump -U vehic_aid vehic_aid > backup.sql
-
-# Database restore
-docker-compose exec -T db psql -U vehic_aid vehic_aid < backup.sql
-```
-
-### Port Reference
-- `3000` - Admin Panel
-- `3001` - Provider App
-- `3003` - Booker App
-- `8001` - Backend API
-- `5432` - PostgreSQL
-- `6379` - Redis
-
----
-
-**Last Updated**: January 2026
-**Version**: 2.0.0
+**Last Updated**: January 20, 2026  
+**Version**: 2.6.0

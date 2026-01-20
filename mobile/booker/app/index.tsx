@@ -1,50 +1,47 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
-import { useRouter, Redirect } from 'expo-router';
-import { useAuthStore } from '../store/authStore';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
-export default function Landing() {
-    const { token, isLoading, checkAuth } = useAuthStore();
+export default function Index() {
     const router = useRouter();
 
-    useEffect(() => {
-        checkAuth();
-    }, []);
-
-    if (isLoading) return null;
-
-    if (token) {
-        return <Redirect href="/(tabs)" />;
-    }
+    // Temporary auto-navigation for testing auth flow
+    // useEffect(() => {
+    //   setTimeout(() => router.push('/(auth)/login'), 2000);
+    // }, []);
 
     return (
-        <SafeAreaView className="flex-1 bg-white items-center justify-between p-6">
-            <View className="items-center mt-20">
-                <View className="w-24 h-24 bg-blue-600 rounded-3xl items-center justify-center mb-6 shadow-xl shadow-blue-200">
-                    <Text className="text-white text-5xl font-extrabold italic">V</Text>
+        <View className="flex-1 bg-background items-center justify-center p-6">
+            <Animated.View entering={FadeIn.duration(1000)} className="items-center mb-12">
+                <View className="mb-6 w-32 h-32 items-center justify-center">
+                    <Image
+                        source={require('../logo_booker.png')}
+                        className="w-full h-full rounded-2xl"
+                        resizeMode="contain"
+                    />
                 </View>
-                <Text className="text-4xl font-bold text-gray-900 text-center">Vehic-Aid</Text>
-                <Text className="text-lg text-gray-500 text-center mt-2">
-                    India's #1 Roadside Assistance
+                <Text className="text-5xl font-black text-foreground mb-2">Vehic<Text className="text-primary">Aid</Text></Text>
+                <Text className="text-slate-400 text-center text-lg px-8">
+                    Smart Roadside Assistance at your fingertips.
                 </Text>
-            </View>
+            </Animated.View>
 
-            <View className="w-full space-y-4 mb-10">
+            <Animated.View entering={FadeInDown.delay(500).duration(800)} className="w-full space-y-4">
                 <TouchableOpacity
-                    className="bg-blue-600 w-full py-4 rounded-xl items-center shadow-lg shadow-blue-200"
-                    onPress={() => router.push('/(auth)/login')}
+                    className="w-full bg-primary py-4 rounded-2xl items-center shadow-lg shadow-primary/30 active:opacity-90 transition-all mb-4"
+                    onPress={() => router.push('/auth/login')}
                 >
-                    <Text className="text-white font-bold text-lg">Login</Text>
+                    <Text className="text-black font-bold text-lg">Login</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    className="bg-white border-2 border-gray-100 w-full py-4 rounded-xl items-center"
-                    onPress={() => router.push('/(auth)/signup')}
+                    className="w-full bg-surface border border-border py-4 rounded-2xl items-center active:bg-border/50 transition-all"
+                    onPress={() => router.push('/auth/signup')}
                 >
-                    <Text className="text-gray-900 font-bold text-lg">Create Account</Text>
+                    <Text className="text-foreground font-semibold text-lg">Sign Up</Text>
                 </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+            </Animated.View>
+        </View>
     );
 }

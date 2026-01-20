@@ -56,7 +56,7 @@ export default function ProviderDashboard() {
             // Fetch jobs assigned to this provider (Active Jobs)
             const activeResponse = await apiClient.get('/services/provider/jobs/');
             const assignedJobs: ServiceRequest[] = activeResponse.data;
-            setActiveJobs(assignedJobs.filter(r => r.status === 'DISPATCHED' || r.status === 'IN_PROGRESS'));
+            setActiveJobs(assignedJobs.filter(r => ['DISPATCHED', 'ARRIVED', 'SERVICE_IN_PROGRESS', 'FINAL_FARE_PENDING'].includes(r.status)));
 
             // Fetch jobs available for pickup (Available Jobs)
             const availableResponse = await apiClient.get('/services/provider/jobs/available/');

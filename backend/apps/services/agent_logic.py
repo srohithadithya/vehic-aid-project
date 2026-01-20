@@ -26,12 +26,16 @@ class BookingAgent:
         # 1. Eligibility Check (Subscription/Balance)
         subscription = UserSubscription.objects.filter(user__user=self.user, is_active=True).first()
         
-        # 2. Create Service Request
+        # 2. AI Automation: Triage analysis
+        triage = self.ai_triage.analyze_request(service_data.get('description', ''))
+        
+        # 3. Create Service Request
         service_request = ServiceRequest.objects.create(
             booker=self.user,
             latitude=service_data.get('latitude'),
             longitude=service_data.get('longitude'),
-            service_type=service_data.get('service_type'),
+            service_type=triage['suggested_type'], # Automated categorization
+            priority=triage['suggested_priority'], # Automated prioritization
             customer_notes=service_data.get('description', ''),
             source="AGENTIC_SERVICE"
         )

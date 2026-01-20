@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { LucideActivity, LucideBot, User, LucideLayoutDashboard, Bell, CreditCard, Settings, LogOut } from "lucide-react";
+import { LucideActivity, LucideBot, User, LucideLayoutDashboard, Bell, CreditCard, Settings, LogOut, BrainCircuit } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import {
     DropdownMenu,
@@ -37,9 +37,9 @@ export function Navbar() {
                         <LucideActivity size={16} />
                         <span>{t('nav.health')}</span>
                     </Link>
-                    <Link href="/support" className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors">
-                        <LucideBot size={16} />
-                        <span>{t('nav.support')}</span>
+                    <Link href="/automind" className="flex items-center space-x-1 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                        <BrainCircuit size={16} className="text-purple-600" />
+                        <span>AutoMind</span>
                     </Link>
                     <Link href="/subscription" className="text-sm font-medium hover:text-primary transition-colors">{t('nav.sub')}</Link>
                     <Link href="/dashboard" className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors">
@@ -69,6 +69,14 @@ export function Navbar() {
                                 <DropdownMenuItem onClick={() => router.push('/billing')}>
                                     <CreditCard className="mr-2 h-4 w-4" />
                                     <span>Billing</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push('/wallet')}>
+                                    <CreditCard className="mr-2 h-4 w-4" />
+                                    <span>Wallet</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push('/rewards')}>
+                                    <LucideBot className="mr-2 h-4 w-4" /> {/* Using Bot icon as placeholder for Reward, or Star */}
+                                    <span>Rewards</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push('/settings')}>
                                     <Settings className="mr-2 h-4 w-4" />

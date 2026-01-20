@@ -31,6 +31,7 @@ else:
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")  # This will now successfully load from the .env file
+GROQ_API_KEY = env("GROQ_API_KEY", default=None)
 
 # Core Applications
 INSTALLED_APPS = [
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
     "drf_spectacular", # Swagger API Documentation
     "parler", # Django Parler (Multi-language)
     # "csp", # Content Security Policy
-    "auditlog",  # New: For detailed audit logging
+    # "auditlog",  # New: For detailed audit logging
     # Custom Vehic-Aid Apps
     "apps.users",
     "apps.services",
@@ -76,7 +77,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "vehic_aid_backend.middleware.plan_access.PlanAccessMiddleware",
-    "auditlog.middleware.AuditlogMiddleware",
+    # "auditlog.middleware.AuditlogMiddleware",
     # "csp.middleware.CSPMiddleware", # Added CSP Middleware
 ]
 
@@ -374,6 +375,16 @@ EMAIL_TIMEOUT = 10  # seconds
 # SMS Configuration
 SMS_PROVIDER = env('SMS_PROVIDER', default='fast2sms')
 FAST2SMS_API_KEY = env('FAST2SMS_API_KEY', default='')
+SMS_API_KEY = FAST2SMS_API_KEY # Alias for Service usage
+
+# Google Maps Configuration
+GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY", default="")
+
+# Razorpay Webhook Configuration
+RAZORPAY_WEBHOOK_SECRET = env("RAZORPAY_WEBHOOK_SECRET", default="test_secret")
+
+# Firebase/Push Notification Configuration
+FIREBASE_CONFIG = env.json("FIREBASE_CONFIG", default={})
 
 # Import logging configuration
 from .logging_config import LOGGING

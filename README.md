@@ -1,4 +1,4 @@
-# 🚗 VehicAid - AI-Powered Roadside Assistance Platform
+# 🚗 VehicAid - Groq-Powered AI Roadside Assistance
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
@@ -48,7 +48,11 @@ VehicAid supports **ALL types of vehicles** with customized pricing and services
 - 📊 Service history & invoices
 - 🚙 Vehicle management (add multiple vehicles)
 - 📦 Subscription plans (Basic, Premium, Pro)
+- 📊 Service history & invoices
+- 🚙 Vehicle management (add multiple vehicles)
+- 📦 Subscription plans (Basic, Premium, Pro)
 - 💰 Dynamic pricing based on vehicle type
+- 📈 **NEW: Real-time Platform Stats** on Landing Page
 
 ### **Provider Features**
 - 📋 Service request dashboard
@@ -161,7 +165,7 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 #### 1. Vehic-Aid (User App)
 **Path**: `mobile/booker`
 - **Features**: 
-  - 🤖 **AI Booking Agent**: Diagnose issues via chat
+  - 🧠 **AutoMind Intelligence**: Groq-powered conversational diagnostics and booking
   - 🗺️ **Real-time Tracking**: Live status & map updates
   - 💬 **In-App Chat**: Talk to providers directly
   - 💳 **Payments & Subs**: Razorpay integration
@@ -701,5 +705,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by the VehicAid Team**
 
-**Version**: 2.0.0  
-**Last Updated**: January 17, 2026
+**Version**: 2.6.0  
+**Last Updated**: January 20, 2026

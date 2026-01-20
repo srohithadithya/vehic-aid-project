@@ -1,4 +1,3 @@
-# at top of file
 import logging
 import os
 import requests
@@ -8,10 +7,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-# ... (inside PricingService.calculate_distance) ...
-        except Exception as e:
-            logger.error(f"Error calculating distance: {e}")
-            return Decimal("10.0"), 30
+class PricingService:
     """
     Budget-friendly pricing service for Indian market.
     Tiered pricing based on vehicle type and service complexity.
@@ -34,88 +30,92 @@ logger = logging.getLogger(__name__)
         
         # Budget-friendly base pricing per service type (in INR)
         # Designed for lower-middle to upper-middle class affordability
+        # Updated as per COMPLETE_DOCUMENTATION.md
         self.base_prices = {
             # Two-wheeler pricing (most affordable)
             "TWO_WHEELER": {
-                "TOWING": Decimal("150.00"),
-                "JUMPSTART": Decimal("80.00"),
-                "TIRE_CHANGE": Decimal("100.00"),
-                "FUEL_DELIVERY": Decimal("70.00"),
-                "LOCKOUT": Decimal("120.00"),
-                "GENERAL": Decimal("100.00"),
+                "TOWING": Decimal("199.00"),
+                "FLATBED_TOWING": Decimal("349.00"),
+                "MECHANIC": Decimal("99.00"),
+                "FUEL_DELIVERY": Decimal("49.00"),
+                "BATTERY_JUMP": Decimal("149.00"),
+                "LOCKOUT": Decimal("149.00"),
+                "TIRE_CHANGE": Decimal("99.00"),
+                "GENERAL": Decimal("99.00"),
             },
-            # Three-wheeler (Auto Rickshaw) - slightly higher than two-wheeler
+            # Three-wheeler (Auto Rickshaw)
             "THREE_WHEELER": {
-                "TOWING": Decimal("200.00"),
-                "JUMPSTART": Decimal("100.00"),
-                "TIRE_CHANGE": Decimal("120.00"),
-                "FUEL_DELIVERY": Decimal("90.00"),
-                "LOCKOUT": Decimal("150.00"),
-                "GENERAL": Decimal("130.00"),
+                "TOWING": Decimal("249.00"),
+                "FLATBED_TOWING": Decimal("449.00"),
+                "MECHANIC": Decimal("149.00"),
+                "FUEL_DELIVERY": Decimal("49.00"),
+                "BATTERY_JUMP": Decimal("199.00"),
+                "LOCKOUT": Decimal("199.00"),
+                "TIRE_CHANGE": Decimal("199.00"),
+                "GENERAL": Decimal("149.00"),
             },
-            # Four-wheeler (sedan/hatchback) - mid-range
+            # Four-wheeler (sedan/hatchback)
             "FOUR_WHEELER": {
-                "TOWING": Decimal("300.00"),
-                "JUMPSTART": Decimal("150.00"),
-                "TIRE_CHANGE": Decimal("200.00"),
-                "FUEL_DELIVERY": Decimal("150.00"),
-                "LOCKOUT": Decimal("250.00"),
-                "GENERAL": Decimal("250.00"),
+                "TOWING": Decimal("249.00"),
+                "FLATBED_TOWING": Decimal("449.00"),
+                "MECHANIC": Decimal("349.00"),
+                "FUEL_DELIVERY": Decimal("49.00"),
+                "BATTERY_JUMP": Decimal("249.00"),
+                "LOCKOUT": Decimal("299.00"),
+                "TIRE_CHANGE": Decimal("249.00"),
+                "GENERAL": Decimal("249.00"),
             },
-            # SUV - premium pricing
+            # SUV
             "SUV": {
-                "TOWING": Decimal("500.00"),
-                "JUMPSTART": Decimal("250.00"),
-                "TIRE_CHANGE": Decimal("350.00"),
-                "FUEL_DELIVERY": Decimal("250.00"),
-                "LOCKOUT": Decimal("400.00"),
-                "GENERAL": Decimal("400.00"),
+                "TOWING": Decimal("299.00"),
+                "FLATBED_TOWING": Decimal("499.00"),
+                "MECHANIC": Decimal("349.00"),
+                "FUEL_DELIVERY": Decimal("49.00"),
+                "BATTERY_JUMP": Decimal("249.00"),
+                "LOCKOUT": Decimal("299.00"),
+                "TIRE_CHANGE": Decimal("249.00"),
+                "GENERAL": Decimal("249.00"),
             },
-            # Van - commercial vehicle pricing
+            # Van
             "VAN": {
-                "TOWING": Decimal("600.00"),
-                "JUMPSTART": Decimal("300.00"),
-                "TIRE_CHANGE": Decimal("400.00"),
-                "FUEL_DELIVERY": Decimal("300.00"),
-                "LOCKOUT": Decimal("450.00"),
-                "GENERAL": Decimal("450.00"),
+                "TOWING": Decimal("349.00"),
+                "FLATBED_TOWING": Decimal("499.00"),
+                "MECHANIC": Decimal("399.00"),
+                "FUEL_DELIVERY": Decimal("49.00"),
+                "BATTERY_JUMP": Decimal("299.00"),
+                "LOCKOUT": Decimal("299.00"),
+                "TIRE_CHANGE": Decimal("249.00"),
+                "GENERAL": Decimal("249.00"),
             },
-            # Truck - light/medium commercial
+            # Truck
             "TRUCK": {
-                "TOWING": Decimal("800.00"),
-                "JUMPSTART": Decimal("400.00"),
-                "TIRE_CHANGE": Decimal("500.00"),
-                "FUEL_DELIVERY": Decimal("400.00"),
-                "LOCKOUT": Decimal("550.00"),
-                "GENERAL": Decimal("600.00"),
-            },
-            # Heavy Vehicle - highest pricing
-            "HEAVY_VEHICLE": {
-                "TOWING": Decimal("1200.00"),
-                "JUMPSTART": Decimal("600.00"),
-                "TIRE_CHANGE": Decimal("800.00"),
-                "FUEL_DELIVERY": Decimal("600.00"),
-                "LOCKOUT": Decimal("800.00"),
-                "GENERAL": Decimal("1000.00"),
+                "TOWING": Decimal("499.00"),
+                "FLATBED_TOWING": Decimal("699.00"),
+                "MECHANIC": Decimal("399.00"),
+                "FUEL_DELIVERY": Decimal("69.00"),
+                "BATTERY_JUMP": Decimal("349.00"),
+                "LOCKOUT": Decimal("299.00"),
+                "TIRE_CHANGE": Decimal("299.00"),
+                "GENERAL": Decimal("299.00"),
             },
         }
         
         # Affordable per km rates (in INR)
         self.per_km_rates = {
-            "TWO_WHEELER": Decimal("5.00"),
-            "THREE_WHEELER": Decimal("6.00"),
-            "FOUR_WHEELER": Decimal("10.00"),
-            "SUV": Decimal("15.00"),
-            "VAN": Decimal("18.00"),
-            "TRUCK": Decimal("25.00"),
-            "HEAVY_VEHICLE": Decimal("35.00"),
+            "TWO_WHEELER": Decimal("15.00"),
+            "THREE_WHEELER": Decimal("20.00"),
+            "FOUR_WHEELER": Decimal("25.00"),
+            "SUV": Decimal("30.00"),
+            "VAN": Decimal("40.00"),
+            "TRUCK": Decimal("40.00"),
         }
         
         # Subscription discounts (encouraging subscriptions)
         self.plan_discounts = {
             "FREE": Decimal("0.00"),
-            "STANDARD": Decimal("0.15"),  # 15% discount
-            "PREMIUM": Decimal("0.25"),   # 25% discount
+            "BASIC": Decimal("0.10"),    # 10% discount
+            "PREMIUM": Decimal("0.30"),  # 30% discount
+            "ELITE": Decimal("1.00"),    # 100% discount
         }
         
         # Time-based surge pricing (minimal, only for peak hours)

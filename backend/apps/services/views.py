@@ -26,6 +26,7 @@ from .models import (
     HelplineCall,
     ServiceQuote,
     ChatMessage,
+    SparePartStore,
 )
 from .serializers import (
     ServiceRequestSerializer,
@@ -38,10 +39,10 @@ from .serializers import (
 
 
 
-class AgenticBookingView(APIView):
+class AutoMindView(APIView):
     """
-    Exposes the smart BookingAgent coordinator via a single endpoint.
-    Ideal for 'One-Click' booking from mobile/IoT.
+    AutoMind: Consolidated intelligence endpoint.
+    Handles conversational triage and agentic booking.
     """
     permission_classes = [IsAuthenticated]
 
@@ -503,7 +504,35 @@ class ServiceQuoteViewSet(viewsets.ReadOnlyModelViewSet):
          user = self.request.user
          if hasattr(user, 'servicebooker'):
              return ServiceQuote.objects.filter(request__booker=user.servicebooker)
+         if hasattr(user, 'serviceprovider'):
+             return ServiceQuote.objects.filter(request__provider=user)
          return ServiceQuote.objects.none()
+
+    @action(detail=True, methods=['post'], url_path='finalize')
+    def finalize_fare(self, request, pk=None):
+        """Allows provider to finalize the fare with spare parts."""
+        quote = self.get_object()
+        
+        # Security: Only the assigned provider can finalize
+        if request.user != quote.request.provider:
+            return Response({"error": "Only the assigned provider can finalize the fare."}, status=status.HTTP_403_FORBIDDEN)
+            
+        spare_parts = request.data.get('spare_parts', []) # list of {'name': '...', 'price': 100}
+        platform_fee = Decimal(str(request.data.get('platform_fee', 25.00)))
+        
+        try:
+            quote.finalize_quote(spare_parts=spare_parts, platform_fee=platform_fee)
+            return Response({
+                "status": "Quote finalized.",
+                "total": quote.dynamic_total,
+                "breakup": {
+                    "provider_payout": quote.provider_payout,
+                    "platform_profit": quote.platform_profit,
+                    "expenses": quote.expenses_amount
+                }
+            })
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'], url_path='accept')
     def accept_quote(self, request, pk=None):
@@ -514,10 +543,22 @@ class ServiceQuoteViewSet(viewsets.ReadOnlyModelViewSet):
         quote.status = 'ACCEPTED'
         quote.save()
         
-        # Logic to proceed with service (e.g., notify provider)
-        # In a real system, this might trigger a payment intent creation
+        # If this was the final fare, complete the request and award points
+        if quote.is_final:
+            request_obj = quote.request
+            request_obj.status = 'COMPLETED'
+            request_obj.save()
+            
+            # Award points
+            try:
+                from .models import RewardsProgram
+                booker = request_obj.booker.servicebooker
+                rewards, _ = RewardsProgram.objects.get_or_create(user=booker)
+                rewards.reward_for_service(request_obj)
+            except Exception as e:
+                print(f"Failed to award points: {e}")
         
-        return Response({"status": "Quote accepted. Service will proceed.", "dynamic_total": quote.dynamic_total})
+        return Response({"status": "Quote accepted.", "dynamic_total": quote.dynamic_total})
 
     @action(detail=True, methods=['post'], url_path='reject')
     def reject_quote(self, request, pk=None):
@@ -536,16 +577,25 @@ class ServiceQuoteViewSet(viewsets.ReadOnlyModelViewSet):
 class WalletViewSet(viewsets.ViewSet):
     """Wallet management endpoints."""
     permission_classes = [IsAuthenticated]
+    from .models import Wallet
+    queryset = Wallet.objects.all()
     
-    def retrieve(self, request, pk=None):
-        """Get wallet balance and details."""
+    def list(self, request):
+        """Get current user's wallet balance and details."""
         from .models import Wallet
         from .serializers import WalletSerializer
         
+        # Check if user has a booker profile
+        if not hasattr(request.user, 'servicebooker'):
+            return Response({"error": "Only service bookers have wallets."}, status=status.HTTP_403_FORBIDDEN)
+            
         wallet, created = Wallet.objects.get_or_create(user=request.user.servicebooker)
         serializer = WalletSerializer(wallet)
         return Response(serializer.data)
-    
+
+    def retrieve(self, request, pk=None):
+        pass
+
     @action(detail=False, methods=['post'], url_path='add-money')
     def add_money(self, request):
         """Add money to wallet."""
@@ -582,19 +632,27 @@ class WalletViewSet(viewsets.ViewSet):
 class RewardsViewSet(viewsets.ViewSet):
     """Rewards program endpoints."""
     permission_classes = [IsAuthenticated]
+    from .models import RewardsProgram
+    queryset = RewardsProgram.objects.all()
     
-    def retrieve(self, request, pk=None):
-        """Get rewards program details."""
+    def list(self, request):
+        """Get current user's rewards program details."""
         from .models import RewardsProgram
         from .serializers import RewardsProgramSerializer
         
+        if not hasattr(request.user, 'servicebooker'):
+            return Response({"error": "Only service bookers participate in rewards."}, status=status.HTTP_403_FORBIDDEN)
+
         rewards, created = RewardsProgram.objects.get_or_create(user=request.user.servicebooker)
         if created:
             rewards.generate_referral_code()
         
         serializer = RewardsProgramSerializer(rewards)
         return Response(serializer.data)
-    
+
+    def retrieve(self, request, pk=None):
+        pass
+
     @action(detail=False, methods=['post'], url_path='redeem')
     def redeem_points(self, request):
         """Redeem reward points for wallet cash."""
@@ -879,4 +937,70 @@ class ProviderLocationUpdateView(APIView):
         provider.save()
         
         return Response({"status": "Location updated successfully."})
+
+
+class VehiclePlacementViewSet(viewsets.ModelViewSet):
+    """Endpoints for vehicle placement requests (moving vehicle after service)."""
+    permission_classes = [IsAuthenticated]
+    from .models import VehiclePlacement
+    queryset = VehiclePlacement.objects.all()
+    
+    def get_serializer_class(self):
+        from .serializers import VehiclePlacementSerializer
+        return VehiclePlacementSerializer
+        
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'servicebooker'):
+            return VehiclePlacement.objects.filter(request__booker=user.servicebooker)
+        return VehiclePlacement.objects.all()
+        
+    def perform_create(self, serializer):
+        serializer.save()
+
+def haversine(lat1, lon1, lat2, lon2):
+    import math
+    # Radius of the Earth in km
+    R = 6371.0
+    
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = R * c
+    return distance
+
+class SparePartStoreViewSet(viewsets.ReadOnlyModelViewSet):
+    """Endpoints for providers to fetch nearby spare part stores."""
+    permission_classes = [IsAuthenticated]
+    queryset = SparePartStore.objects.all()
+    
+    def get_serializer_class(self):
+        from .serializers import SparePartStoreSerializer
+        return SparePartStoreSerializer
+
+    @action(detail=False, methods=['get'], url_path='nearby')
+    def nearby_stores(self, request):
+        lat = request.query_params.get('lat')
+        lng = request.query_params.get('lng')
+        
+        try:
+            lat = float(lat)
+            lng = float(lng)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid coordinates."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        stores = SparePartStore.objects.all()
+        nearby = []
+        
+        for store in stores:
+            dist = haversine(lat, lng, float(store.latitude), float(store.longitude))
+            if dist <= 20: # 20km radius
+                data = self.get_serializer(store).data
+                data['distance_km'] = round(dist, 2)
+                nearby.append(data)
+                
+        # Sort by distance
+        nearby.sort(key=lambda x: x['distance_km'])
+        return Response(nearby)
 

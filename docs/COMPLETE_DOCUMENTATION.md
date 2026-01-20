@@ -10,7 +10,9 @@
 7. [Features & Capabilities](#features--capabilities)
 8. [Database Schema](#database-schema)
 9. [Deployment Guide](#deployment-guide)
+9. [Deployment Guide](#deployment-guide)
 10. [Future Roadmap](#future-roadmap)
+11. [Public Stats](#public-stats)
 
 ---
 
@@ -21,7 +23,7 @@
 **VehicAid** is India's most comprehensive roadside assistance platform that connects vehicle owners (Bookers) with verified service providers in real-time. The platform leverages AI-powered triage, dynamic pricing, and IoT integration to deliver rapid, affordable, and reliable roadside assistance across all vehicle types.
 
 ### Mission Statement
-To democratize roadside assistance in India by making it accessible, affordable, and efficient for all vehicle owners, from two-wheelers to heavy commercial vehicles.
+To democratize roadside assistance in India by making it accessible, affordable, and efficient for all vehicle owners, from two-wheelers to commercial trucks.
 
 ### Core Value Propositions
 1. **Speed**: Average 15-minute response time
@@ -29,7 +31,7 @@ To democratize roadside assistance in India by making it accessible, affordable,
 3. **Coverage**: Pan-India network with 1000+ verified providers
 4. **Technology**: AI-powered dispatch, real-time tracking, IoT integration
 5. **Transparency**: Dynamic pricing with upfront quotes
-6. **Inclusivity**: Support for 7 vehicle types (Two-wheeler to Heavy Vehicle)
+6. **Inclusivity**: Support for 6 vehicle types (Two-wheeler to Commercial Truck)
 
 ---
 
@@ -55,10 +57,9 @@ To democratize roadside assistance in India by making it accessible, affordable,
        ┌──────────────▼──────────────────────────┐
        │         Business Logic Layer            │
        ├─────────────────────────────────────────┤
-       │  • Booking Agent (AI Coordinator)       │
-       │  • AI Triage Service                    │
-       │  • Dispatch Logic (Smart Matching)      │
-       │  • Pricing Service (Dynamic Quotes)     │
+        │  • AutoMind (Groq-Powered Intelligence)  │
+        │  • Dispatch Logic (Smart Matching)      │
+        │  • Pricing Service (Dynamic Quotes)     │
        │  • Notification Service (Push/SMS)      │
        └──────────────┬──────────────────────────┘
                       │
@@ -423,7 +424,7 @@ Response: 200 OK
     "id": 2,
     "name": "Basic Plan",
     "price": "99.00",
-    "duration_days": 30,
+    "duration_days": 45,
     "features": ["Discounted towing", "Priority"],
     "description": "Basic Plan"
   }
@@ -601,6 +602,23 @@ Response: 200 OK
   "triage_data": [...],
   "load_data": [...]
 }
+```
+
+#### 7. **Public Stats**
+
+**Get Platform Statistics**
+```http
+GET /services/stats/public/
+# No authentication required
+
+Response: 200 OK
+{
+  "customers": "5000+",
+  "providers": "120+",
+  "satisfaction": "98%",
+  "response_time": "15 min"
+}
+```
 ```
 
 ### WebSocket Endpoints
@@ -786,15 +804,71 @@ def calculate_dynamic_price(service_type, distance_km, user_subscription):
 ```
 
 **Pricing Tiers**:
+**For 2 wheeler**:
 | Service Type | Base Price | Included KM | Per KM Rate |
 |--------------|------------|-------------|-------------|
 | Towing | ₹199 | 5 km | ₹20/km |
 | Flatbed Towing | ₹349 | 5 km | ₹25/km |
-| Mechanic | ₹79 | 5 km | ₹15/km |
+| Mechanic | ₹99 | 5 km | ₹15/km |
 | Fuel Delivery | ₹49 | 5 km | ₹15/km |
-| Battery Jump | ₹119 | 5 km | ₹15/km |
+| Battery Jump | ₹149 | 5 km | ₹15/km |
 | Lockout | ₹149 | 5 km | ₹15/km |
 | Flat Tire | ₹99 | 5 km | ₹15/km |
+
+**For 3 wheeler**:
+| Service Type | Base Price | Included KM | Per KM Rate |
+|--------------|------------|-------------|-------------|
+| Towing | ₹249 | 5 km | ₹25/km |
+| Flatbed Towing | ₹449 | 5 km | ₹30/km |
+| Mechanic | ₹149 | 5 km | ₹20/km |
+| Fuel Delivery | ₹49 | 5 km | ₹20/km |
+| Battery Jump | ₹1999 | 5 km | ₹20/km |
+| Lockout | ₹199 | 5 km | ₹20/km |
+| Flat Tire | ₹199 | 5 km | ₹20/km |
+
+**For 4 wheeler**:
+| Service Type | Base Price | Included KM | Per KM Rate |
+|--------------|------------|-------------|-------------|
+| Towing | ₹249 | 5 km | ₹25/km |
+| Flatbed Towing | ₹449 | 5 km | ₹35/km |
+| Mechanic | ₹349 | 5 km | ₹25/km |
+| Fuel Delivery | ₹49 | 5 km | ₹20/km |
+| Battery Jump | ₹249 | 5 km | ₹25/km |
+| Lockout | ₹299 | 5 km | ₹25/km |
+| Flat Tire | ₹249 | 5 km | ₹25/km |
+
+**For SUV wheeler**:
+| Service Type | Base Price | Included KM | Per KM Rate |
+|--------------|------------|-------------|-------------|
+| Towing | ₹299 | 5 km | ₹25/km |
+| Flatbed Towing | ₹499 | 5 km | ₹40/km |
+| Mechanic | ₹349 | 5 km | ₹30/km |
+| Fuel Delivery | ₹49 | 5 km | ₹20/km |
+| Battery Jump | ₹249 | 5 km | ₹30/km |
+| Lockout | ₹299 | 5 km | ₹30/km |
+| Flat Tire | ₹249 | 5 km | ₹30/km |
+
+**For Vans**:
+| Service Type | Base Price | Included KM | Per KM Rate |
+|--------------|------------|-------------|-------------|
+| Towing | ₹349 | 5 km | ₹30/km |
+| Flatbed Towing | ₹499 | 5 km | ₹45/km |
+| Mechanic | ₹399 | 5 km | ₹40/km |
+| Fuel Delivery | ₹49 | 5 km | ₹20/km |
+| Battery Jump | ₹299 | 5 km | ₹35/km |
+| Lockout | ₹299 | 5 km | ₹35/km |
+| Flat Tire | ₹249 | 5 km | ₹35/km |
+
+**For Trucks**:
+| Service Type | Base Price | Included KM | Per KM Rate |
+|--------------|------------|-------------|-------------|
+| Towing | ₹499 | 5 km | ₹40/km |
+| Flatbed Towing | ₹699 | 5 km | ₹50/km |
+| Mechanic | ₹399 | 5 km | ₹40/km |
+| Fuel Delivery | ₹69 | 5 km | ₹20/km |
+| Battery Jump | ₹349 | 5 km | ₹40/km |
+| Lockout | ₹299 | 5 km | ₹40/km |
+| Flat Tire | ₹299 | 5 km | ₹40/km |
 
 ### 3. **AI Triage Algorithm**
 
@@ -940,9 +1014,9 @@ def calculate_reward_points(service_request, user_tier):
 | Plan | Price | Benefits |
 |------|-------|----------|
 | **Free** | ₹0 | Pay-per-use, standard rates |
-| **Basic** | ₹99/month | 15% discount, priority support |
-| **Premium** | ₹199/month | 50% discount, free towing (50km), helpline |
-| **Elite** | ₹399/month | Unlimited free services, VIP support, vehicle exchange |
+| **Basic** | ₹99/45days | 10% discount, priority support |
+| **Premium** | ₹199/45days | upto 30% discount, free towing (5-10km), helpline, vehicle exchange for limited time |
+| **Elite** | ₹399/45days | Unlimited free services charges, VIP support, vehicle exchange |
 
 #### 7. **Vehicle Type Support**
 - Two-Wheeler (Bike/Scooter)
@@ -951,7 +1025,6 @@ def calculate_reward_points(service_request, user_tier):
 - SUV (Sport Utility Vehicle)
 - Van (Minivan/Cargo Van)
 - Truck (Light/Medium Commercial)
-- Heavy Vehicle (Bus/Heavy Truck)
 
 #### 8. **Service Types**
 - **Towing**: Basic and flatbed options
@@ -980,12 +1053,18 @@ def calculate_reward_points(service_request, user_tier):
 - Available for Elite plan subscribers
 - Seamless handover process
 
-#### 2. **Vehicle Placement Service**
+#### 2. **AutoMind Intelligence**
+- Unified AI Assistant for support and booking
+- Natural language problem diagnosis (Triage)
+- Immediate agentic dispatch bypassing forms
+- 24/7 conversational support
+
+#### 3. **Vehicle Placement Service**
 - Move vehicle to specified location after service
 - Privacy-safe location handling
 - Additional fee-based service
 
-#### 3. **Helpline Integration**
+#### 4. **Helpline Integration**
 - 24/7 phone support
 - Call logging and recording
 - Link calls to service requests

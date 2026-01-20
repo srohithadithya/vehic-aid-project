@@ -16,6 +16,7 @@ from .models import (
     RewardsProgram,
     RewardTransaction,
     ChatMessage,
+    SparePartStore,
 )
 
 
@@ -24,7 +25,7 @@ class VehicleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Vehicle
-        fields = ["id", "license_plate", "make", "model", "fuel_type", "owner"]
+        fields = ["id", "license_plate", "make", "model", "fuel_type", "vehicle_type", "owner"]
         read_only_fields = ["id", "owner"]
 
 
@@ -44,6 +45,7 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
             "customer_notes",
             "latitude",
             "longitude",
+            "location_name",
             "status",
             "priority",
             "created_at",
@@ -124,8 +126,16 @@ class ServiceQuoteSerializer(serializers.ModelSerializer):
             "status",
             "valid_until",
             "created_at",
+            "spare_parts_total",
+            "platform_fee",
+            "tax_amount",
+            "is_final",
+            "spare_parts_details",
+            "provider_payout",
+            "expenses_amount",
+            "platform_profit",
         ]
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "created_at", "provider_payout", "expenses_amount", "platform_profit"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -272,3 +282,7 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         if request and request.user:
             return obj.sender == request.user
         return False
+class SparePartStoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SparePartStore
+        fields = "__all__"

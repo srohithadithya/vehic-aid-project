@@ -6,7 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  optimizeFonts: false,
+
   eslint: {
     ignoreDuringBuilds: true,
   },

@@ -65,11 +65,14 @@ class PaymentInitiationView(APIView):
             }
             order = client.order.create(data=order_data)
 
+            if not service_request.provider:
+                return Response({'error': 'Provider must be assigned before payment.'}, status=status.HTTP_400_BAD_REQUEST)
+
             # Create Transaction Record
             Transaction.objects.create(
                 service_request=service_request,
-                booker=request.user.service_booker_profile,
-                provider=service_request.provider, # Assuming provider is assigned
+                booker=request.user.servicebooker,
+                provider=service_request.provider.serviceprovider,
                 amount=Decimal(amount),
                 razorpay_order_id=order['id'],
                 status='PENDING',
@@ -153,8 +156,16 @@ class RazorpayWebhookView(APIView):
                 # Update Service Request Status
                 service_request = transaction_obj.service_request
                 if service_request:
-                    service_request.status = ServiceRequest.STATUS_CHOICES.COMPLETED
+                    service_request.status = 'COMPLETED'
                     service_request.save()
+
+                    # Add Reward Points
+                    try:
+                        from apps.services.models import RewardsProgram
+                        rewards, _ = RewardsProgram.objects.get_or_create(user=service_request.booker.servicebooker)
+                        rewards.reward_for_service(service_request)
+                    except Exception as e:
+                        print(f"Error adding rewards: {e}")
 
                 # Note: The daily settlement task will pick this transaction up later.
 
@@ -199,6 +210,14 @@ class MockPaymentConfirmView(APIView):
                 service_request = get_object_or_404(ServiceRequest, id=request_id)
                 service_request.status = 'COMPLETED'
                 service_request.save()
+
+                # Add Reward Points
+                try:
+                    from apps.services.models import RewardsProgram
+                    rewards, _ = RewardsProgram.objects.get_or_create(user=service_request.booker.servicebooker)
+                    rewards.reward_for_service(service_request)
+                except Exception as e:
+                    print(f"Error adding rewards: {e}")
 
                 # Ensure booker profile is used
                 booker_profile = None

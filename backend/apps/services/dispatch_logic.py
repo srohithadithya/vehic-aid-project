@@ -8,6 +8,7 @@ from django.conf import settings
 
 from apps.users.models import ServiceProvider
 from apps.services.models import ServiceQuote, UserSubscription
+from .services.pricing import PricingService
 from decimal import Decimal
 from datetime import timedelta
 from django.utils import timezone
@@ -116,56 +117,46 @@ def generate_automated_quote(service_request, provider):
         float(provider.latitude), float(provider.longitude)
     )
     
-    # Calculate total
-    # Define pricing configuration (Base Price, Included Km, Per Km Rate)
-    # Matches Frontend "Society Friendly" Prices
-    PRICING_CONFIG = {
-        # Backend IDs
-        'TOWING': {'base': Decimal("199.00"), 'included_km': 5, 'per_km': Decimal("20.00")},
-        'FLATBED_TOWING': {'base': Decimal("349.00"), 'included_km': 5, 'per_km': Decimal("25.00")},
-        'MECHANIC': {'base': Decimal("79.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'FUEL_DELIVERY': {'base': Decimal("49.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'BATTERY_JUMP': {'base': Decimal("119.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'LOCKOUT': {'base': Decimal("149.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'FLAT_TIRE': {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        
-        # Frontend Aliases
-        'basic_tow': {'base': Decimal("199.00"), 'included_km': 5, 'per_km': Decimal("20.00")},
-        'flatbed_tow': {'base': Decimal("349.00"), 'included_km': 5, 'per_km': Decimal("25.00")},
-        'mechanic': {'base': Decimal("79.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'fuel_delivery': {'base': Decimal("49.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'battery_jump': {'base': Decimal("119.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'lockout': {'base': Decimal("149.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-        'tire_change': {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")},
-    }
-
-    # Get config or default
-    config = PRICING_CONFIG.get(service_request.service_type, {'base': Decimal("99.00"), 'included_km': 5, 'per_km': Decimal("15.00")})
+    pricing_service = PricingService()
     
-    base_price = config['base']
+    # Get vehicle type from request (through vehicle relationship)
+    vehicle_type = "FOUR_WHEELER"
+    if service_request.vehicle:
+        vehicle_type = service_request.vehicle.vehicle_type
     
-    # Calculate extra km charge (Distance - Included Limit)
-    dist_decimal = Decimal(str(dist))
-    chargable_dist = max(Decimal("0.00"), dist_decimal - Decimal(config['included_km']))
-    distance_charge = chargable_dist * config['per_km']
-    
-    total = base_price + distance_charge
-
-    # 1. Automation: Apply Subscription Discounts
-    # Check if user has an active subscription
+    # Get user plan
+    user_plan = "FREE"
     sub = UserSubscription.objects.filter(user__user=service_request.booker, is_active=True).first()
     if sub:
-        if sub.plan.name == 'Gold':
-            total = Decimal("0.00") # Gold users get free service
-        elif sub.plan.name == 'Premium':
-            total *= Decimal("0.5") # Premium users get 50% off
-            
+        user_plan = sub.plan.name.upper().split()[0] # Get 'BASIC' from 'Basic Plan'
+        if 'ELITE' in user_plan: user_plan = 'ELITE'
+        elif 'PREMIUM' in user_plan: user_plan = 'PREMIUM'
+        elif 'BASIC' in user_plan: user_plan = 'BASIC'
+        else: user_plan = 'FREE'
+
+    # Provider location (fallback to request loc if provider not yet assigned)
+    prov_lat = service_request.latitude
+    prov_lng = service_request.longitude
+    if service_request.provider:
+        prov_lat = service_request.provider.serviceprovider.latitude
+        prov_lng = service_request.provider.serviceprovider.longitude
+
+    quote_data = pricing_service.calculate_quote(
+        service_type=service_request.service_type,
+        provider_lat=prov_lat,
+        provider_lng=prov_lng,
+        customer_lat=service_request.latitude,
+        customer_lng=service_request.longitude,
+        vehicle_type=vehicle_type,
+        user_plan=user_plan
+    )
+    
     quote = ServiceQuote.objects.create(
         request=service_request,
-        base_price=base_price,
-        distance_km=dist,
-        time_estimate_minutes=int(dist * 5) + 10, # dynamic time could also come from Google API
-        dynamic_total=total,
+        base_price=quote_data['base_price'],
+        distance_km=quote_data['distance_km'],
+        time_estimate_minutes=quote_data['time_estimate_minutes'],
+        dynamic_total=quote_data['dynamic_total'],
         status="PENDING",
         valid_until=timezone.now() + timedelta(minutes=30)
     )
