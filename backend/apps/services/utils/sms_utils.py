@@ -27,6 +27,9 @@ class Fast2SMSService:
             dict: Response with success status
         """
         if not self.api_key:
+            if settings.DEBUG:
+                logger.info(f"SIMULATION SMS to {phone_number}: {message}")
+                return {'success': True, 'message': 'Simulated in DEBUG mode'}
             logger.error("Fast2SMS API key not configured")
             return {'success': False, 'error': 'SMS not configured'}
         
