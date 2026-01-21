@@ -239,7 +239,17 @@ class ServiceRequest(models.Model):
         Vehicle, on_delete=models.SET_NULL, null=True, related_name="service_requests"
     )
 
-    service_type = models.CharField(max_length=50)
+    SERVICE_TYPE_CHOICES = [
+        ("TOWING", "Towing Service"),
+        ("FLAT_TIRE", "Flat Tire Assistance"),
+        ("BATTERY_JUMP", "Battery Jumpstart"),
+        ("FUEL_DELIVERY", "Fuel Delivery"),
+        ("MECHANIC", "Mechanical Issue"),
+        ("LOCKOUT", "Lockout Service"),
+        ("OTHER", "Other Inquiry"),
+    ]
+
+    service_type = models.CharField(max_length=50, choices=SERVICE_TYPE_CHOICES)
     status = models.CharField(
         max_length=30, choices=STATUS_CHOICES, default="PENDING_DISPATCH"
     )
