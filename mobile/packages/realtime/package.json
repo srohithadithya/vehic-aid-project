@@ -1,0 +1,14 @@
+{
+  "name": "@vehic-aid/realtime",
+  "version": "1.0.0",
+  "description": "Real-time messaging and notifications service for VehicAid",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.0",
+    "@react-native-async-storage/async-storage": "^1.21.0"
+  }
+}

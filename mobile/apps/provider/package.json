@@ -1,0 +1,59 @@
+{
+  "name": "vehic-aid-provider",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx expo start",
+    "android": "npx expo start --android",
+    "ios": "npx expo start --ios",
+    "web": "npx expo start --web",
+    "prebuild": "npx expo prebuild --clean",
+    "build:android": "npx eas build --platform android",
+    "build:ios": "npx eas build --platform ios",
+    "build:all": "npx eas build -p all"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "^11.0.0",
+    "@react-native-firebase/app": "^18.0.0",
+    "@react-native-firebase/messaging": "^18.0.0",
+    "@react-navigation/bottom-tabs": "^6.5.0",
+    "@react-navigation/native": "^6.1.0",
+    "@react-navigation/native-stack": "^6.9.0",
+    "@vehic-aid/api": "*",
+    "@vehic-aid/auth": "*",
+    "@vehic-aid/core": "*",
+    "@vehic-aid/storage": "*",
+    "@vehic-aid/ui": "*",
+    "axios": "^1.6.0",
+    "expo": "^54.0.21",
+    "expo-constants": "~18.0.0",
+    "expo-keep-awake": "~15.0.0",
+    "expo-linking": "~8.0.0",
+    "expo-location": "~19.0.0",
+    "expo-notifications": "~0.32.0",
+    "expo-splash-screen": "~0.27.0",
+    "expo-status-bar": "~3.0.0",
+    "expo-system-ui": "~6.0.0",
+    "expo-web-browser": "~15.0.0",
+    "react": "18.3.1",
+    "react-native": "0.74.5",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-paper": "^5.0.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "~0.21.0",
+    "socket.io-client": "^4.7.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@types/react": "~18.2.0",
+    "@types/react-native": "~0.73.0",
+    "typescript": "~5.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
