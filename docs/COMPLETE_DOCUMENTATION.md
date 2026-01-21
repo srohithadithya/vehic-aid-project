@@ -84,9 +84,11 @@ To democratize roadside assistance in India by making it accessible, affordable,
 
 #### 1. **Frontend Applications**
 - **Web Admin Panel** (`web/admin/`): Platform management, analytics, user oversight
-- **Web Provider Panel** (`web/provider/`): Job management, earnings tracking
-- **Web Booker Panel** (`web/booker/`): Service booking, subscription management
-- **Mobile Apps** (`mobile/booker/`, `mobile/provider/`): Native mobile experience
+- **Web Provider Panel** (`web/provider/`): Job management, earnings tracking, analytics
+- **Web Booker Panel** (`web/booker/`): Service booking, subscription management, AI assistant
+- **Mobile Apps** (`mobile/booker/`, `mobile/provider/`): Native mobile experience (React Native/Expo)
+
+> 📖 **For detailed web application features**, see [WEB_APPLICATIONS_FEATURES.md](./WEB_APPLICATIONS_FEATURES.md)
 
 #### 2. **Backend Services**
 - **Django REST Framework**: Core API server
@@ -126,14 +128,34 @@ To democratize roadside assistance in India by making it accessible, affordable,
 | **Framer Motion** | 11+ | Animations | Smooth transitions, gesture support |
 | **shadcn/ui** | Latest | Component Library | Accessible, customizable, modern components |
 
-### Mobile Stack
+### Mobile Stack (Planned/In Development)
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| **React Native** | 0.76+ | Mobile Framework |
-| **Expo** | 52+ | Development Platform |
-| **TypeScript** | 5+ | Type Safety |
-| **React Navigation** | 7+ | Navigation |
+#### Recommended: React Native with Expo
+
+| Technology | Version | Purpose | Why We Use It |
+|------------|---------|---------|---------------|
+| **React Native** | 0.76+ | Mobile Framework | Maximum code reuse from web apps, same language |
+| **Expo** | 52+ | Development Platform | Simplified setup, fast development, easy builds |
+| **TypeScript** | 5+ | Type Safety | Consistency with web apps |
+| **React Navigation** | 7+ | Navigation | Industry standard for RN navigation |
+| **Expo Location** | Latest | GPS Services | Real-time tracking, location updates |
+| **Expo Notifications** | Latest | Push Notifications | Firebase Cloud Messaging integration |
+
+#### Alternative Options
+
+**Flutter** (7-10 days development time):
+- Beautiful UI with Material Design
+- High performance
+- Zero code reuse from web (Dart language)
+- Good for custom animations
+
+**Native Android (Kotlin)** (10-14 days development time):
+- Maximum performance
+- Android only (iOS requires separate Swift development)
+- Zero code reuse from web
+- Full platform access
+
+> 📱 **Mobile Development Status**: Ready for development. All API services and business logic are mobile-ready. See [WEB_APPLICATIONS_FEATURES.md](./WEB_APPLICATIONS_FEATURES.md#mobile-app-readiness) for reusability analysis.
 
 ### External APIs & Services
 

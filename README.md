@@ -150,34 +150,47 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 - **Maps**: Google Maps API
 - **Charts**: Recharts
 
-### **Mobile (Expo / React Native)**
-- **Framework**: React Native (Expo SDK 50+)
+### **Mobile (React Native / Expo) - Planned**
+- **Framework**: React Native 0.76+ with Expo SDK 52+
 - **Routing**: Expo Router v3 (File-based)
-- **Styling**: NativeWind (Tailwind CSS)
-- **State**: Zustand (Lightweight state management)
+- **Styling**: NativeWind (Tailwind CSS for React Native)
+- **State**: React Context (reused from web apps)
 - **Icons**: Lucide React Native
 - **Maps**: React Native Maps
 
-### **Mobile Apps Overview**
+### **Mobile Apps Status**
 
-#### 1. Vehic-Aid (User App)
-**Path**: `mobile/booker`
-- **Features**: 
+#### 1. Vehic-Aid Booker (Customer App)
+**Path**: `mobile/booker` (Planned)
+- **Status**: 🟡 Ready for development (3-5 days)
+- **Features to Port from Web**:
   - 🧠 **AutoMind Intelligence**: Groq-powered conversational diagnostics and booking
-  - 🗺️ **Real-time Tracking**: Live status & map updates
-  - 💬 **In-App Chat**: Talk to providers directly
-  - 💳 **Payments & Subs**: Razorpay integration
-  - 🔔 **Notifications**: Real-time alerts center
-- **Stack**: Expo Router, NativeWind (Tailwind), Zustand
+  - 📱 **Dashboard**: KPIs, active requests, quick actions
+  - 🗺️ **Service Booking**: Multi-step wizard with location picker
+  - 💬 **Real-time Chat**: In-app messaging with providers
+  - 🚗 **Vehicle Management**: Garage with 7 vehicle types
+  - 💳 **Payments & Subscriptions**: Razorpay integration
+  - 📊 **Service History**: Past requests and invoices
+  - 💰 **Wallet**: Balance, transactions, add money
+  - 🔔 **Notifications**: Push notifications via Firebase
+- **Stack**: Expo Router, NativeWind, React Context (from web)
+- **Code Reuse**: ~70% (API services, contexts, business logic)
 
-#### 2. Vehic-Aid Partner (Provider App)
-**Path**: `mobile/provider`
-- **Features**: 
-  - 🌙 **Dark Mode Dashboard**: Optimized for drivers
-  - 🛎️ **Job Management**: Accept/Decline & Navigation
-  - 💰 **Earnings Tracker**: Daily/Weekly insights
-  - 📝 **Profile & History**: Manage vehicle & past jobs
-- **Stack**: Expo Router, NativeWind (Tailwind), Zustand
+#### 2. Vehic-Aid Provider (Partner App)
+**Path**: `mobile/provider` (Planned)
+- **Status**: 🟡 Ready for development (3-5 days)
+- **Features to Port from Web**:
+  - 🌙 **Dashboard**: Real-time job feed with distance calculation
+  - 🛎️ **Job Management**: Accept/decline jobs, navigation
+  - 💰 **Earnings Tracker**: Daily/weekly/monthly analytics
+  - 📊 **Analytics**: Performance metrics, ratings
+  - 📝 **Profile Management**: Documents, verification status
+  - 💬 **Chat**: Customer communication
+  - 📍 **Location Updates**: Real-time GPS tracking
+- **Stack**: Expo Router, NativeWind, React Context (from web)
+- **Code Reuse**: ~70% (API services, contexts, business logic)
+
+> 📱 **Mobile Development Guide**: See [WEB_APPLICATIONS_FEATURES.md](docs/WEB_APPLICATIONS_FEATURES.md#mobile-app-readiness) for detailed feature parity analysis and development roadmap.
 
 ### **Infrastructure**
 - **Containerization**: Docker
@@ -650,6 +663,8 @@ EXPO_PUBLIC_WS_URL=ws://localhost:8001/ws
 
 ## 📖 Documentation
 
+- **[Complete Documentation](docs/COMPLETE_DOCUMENTATION.md)** - Master reference guide
+- **[Web Applications Features](docs/WEB_APPLICATIONS_FEATURES.md)** - Detailed web app features & mobile readiness
 - **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Complete deployment instructions
 - **[SMTP Setup](docs/SMTP_SETUP.md)** - Email configuration guide
 - **[Free SMS Setup](docs/FREE_SMS_SETUP.md)** - SMS service configuration

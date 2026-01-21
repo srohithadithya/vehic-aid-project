@@ -32,13 +32,30 @@ vehic-aid-project/
 │   │   └── components/               # Professional Shadcn UI
 │   │
 │   ├── provider/                     # Provider Dashboard (Port: 3001)
+│   │   ├── app/dashboard/            # Live job feed & KPIs
 │   │   ├── app/earnings/             # Direct payout management
-│   │   └── app/requests/             # Live job feed
+│   │   ├── app/analytics/            # Performance metrics
+│   │   └── app/history/              # Completed jobs
 │   │
 │   └── booker/                       # Customer Portal (Port: 3003)
-│       ├── app/automind/             # AI Conversational Gateway
-│       ├── app/history/              # Service history
-│       └── app/vehicles/             # Garage management
+│       ├── app/                      # 18+ feature pages
+│       │   ├── automind/             # AI Conversational Gateway
+│       │   ├── dashboard/            # User dashboard with KPIs
+│       │   ├── book/                 # Multi-step booking wizard
+│       │   ├── history/              # Service history
+│       │   ├── vehicles/             # Garage management (7 types)
+│       │   ├── subscription/         # Plan management
+│       │   ├── wallet/               # Wallet & transactions
+│       │   ├── exchange/             # Vehicle marketplace
+│       │   ├── health/               # IoT diagnostics
+│       │   └── ...                   # 10+ more features
+│       └── components/               # Reusable UI components
+│
+├── mobile/                           # Mobile Applications (Planned)
+│   ├── booker/                       # React Native (Expo) - Customer App
+│   │   └── [Ready for development - 3-5 days]
+│   └── provider/                     # React Native (Expo) - Provider App
+│       └── [Ready for development - 3-5 days]
 │
 ├── infrastructure/                   # Infrastructure & DevOps
 │   ├── launch.ps1                    # Universal System Launcher
@@ -46,7 +63,9 @@ vehic-aid-project/
 │   └── k8s/                          # Production Scalability
 │
 ├── docs/                             # Documentation
-│   └── COMPLETE_DOCUMENTATION.md     # Master Reference
+│   ├── COMPLETE_DOCUMENTATION.md     # Master Reference
+│   ├── WEB_APPLICATIONS_FEATURES.md  # Detailed Web Features (NEW)
+│   └── ...                           # API, Deployment, Setup guides
 │
 ├── README.md                         # Main documentation
 └── PROJECT_MAP.md                    # This file (AutoMind Ready)

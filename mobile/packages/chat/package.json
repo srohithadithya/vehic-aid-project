@@ -1,0 +1,14 @@
+{
+  "name": "@vehic-aid/chat",
+  "version": "1.0.0",
+  "description": "Chat and messaging context for VehicAid",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@vehic-aid/realtime": "*",
+    "react": "^18.3.1"
+  }
+}
