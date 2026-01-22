@@ -22,6 +22,7 @@ const SERVICE_TYPES = [
   { id: 'BATTERY_JUMP', name: '🔋 Battery Jump', desc: 'Jumpstart service' },
   { id: 'LOCKOUT', name: '🔐 Lockout', desc: 'Vehicle lockout assistance' },
   { id: 'FLAT_TIRE', name: '🛞 Flat Tire', desc: 'Tire repair/replacement' },
+  { id: 'REPLACEMENT_VEHICLE', name: '🚗 Replacement Vehicle', desc: 'Temporary rental during service' },
 ];
 
 // Dynamic Pricing Matrix: Vehicle Type × Service Type
@@ -34,6 +35,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 149, perKm: 15, includedKm: 5 },
     LOCKOUT: { base: 149, perKm: 15, includedKm: 5 },
     FLAT_TIRE: { base: 99, perKm: 15, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
   THREE_WHEELER: {
     TOWING: { base: 249, perKm: 25, includedKm: 5 },
@@ -43,6 +45,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 199, perKm: 20, includedKm: 5 },
     LOCKOUT: { base: 199, perKm: 20, includedKm: 5 },
     FLAT_TIRE: { base: 199, perKm: 20, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
   FOUR_WHEELER: {
     TOWING: { base: 249, perKm: 25, includedKm: 5 },
@@ -52,6 +55,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 249, perKm: 25, includedKm: 5 },
     LOCKOUT: { base: 299, perKm: 25, includedKm: 5 },
     FLAT_TIRE: { base: 249, perKm: 25, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
   SUV: {
     TOWING: { base: 299, perKm: 25, includedKm: 5 },
@@ -61,6 +65,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 249, perKm: 30, includedKm: 5 },
     LOCKOUT: { base: 299, perKm: 30, includedKm: 5 },
     FLAT_TIRE: { base: 249, perKm: 30, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
   VAN: {
     TOWING: { base: 349, perKm: 30, includedKm: 5 },
@@ -70,6 +75,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 299, perKm: 35, includedKm: 5 },
     LOCKOUT: { base: 299, perKm: 35, includedKm: 5 },
     FLAT_TIRE: { base: 249, perKm: 35, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
   TRUCK: {
     TOWING: { base: 499, perKm: 40, includedKm: 5 },
@@ -79,6 +85,7 @@ const PRICING_CONFIG: Record<string, Record<string, { base: number; perKm: numbe
     BATTERY_JUMP: { base: 349, perKm: 40, includedKm: 5 },
     LOCKOUT: { base: 299, perKm: 40, includedKm: 5 },
     FLAT_TIRE: { base: 299, perKm: 40, includedKm: 5 },
+    REPLACEMENT_VEHICLE: { base: 1500, perKm: 0, includedKm: 0 },
   },
 };
 
@@ -110,7 +117,7 @@ function calculatePrice(vehicleType: string, serviceType: string, distanceKm: nu
   const chargeableDistance = Math.max(0, distanceKm - config.includedKm);
   const distanceCharge = chargeableDistance * config.perKm;
   const subtotal = basePrice + distanceCharge;
-  
+
   // Apply 18% tax
   const tax = (subtotal * 18) / 100;
   return Math.round(subtotal + tax);
@@ -202,10 +209,10 @@ export default function BookScreen() {
               For: {VEHICLE_TYPES.find(v => v.id === bookingData.vehicle_type)?.name}
             </Text>
             {SERVICE_TYPES.map((service) => {
-              const price = bookingData.vehicle_type 
+              const price = bookingData.vehicle_type
                 ? calculatePrice(bookingData.vehicle_type, service.id, bookingData.distance_km)
                 : 0;
-              
+
               return (
                 <TouchableOpacity
                   key={service.id}
@@ -214,8 +221,8 @@ export default function BookScreen() {
                     bookingData.service_type === service.id && styles.serviceCardSelected,
                   ]}
                   onPress={() => {
-                    setBookingData({ 
-                      ...bookingData, 
+                    setBookingData({
+                      ...bookingData,
                       service_type: service.id,
                       estimated_price: price,
                     });

@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-01-22T07:29:50.655Z",
+  "summary": {
+    "totalTests": 9,
+    "passedTests": 8,
+    "failedTests": 1,
+    "passRate": "88.89%",
+    "totalDuration": "1.19s",
+    "averageResponseTime": "119ms"
+  },
+  "results": [
+    {
+      "name": "Backend Health Check",
+      "passed": true,
+      "message": "Backend is responsive (401)",
+      "duration": "100ms",
+      "details": {
+        "endpoint": "http://localhost:8001/api/v1/users/",
+        "statusCode": 401,
+        "headers": {
+          "content-type": "application/json",
+          "www-authenticate": "Bearer realm=\"api\"",
+          "vary": "Accept, Accept-Language, origin",
+          "allow": "GET, HEAD, OPTIONS",
+          "x-frame-options": "DENY",
+          "content-length": "58",
+          "content-language": "en",
+          "x-db-query-count": "0",
+          "x-response-time": "0.006s",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "same-origin",
+          "cross-origin-opener-policy": "same-origin",
+          "server": "daphne"
+        }
+      }
+    },
+    {
+      "name": "API - User Profile",
+      "passed": true,
+      "message": "Endpoint returned 401",
+      "duration": "15ms",
+      "details": {
+        "endpoint": "http://localhost:8001/api/v1/users/",
+        "statusCode": 401,
+        "responseSize": 58
+      }
+    },
+    {
+      "name": "API - User List",
+      "passed": true,
+      "message": "Endpoint returned 401",
+      "duration": "14ms",
+      "details": {
+        "endpoint": "http://localhost:8001/api/v1/users/",
+        "statusCode": 401,
+        "responseSize": 58
+      }
+    },
+    {
+      "name": "API - Services List",
+      "passed": true,
+      "message": "Endpoint returned 401",
+      "duration": "658ms",
+      "details": {
+        "endpoint": "http://localhost:8001/api/v1/services/",
+        "statusCode": 401,
+        "responseSize": 58
+      }
+    },
+    {
+      "name": "API - Payments List",
+      "passed": false,
+      "message": "Endpoint returned 404",
+      "duration": "21ms",
+      "details": {
+        "endpoint": "http://localhost:8001/api/v1/payments/",
+        "statusCode": 404,
+        "responseSize": 5690
+      }
+    },
+    {
+      "name": "Performance - http://localhost:8001/api/v1/users/",
+      "passed": true,
+      "message": "Average response time: 14ms",
+      "duration": "14.3ms",
+      "details": {
+        "minTime": 13,
+        "maxTime": 19,
+        "target": 2000,
+        "samples": 10
+      }
+    },
+    {
+      "name": "Performance - http://localhost:8001/api/v1/services/",
+      "passed": true,
+      "message": "Average response time: 14ms",
+      "duration": "13.7ms",
+      "details": {
+        "minTime": 13,
+        "maxTime": 15,
+        "target": 2000,
+        "samples": 10
+      }
+    },
+    {
+      "name": "Bundle Size - Booker App",
+      "passed": true,
+      "message": "Size: 0.00MB",
+      "duration": "0ms",
+      "details": {
+        "sizeBytes": 1864,
+        "maxSize": 52428800
+      }
+    },
+    {
+      "name": "Bundle Size - Provider App",
+      "passed": true,
+      "message": "Size: 0.00MB",
+      "duration": "0ms",
+      "details": {
+        "sizeBytes": 1910,
+        "maxSize": 47185920
+      }
+    }
+  ],
+  "environment": {
+    "apiBase": "http://localhost:8001/api/v1",
+    "nodeVersion": "v22.15.0",
+    "platform": "win32"
+  }
+}

@@ -6,9 +6,10 @@ from django.conf import settings
 from apps.users.models import ServiceProvider
 
 # --- Configuration ---
-# Platform commission rate (e.g., 20%) loaded from Django settings.
-# This ensures easy modification without changing code.
-PLATFORM_COMMISSION_RATE = Decimal(getattr(settings, "PLATFORM_COMMISSION_RATE", 0.20))
+# Platform commission rate (25%) loaded from Django settings.
+# Provider receives 75% of service charges, platform keeps 25% + platform fee.
+PLATFORM_COMMISSION_RATE = Decimal(getattr(settings, "PLATFORM_COMMISSION_RATE", "0.25"))
+PLATFORM_FEE = Decimal(getattr(settings, "PLATFORM_FEE", "11.00"))  # ₹11 per service
 MIN_TRANSACTION_AMOUNT = Decimal("10.00")
 
 # --- Validation Constants for Indian Banking ---

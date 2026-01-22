@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-01-22T07:28:59.791Z",
+  "summary": {
+    "totalTests": 3,
+    "passedTests": 2,
+    "failedTests": 1,
+    "passRate": "66.67%",
+    "totalDuration": "8.27s",
+    "averageResponseTime": "NaNms"
+  },
+  "results": [
+    {
+      "name": "Backend Health Check",
+      "passed": false,
+      "message": "Backend unreachable: Request failed with status code 401",
+      "duration": "0ms",
+      "details": {
+        "error": "Request failed with status code 401"
+      }
+    },
+    {
+      "name": "Bundle Size - Booker App",
+      "passed": true,
+      "message": "Size: 0.00MB",
+      "duration": "0ms",
+      "details": {
+        "sizeBytes": 1864,
+        "maxSize": 52428800
+      }
+    },
+    {
+      "name": "Bundle Size - Provider App",
+      "passed": true,
+      "message": "Size: 0.00MB",
+      "duration": "0ms",
+      "details": {
+        "sizeBytes": 1910,
+        "maxSize": 47185920
+      }
+    }
+  ],
+  "environment": {
+    "apiBase": "http://localhost:8001/api/v1",
+    "nodeVersion": "v22.15.0",
+    "platform": "win32"
+  }
+}

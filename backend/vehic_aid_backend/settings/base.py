@@ -322,7 +322,9 @@ CHANNEL_LAYERS = {
 }
 
 # --- Custom Constants ---
-VEHIC_AID_COMMISSION_RATE = 0.20  # 20% commission rate
+VEHIC_AID_COMMISSION_RATE = 0.25  # 25% commission rate (provider receives 75%)
+PLATFORM_COMMISSION_RATE = 0.25  # Alias for financial_tools.py
+PLATFORM_FEE = 11.00  # ₹11 per service
 
 # Payment Gateway (Razorpay/Stripe) Keys
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID", default="key_id_default")

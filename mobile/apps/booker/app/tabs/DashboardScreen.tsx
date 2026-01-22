@@ -13,6 +13,7 @@ const SERVICE_TYPES: Record<string, { emoji: string; name: string; desc: string 
   BATTERY_JUMP: { emoji: '🔋', name: 'Battery Jump', desc: 'Jumpstart service' },
   LOCKOUT: { emoji: '🔐', name: 'Lockout', desc: 'Vehicle lockout assistance' },
   FLAT_TIRE: { emoji: '🛞', name: 'Flat Tire', desc: 'Tire repair/replacement' },
+  REPLACEMENT_VEHICLE: { emoji: '🚗', name: 'Replacement Vehicle', desc: 'Temporary rental vehicle during service' },
 };
 
 interface DashboardStats {
@@ -92,8 +93,8 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView 
-      style={styles.container} 
+    <ScrollView
+      style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
@@ -236,25 +237,25 @@ export default function DashboardScreen() {
         <Text style={[typography.subtitle, { marginBottom: spacing.md }]}>Quick Actions</Text>
         <Button
           title="📅 Book New Service"
-          onPress={() => {}}
+          onPress={() => { }}
           variant="primary"
           style={{ marginBottom: spacing.md }}
         />
         <Button
           title="🚗 Manage Vehicles"
-          onPress={() => {}}
+          onPress={() => { }}
           variant="outline"
           style={{ marginBottom: spacing.md }}
         />
         <Button
           title="🎁 Subscription Plans"
-          onPress={() => {}}
+          onPress={() => { }}
           variant="outline"
           style={{ marginBottom: spacing.md }}
         />
         <Button
           title="💳 Add Wallet Balance"
-          onPress={() => {}}
+          onPress={() => { }}
           variant="outline"
           style={{ marginBottom: spacing.md }}
         />

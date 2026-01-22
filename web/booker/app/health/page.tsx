@@ -63,13 +63,26 @@ export default function HealthPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="max-w-4xl mx-auto"
                 >
-                    <div className="flex items-center space-x-4 mb-8">
+                    <div className="flex items-center space-x-4 mb-4">
                         <div className="p-3 bg-primary/10 rounded-2xl">
                             <LucideActivity className="text-primary" size={32} />
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold">{t('health.title')}</h1>
                             <p className="text-muted-foreground">{t('health.status')}</p>
+                        </div>
+                    </div>
+
+                    {/* Coming Soon Banner */}
+                    <div className="mb-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl flex items-center gap-4">
+                        <div className="p-2 bg-amber-100 rounded-lg">
+                            <LucideAlertTriangle className="text-amber-600" size={24} />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-semibold text-amber-800">🚀 Coming Soon - Future Feature</h3>
+                            <p className="text-sm text-amber-700">
+                                IoT device integration is planned for a future release. This page showcases the concept of real-time vehicle health monitoring using smart IoT devices.
+                            </p>
                         </div>
                     </div>
 

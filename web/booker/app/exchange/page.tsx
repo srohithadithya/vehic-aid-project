@@ -9,7 +9,7 @@ import { apiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-export default function VehicleExchangePage() {
+export default function ReplacementVehiclePage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [eligible, setEligible] = useState(false);
@@ -43,28 +43,37 @@ export default function VehicleExchangePage() {
         if (!location) return alert("Please enter a location");
         setSubmitting(true);
         try {
-            // Need a VehicleExchange endpoint. Assuming /services/vehicle-exchange/
-            // Note: ViewSet requires 'request' (ServiceRequest ID) usually?
-            // Wait, VehicleExchangeViewSet `perform_create` checks subscription.
-            // But Model VehicleExchange links to `request`.
-            // We might need to Create a ServiceRequest of type 'EXCHANGE' first?
+            // First, we need to create a service request to associate with the exchange
+            // Then create the vehicle exchange using the dedicated endpoint
 
-            // For now, let's assume we can create a direct exchange request or this is a "Service Request" of type EXCHANGE.
-            // Actually, usually Exchange is a separate flow. 
-            // If the backend requires a ServiceRequest, we should create that first.
-
-            // Simplified flow: Create Service Request with description "Vehicle Exchange"
-            await apiClient.post('/services/request/', {
-                service_type: 'TOWING', // or OTHER
-                description: `Vehicle Exchange Request. Duration: ${days} days. Location: ${location}`,
-                vehicle_id: null // User picks vehicle later or system picks default
+            // Create a service request first (required for VehicleExchange model)
+            const serviceRes = await apiClient.post('/services/request/', {
+                service_type: 'TOWING',
+                description: `Replacement Vehicle Request. Duration: ${days} days. Pickup: ${location}`,
+                latitude: 0, // Will be updated by support
+                longitude: 0
             });
 
-            alert("Exchange Request Submitted! A support agent will contact you shortly.");
+            const requestId = serviceRes.data.id;
+
+            // Now create the vehicle exchange request using the dedicated endpoint
+            await apiClient.post('/services/vehicle-exchange/', {
+                request: requestId,
+                pickup_location: location,
+                return_location: location, // Same as pickup for now
+                rental_fee: 1500 * days, // ₹1500/day
+                status: 'REQUESTED'
+            });
+
+            alert("Replacement Vehicle Request Submitted! A support agent will contact you shortly with vehicle options.");
             router.push('/dashboard');
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Failed to submit request.");
+            if (error.response?.status === 403) {
+                alert("Your subscription plan does not support Replacement Vehicle service. Please upgrade to Premium or Elite.");
+            } else {
+                alert("Failed to submit request. Please try again.");
+            }
         } finally {
             setSubmitting(false);
         }
@@ -81,7 +90,7 @@ export default function VehicleExchangePage() {
                     </div>
                     <h2 className="text-2xl font-bold">Premium Feature</h2>
                     <p className="text-slate-500">
-                        Vehicle Exchange is exclusively available for <span className="font-bold text-indigo-600">Premium</span> and <span className="font-bold text-indigo-600">Elite</span> members.
+                        Replacement Vehicle service is exclusively available for <span className="font-bold text-indigo-600">Premium</span> and <span className="font-bold text-indigo-600">Elite</span> members.
                     </p>
                     <Button onClick={() => router.push('/subscription')} className="w-full bg-indigo-600 hover:bg-indigo-700">
                         Upgrade Plan
@@ -104,8 +113,8 @@ export default function VehicleExchangePage() {
                     <div className="bg-white/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
                         <ArrowRightLeft size={32} />
                     </div>
-                    <h1 className="text-2xl font-bold">Premium Exchange</h1>
-                    <p className="text-purple-100 mt-2 text-sm">Don&apos;t stop moving. Swap your vehicle instantly.</p>
+                    <h1 className="text-2xl font-bold">Replacement Vehicle</h1>
+                    <p className="text-purple-100 mt-2 text-sm">Don&apos;t stop moving. Get a temporary vehicle while yours is serviced.</p>
                 </div>
 
                 <div className="p-8 space-y-6">
@@ -153,7 +162,7 @@ export default function VehicleExchangePage() {
                             disabled={submitting}
                             className="flex-1 py-3 bg-purple-600 text-white font-bold rounded-lg shadow-lg hover:bg-purple-700 transition transform active:scale-95 disabled:opacity-70 flex justify-center items-center"
                         >
-                            {submitting ? <Loader2 className="animate-spin w-5 h-5" /> : "Request Swap"}
+                            {submitting ? <Loader2 className="animate-spin w-5 h-5" /> : "Request Vehicle"}
                         </button>
                     </div>
                 </div>

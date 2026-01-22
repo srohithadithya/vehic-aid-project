@@ -1,0 +1,59 @@
+{
+  "development": {
+    "description": "Development builds with debug mode enabled",
+    "web": {
+      "command": "npm run dev",
+      "output": "http://localhost:3000",
+      "purpose": "Local development"
+    },
+    "android": {
+      "command": "expo start --android",
+      "output": "Expo dev client on Android device",
+      "purpose": "Testing on Android device"
+    },
+    "ios": {
+      "command": "expo start --ios",
+      "output": "Expo dev client on iOS simulator",
+      "purpose": "Testing on iOS simulator"
+    }
+  },
+  "testing": {
+    "description": "Build for testing purposes",
+    "android": {
+      "command": "./gradlew assembleDebug",
+      "output": "app/build/outputs/apk/debug/app-debug.apk",
+      "size": "~100MB",
+      "purpose": "Testing on real devices"
+    }
+  },
+  "production": {
+    "description": "Production builds ready for app store",
+    "android": {
+      "aab": {
+        "command": "cd android && ./gradlew bundleRelease",
+        "output": "app/build/outputs/bundle/release/app-release.aab",
+        "size": "~30-50MB",
+        "destination": "Google Play Console"
+      },
+      "apk": {
+        "command": "cd android && ./gradlew assembleRelease",
+        "output": "app/build/outputs/apk/release/app-release.apk",
+        "size": "~50-80MB",
+        "destination": "Direct installation"
+      }
+    },
+    "ios": {
+      "command": "xcodebuild -workspace ios/VehicAid.xcworkspace -scheme VehicAidBooker -configuration Release -archivePath build/VehicAid.xcarchive archive",
+      "export": "xcodebuild -exportArchive -archivePath build/VehicAid.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath build/ipa",
+      "output": "build/ipa/VehicAid.ipa",
+      "size": "~100-150MB",
+      "destination": "App Store Connect / TestFlight"
+    },
+    "web": {
+      "command": "npm run build",
+      "output": "build/ directory",
+      "size": "~5-10MB",
+      "destination": "Vercel / AWS S3 / GitHub Pages"
+    }
+  }
+}

@@ -1,14 +1,23 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from django.db.models import Avg
 from apps.users.models import ServiceBooker, ServiceProvider
 from .models import Review
 
+
+class PublicStatsRateThrottle(AnonRateThrottle):
+    """Rate limiting for public stats endpoint - 100 requests per hour per IP"""
+    rate = '100/hour'
+
+
 class PublicStatsView(APIView):
     """
     Publicly accessible stats for the landing page.
+    Rate limited to 100 requests per hour per IP address.
     """
-    permission_classes = [] # Public access
+    permission_classes = []  # Public access
+    throttle_classes = [PublicStatsRateThrottle]
 
     def get(self, request):
         # 1. Happy Customers (Total Users)

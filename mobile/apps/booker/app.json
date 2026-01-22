@@ -1,50 +1,58 @@
 {
   "expo": {
-    "name": "VehicAid Booker",
-    "slug": "vehic-aid-booker",
+    "name": "VehicAid",
+    "description": "On-demand roadside assistance and vehicle services at your fingertips",
+    "slug": "vehicaid-booker",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0066CC"
-    },
-    "assetBundlePatterns": ["**/*"],
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTabletMode": true,
-      "bundleIdentifier": "com.vehicaid.booker"
+      "bundleIdentifier": "com.vehicaid.booker",
+      "appStoreUrl": "https://apps.apple.com/app/vehicaid"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0066CC"
-      },
       "package": "com.vehicaid.booker",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.vehicaid.booker",
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "name": "VehicAid - Roadside Assistance",
+      "shortName": "VehicAid",
+      "themeColor": "#FF6B35"
     },
     "plugins": [
-      "expo-font",
-      "expo-location",
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/notification-sound.wav"]
+          "icon": "./assets/notification-icon.png",
+          "color": "#FF6B35"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-location",
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
-        "projectId": "vehic-aid-booker"
-      }
+        "projectId": "vehicaid-booker"
+      },
+      "apiUrl": "http://localhost:8001/api/v1",
+      "wsUrl": "ws://localhost:8001/ws"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 30000,
+      "checkAutomatically": "ON_APP_RESUME"
     }
   }
 }
