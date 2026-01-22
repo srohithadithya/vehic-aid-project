@@ -50,8 +50,8 @@ plans = {}
 plan_defs = [
     ('FREE', 'Free Plan', 0, 3650, ["Pay-per-use", "Standard rates"]),
     ('BASIC', 'Basic Plan', 99, 45, ["10% discount", "Priority support"]),
-    ('PREMIUM', 'Premium Plan', 199, 45, ["30% discount", "Free towing (10km)", "Helpline access", "Vehicle exchange (limited)"]),
-    ('ELITE', 'Elite Plan', 399, 45, ["Unlimited free service charges", "VIP support", "Full vehicle exchange"]),
+    ('PREMIUM', 'Premium Plan', 199, 45, ["30% discount", "Free towing (10km)", "Helpline access", "Replacement vehicle (limited)"]),
+    ('ELITE', 'Elite Plan', 399, 45, ["Unlimited free service charges", "VIP support", "Full replacement vehicle"]),
 ]
 
 for code, name, price, days, feats in plan_defs:

@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "npx expo start",
+    "start": "npx expo start --clear",
+    "start:android": "npx expo start --android --clear",
+    "start:ios": "npx expo start --ios --clear",
+    "start:web": "npx expo start --web --clear",
     "android": "npx expo start --android",
     "ios": "npx expo start --ios",
     "web": "npx expo start --web",
@@ -15,8 +18,6 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/netinfo": "^11.0.0",
-    "@react-native-firebase/app": "^18.0.0",
-    "@react-native-firebase/messaging": "^18.0.0",
     "@react-navigation/bottom-tabs": "^6.5.0",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.0",

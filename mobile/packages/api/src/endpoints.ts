@@ -40,6 +40,15 @@ export const vehicleEndpoints = {
   deleteVehicle: (id: number) => apiClient.delete(`/vehicles/${id}/`),
 };
 
+// Service Types & Data Endpoints (from seed data)
+export const serviceDataEndpoints = {
+  getServiceTypes: () => apiClient.get<any[]>('/services/types/'),
+  getVehicleTypes: () => apiClient.get<any[]>('/vehicles/types/'),
+  getPricingRules: (serviceType?: string) =>
+    apiClient.get('/services/pricing-rules/', { params: { service_type: serviceType } }),
+  getServiceDetails: (serviceType: string) => apiClient.get(`/services/types/${serviceType}/`),
+};
+
 // Service Request Endpoints
 export const serviceEndpoints = {
   listRequests: (status?: string) =>
@@ -55,7 +64,14 @@ export const serviceEndpoints = {
     location_lat: number;
     location_lon: number;
     distance?: number;
+    vehicle_id?: number;
   }) => apiClient.post<ServiceQuote>('/services/quote/', data),
+  automindBooking: (data: {
+    latitude: number;
+    longitude: number;
+    service_type: string;
+    description: string;
+  }) => apiClient.post('/services/agentic-booking/', data),
 };
 
 // Provider Job Endpoints
@@ -93,6 +109,18 @@ export const walletEndpoints = {
     apiClient.get('/payments/wallet/transactions/', { params: { limit } }),
 };
 
+// Payment Endpoints
+export const paymentEndpoints = {
+  createPaymentOrder: (amount: number, requestId?: number) =>
+    apiClient.post('/payments/create-order/', { amount, service_request_id: requestId }),
+  verifyPayment: (orderId: string, paymentId: string, signature: string) =>
+    apiClient.post('/payments/verify/', { order_id: orderId, payment_id: paymentId, signature }),
+  getPaymentHistory: (limit: number = 20) =>
+    apiClient.get('/payments/history/', { params: { limit } }),
+  getInvoices: () => apiClient.get('/services/invoices/'),
+  getInvoice: (id: number) => apiClient.get(`/services/invoices/${id}/`),
+};
+
 // Chat Endpoints
 export const chatEndpoints = {
   sendMessage: (chatId: number, message: string) =>
@@ -112,6 +140,13 @@ export const earningsEndpoints = {
   requestPayout: (amount: number, bankAccountId: number) =>
     apiClient.post('/services/provider/payout/', { amount, bank_account_id: bankAccountId }),
   getPayoutHistory: () => apiClient.get('/services/provider/payout/history/'),
+};
+
+// Analytics Endpoints (Provider)
+export const analyticsEndpoints = {
+  getDashboardStats: () => apiClient.get('/services/admin/dashboard-stats/'),
+  getProviderStats: () => apiClient.get('/services/provider/analytics/'),
+  getAIStats: () => apiClient.get('/services/admin/ai-stats/'),
 };
 
 // Ratings & Reviews

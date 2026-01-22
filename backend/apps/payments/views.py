@@ -20,10 +20,10 @@ from apps.users.models import ServiceBooker, ServiceProvider
 from .models import Transaction
 from .serializers import RazorpayWebhookSerializer
 
-# Assuming the commission rate is defined in settings
+# Platform commission rate (25%) - Provider receives 75% of service charges
 PLATFORM_COMMISSION_RATE = Decimal(
-    getattr(settings, "PLATFORM_COMMISSION_RATE", 0.20)
-)  # Default 20%
+    getattr(settings, "PLATFORM_COMMISSION_RATE", "0.25")
+)  # 25% commission (provider receives 75%)
 
 
 class PaymentInitiationView(APIView):

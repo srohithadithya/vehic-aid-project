@@ -146,6 +146,20 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class VehicleExchangeSerializer(serializers.ModelSerializer):
+    # Make vehicle fields optional - they will be assigned by admin/support
+    original_vehicle = serializers.PrimaryKeyRelatedField(
+        queryset=Vehicle.objects.all(), 
+        required=False, 
+        allow_null=True,
+        help_text="User's original vehicle - assigned by support"
+    )
+    rental_vehicle = serializers.PrimaryKeyRelatedField(
+        queryset=Vehicle.objects.all(), 
+        required=False, 
+        allow_null=True,
+        help_text="Rental vehicle to be provided - assigned by support"
+    )
+    
     class Meta:
         model = VehicleExchange
         fields = [

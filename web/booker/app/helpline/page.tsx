@@ -90,7 +90,7 @@ export default function HelplinePage() {
     const getPlanBenefits = (planName: string) => {
         switch (planName?.toUpperCase()) {
             case 'PREMIUM':
-                return ['24/7 Dedicated Support', 'Priority Response', 'No Wait Time', 'Vehicle Exchange Access'];
+                return ['24/7 Dedicated Support', 'Priority Response', 'No Wait Time', 'Replacement Vehicle Access'];
             case 'STANDARD':
                 return ['24/7 Toll-Free Support', 'Average Wait: 2 mins', 'Call Records Saved'];
             default:

@@ -1,0 +1,117 @@
+{
+  "booker": {
+    "screens": [
+      {
+        "name": "OnboardingScreen",
+        "path": "src/screens/Onboarding.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "LoginScreen",
+        "path": "src/screens/Login.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "SignupScreen",
+        "path": "src/screens/Signup.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "HomeScreen",
+        "path": "src/screens/Home.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "BookingScreen",
+        "path": "src/screens/Booking.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ServiceListScreen",
+        "path": "src/screens/ServiceList.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ServiceDetailScreen",
+        "path": "src/screens/ServiceDetail.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "BookingHistoryScreen",
+        "path": "src/screens/BookingHistory.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "PaymentScreen",
+        "path": "src/screens/Payment.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ProfileScreen",
+        "path": "src/screens/Profile.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "SettingsScreen",
+        "path": "src/screens/Settings.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "NotificationsScreen",
+        "path": "src/screens/Notifications.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "SupportScreen",
+        "path": "src/screens/Support.tsx",
+        "size": "1242x2688"
+      }
+    ],
+    "dimensions": {
+      "mobile": {
+        "width": 1242,
+        "height": 2688,
+        "ratio": "19.5:9"
+      },
+      "tablet": {
+        "width": 2048,
+        "height": 1536,
+        "ratio": "4:3"
+      }
+    }
+  },
+  "provider": {
+    "screens": [
+      {
+        "name": "ProviderOnboarding",
+        "path": "src/screens/Onboarding.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ProviderLogin",
+        "path": "src/screens/Login.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ProviderSignup",
+        "path": "src/screens/Signup.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "ProviderDashboard",
+        "path": "src/screens/Dashboard.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "AvailabilityScreen",
+        "path": "src/screens/Availability.tsx",
+        "size": "1242x2688"
+      },
+      {
+        "name": "BookingsScreen",
+        "path": "src/screens/Bookings.tsx",
+        "size": "1242x2688"
+      }
+    ]
+  }
+}

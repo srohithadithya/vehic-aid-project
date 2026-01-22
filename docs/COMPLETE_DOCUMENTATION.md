@@ -1037,8 +1037,8 @@ def calculate_reward_points(service_request, user_tier):
 |------|-------|----------|
 | **Free** | ₹0 | Pay-per-use, standard rates |
 | **Basic** | ₹99/45days | 10% discount, priority support |
-| **Premium** | ₹199/45days | upto 30% discount, free towing (5-10km), helpline, vehicle exchange for limited time |
-| **Elite** | ₹399/45days | Unlimited free services charges, VIP support, vehicle exchange |
+| **Premium** | ₹199/45days | upto 30% discount, free towing (5-10km), helpline, replacement vehicle for limited time |
+| **Elite** | ₹399/45days | Unlimited free services charges, VIP support, full replacement vehicle |
 
 #### 7. **Vehicle Type Support**
 - Two-Wheeler (Bike/Scooter)
@@ -1070,9 +1070,9 @@ def calculate_reward_points(service_request, user_tier):
 
 ### Advanced Features
 
-#### 1. **Vehicle Exchange Program**
-- Rental vehicle provided during service
-- Available for Elite plan subscribers
+#### 1. **Replacement Vehicle Program**
+- Temporary rental vehicle provided during service
+- Available for Premium (limited) and Elite (full) plan subscribers
 - Seamless handover process
 
 #### 2. **AutoMind Intelligence**

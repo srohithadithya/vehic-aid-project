@@ -14,10 +14,10 @@ VehicAid uses a transparent, fair commission model where service providers earn 
 ## Commission Model
 
 ### Platform Commission Rate
-- **Base Rate**: 20% (configured in `backend/vehic_aid_backend/settings/base.py`)
-- **Service Charge Split**: 70% to provider, 30% to platform
+- **Base Rate**: 25% (configured in `backend/vehic_aid_backend/settings/base.py`)
+- **Service Charge Split**: 75% to provider, 25% to platform
 - **Spare Parts**: 100% to provider (no commission)
-- **Platform Fee**: ₹20 flat fee per service
+- **Platform Fee**: ₹11 flat fee per service
 
 ---
 
@@ -138,13 +138,13 @@ spare_parts_total = models.DecimalField(
     default=0.00
 )
 
-def finalize_quote(self, spare_parts=None, platform_fee=Decimal("20.00"), tax_rate=Decimal("0.05")):
+def finalize_quote(self, spare_parts=None, platform_fee=Decimal("11.00"), tax_rate=Decimal("0.05")):
     if spare_parts:
         self.spare_parts_details = spare_parts
         self.spare_parts_total = sum(Decimal(str(p['price'])) for p in spare_parts)
     
-    # Provider gets 70% of service + 100% of spare parts
-    self.provider_payout = (service_portion * Decimal("0.70")) + self.spare_parts_total
+    # Provider gets 75% of service + 100% of spare parts
+    self.provider_payout = (service_portion * Decimal("0.75")) + self.spare_parts_total
 ```
 
 ### API Endpoint
@@ -184,9 +184,9 @@ Content-Type: application/json
    - Transaction record created
 
 4. **Commission Calculation**
-   - Platform deducts 30% from service portion
-   - Platform adds ₹20 platform fee
-   - Provider receives 70% of service + 100% of spare parts
+   - Platform deducts 25% from service portion
+   - Platform adds ₹11 platform fee
+   - Provider receives 75% of service + 100% of spare parts
 
 5. **Payout Processing**
    - Provider requests payout from earnings page
@@ -250,13 +250,15 @@ Platform Fee: ₹11
 ### Settings Location
 `backend/vehic_aid_backend/settings/base.py`:
 ```python
-VEHIC_AID_COMMISSION_RATE = 0.11  # 11% commission rate
+VEHIC_AID_COMMISSION_RATE = 0.25  # 25% commission rate
+PLATFORM_COMMISSION_RATE = 0.25  # Alias for consistency
 ```
 
 ### Financial Tools
 `backend/apps/payments/financial_tools.py`:
 ```python
-PLATFORM_COMMISSION_RATE = Decimal(getattr(settings, "PLATFORM_COMMISSION_RATE", 0.11))
+PLATFORM_COMMISSION_RATE = Decimal(getattr(settings, "PLATFORM_COMMISSION_RATE", "0.25"))
+PLATFORM_FEE = Decimal(getattr(settings, "PLATFORM_FEE", "11.00"))  # ₹11 per service
 
 def calculate_provider_payout(total_amount, spare_parts_total=Decimal("0.00")):
     """

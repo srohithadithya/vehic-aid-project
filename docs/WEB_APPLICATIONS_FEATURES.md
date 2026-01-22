@@ -258,13 +258,13 @@ VehicAid consists of three Next.js web applications and their corresponding mobi
   - `GET /services/invoices/{id}/` - Invoice details
   - `GET /services/invoices/{id}/download/` - Download PDF
 
-### 11. **Vehicle Exchange** (`/exchange`)
+### 11. **Replacement Vehicle** (`/exchange`)
 - **Features**:
   - **Subscription-Based Access**:
     - Available only for **Premium** and **Elite** plan members
     - Free plan users see upgrade prompt
   - **Temporary Vehicle Rental**:
-    - Request a replacement vehicle while yours is being serviced
+    - Request a temporary replacement vehicle while yours is being serviced
     - Specify pickup location
     - Select rental duration (1-7 days)
     - Estimated rental fee: ₹1,500/day
@@ -275,24 +275,25 @@ VehicAid consists of three Next.js web applications and their corresponding mobi
     - View estimated cost (includes insurance and delivery)
     - Submit request (creates service request in backend)
     - Support agent contacts for confirmation
-  - **Not a Marketplace**: This is NOT for buying/selling vehicles, but for temporary vehicle swaps during service
+  - **Not a Marketplace**: This is NOT for buying/selling vehicles, but for temporary replacement vehicles during service
 
 - **API Endpoints**:
   - `GET /services/subscriptions/current/` - Check eligibility
-  - `POST /services/request/` - Create exchange request
+  - `POST /services/request/` - Create replacement vehicle request
 
 ### 12. **Health Check (IoT)** (`/health`)
 - **Features**:
-  - **Future Feature - UI Only**:
-    - Page exists but no actual IoT devices connected yet
-    - Displays placeholder/demo data
+  - **🚀 Coming Soon - Future Feature**:
+    - IoT integration is planned for a future release
+    - Page exists with UI preview but no actual IoT devices connected
+    - Prominent "Coming Soon" banner displayed
   - **Planned IoT Integration**:
     - Battery voltage monitoring
     - Engine diagnostics
     - Signal strength
     - CPU/system health
   - **Current Status**:
-    - Shows sample health metrics
+    - Shows sample health metrics as preview
     - Educational page about IoT capabilities
     - Promotes future IoT device availability
   - **Emergency Button Concept**:
@@ -300,7 +301,7 @@ VehicAid consists of three Next.js web applications and their corresponding mobi
     - Works even without phone battery/network
     - Future hardware integration planned
 
-- **Note**: This is a **future upgrade** - the page exists to showcase the concept, but no real IoT devices are currently integrated.
+- **Note**: This is a **future upgrade** - the page exists to showcase the concept with a "Coming Soon" banner. No real IoT devices are currently integrated.
 
 ### 13. **Vehicle Placement** (`/placement`)
 - **Features**:

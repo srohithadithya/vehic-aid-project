@@ -1,50 +1,68 @@
 {
   "expo": {
-    "name": "VehicAid Provider",
-    "slug": "vehic-aid-provider",
+    "name": "VA Provider",
+    "description": "VehicAid provider dashboard - Manage service requests, earnings, and customer interactions",
+    "slug": "vehicaid-provider",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FF6B35"
+      "backgroundColor": "#004E89"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTabletMode": true,
-      "bundleIdentifier": "com.vehicaid.provider"
+      "bundleIdentifier": "com.vehicaid.provider",
+      "icon": "./assets/icon.png",
+      "appStoreUrl": "https://apps.apple.com/app/vehicaid-provider"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF6B35"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#004E89"
       },
       "package": "com.vehicaid.provider",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.vehicaid.provider",
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "VA Provider - Earn with VehicAid",
+      "shortName": "VA Provider",
+      "themeColor": "#004E89"
     },
     "plugins": [
-      "expo-font",
-      "expo-location",
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/notification-sound.wav"]
+          "icon": "../../provider icons and favicons/android-icon-192x192.png",
+          "color": "#004E89"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-location",
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
-        "projectId": "vehic-aid-provider"
-      }
+        "projectId": "vehicaid-provider"
+      },
+      "apiUrl": "http://localhost:8001/api/v1",
+      "wsUrl": "ws://localhost:8001/ws"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 30000,
+      "checkAutomatically": "ON_APP_RESUME"
     }
   }
 }

@@ -371,10 +371,25 @@ class Review(models.Model):
 
 
 class VehicleExchange(models.Model):
-    """Exchange a user's vehicle with a rental vehicle during service."""
+    """
+    Replacement Vehicle Service - Provides a temporary rental vehicle 
+    while user's original vehicle is being serviced/repaired.
+    
+    NOT for buying/selling vehicles. Premium/Elite feature only.
+    """
     request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name="exchange")
-    original_vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="exchanges_as_original")
-    rental_vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name="exchanges_as_rental")
+    original_vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.CASCADE, 
+        related_name="exchanges_as_original",
+        null=True, blank=True,
+        help_text="User's original vehicle - assigned by support when processing request"
+    )
+    rental_vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.CASCADE, 
+        related_name="exchanges_as_rental",
+        null=True, blank=True,
+        help_text="Temporary rental vehicle provided - assigned by support"
+    )
     pickup_location = models.CharField(max_length=255)
     return_location = models.CharField(max_length=255)
     rental_fee = models.DecimalField(max_digits=8, decimal_places=2)
@@ -389,11 +404,11 @@ class VehicleExchange(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Exchange for Request {self.request.id} - {self.status}"
+        return f"Replacement Vehicle for Request {self.request.id} - {self.status}"
 
     class Meta:
-        verbose_name = "Vehicle Exchange"
-        verbose_name_plural = "Vehicle Exchanges"
+        verbose_name = "Replacement Vehicle Request"
+        verbose_name_plural = "Replacement Vehicle Requests"
         ordering = ["-created_at"]
 
 
