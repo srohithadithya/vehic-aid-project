@@ -154,6 +154,8 @@ jobs:
     - name: Check if Kubernetes is configured
       id: check_kube
       run: |
+        # Prevent secret exposure in logs
+        set +x
         if [ -z "${{ secrets.KUBE_CONFIG }}" ]; then
           echo "KUBE_CONFIG secret is not set. Skipping Kubernetes deployment."
           echo "skip_deploy=true" >> $GITHUB_OUTPUT
@@ -209,16 +211,18 @@ jobs:
         echo "  Deploy: $deploy_result"
         echo ""
         
-        # Determine if this is a build run (main branch) or test-only run (PR/other)
+        # Determine if builds were attempted (not skipped)
         build_attempted=false
-        if [[ "$backend_result" == "success" || "$web_result" == "success" ]]; then
+        if [[ "$backend_result" != "skipped" || "$web_result" != "skipped" ]]; then
           build_attempted=true
         fi
         
-        # Check for failures
-        if [[ "$backend_result" == "failure" || "$web_result" == "failure" ]]; then
-          echo "❌ Build failed. Please check the logs."
-          exit 1
+        # Check for failures (only matters if builds were attempted)
+        if [[ "$build_attempted" == "true" ]]; then
+          if [[ "$backend_result" == "failure" || "$web_result" == "failure" ]]; then
+            echo "❌ Build failed. Please check the logs."
+            exit 1
+          fi
         fi
         
         # Report success based on what ran
