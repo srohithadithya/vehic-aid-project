@@ -162,7 +162,7 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 
 #### 1. Vehic-Aid Booker (Customer App)
 **Path**: `mobile/booker` (Planned)
-- **Status**: 🟡 Ready for development (3-5 days)
+- **Status**: 🟡 Ready for development 
 - **Features to Port from Web**:
   - 🧠 **AutoMind Intelligence**: Groq-powered conversational diagnostics and booking
   - 📱 **Dashboard**: KPIs, active requests, quick actions
@@ -178,7 +178,7 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 
 #### 2. Vehic-Aid Provider (Partner App)
 **Path**: `mobile/provider` (Planned)
-- **Status**: 🟡 Ready for development (3-5 days)
+- **Status**: 🟡 Ready for development 
 - **Features to Port from Web**:
   - 🌙 **Dashboard**: Real-time job feed with distance calculation
   - 🛎️ **Job Management**: Accept/decline jobs, navigation
