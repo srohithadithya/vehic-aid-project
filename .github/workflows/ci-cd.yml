@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -97,6 +101,7 @@ jobs:
 
   # Build Web Applications
   web-build:
+    needs: backend-test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
@@ -142,7 +147,8 @@ jobs:
   deploy:
     needs: [backend-build, web-build]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.KUBE_CONFIG != ''
+    continue-on-error: true
     
     steps:
     - uses: actions/checkout@v3
@@ -168,14 +174,26 @@ jobs:
         kubectl get pods
         kubectl get services
 
-  # Notify on Success
+  # Notify on Completion
   notify:
-    needs: [deploy]
+    needs: [backend-build, web-build, deploy]
     runs-on: ubuntu-latest
-    if: success()
+    if: always()
     
     steps:
-    - name: Send success notification
+    - name: Check workflow status
       run: |
-        echo "Deployment successful! 🎉"
-        # Add Slack/Discord/Email notification here
+        if [ "${{ needs.backend-build.result }}" == "success" ] && [ "${{ needs.web-build.result }}" == "success" ]; then
+          echo "✅ Build completed successfully!"
+          echo "Backend and web applications built and pushed to registry."
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "🚀 Deployment to Kubernetes successful!"
+          elif [ "${{ needs.deploy.result }}" == "skipped" ]; then
+            echo "⏭️ Kubernetes deployment skipped (KUBE_CONFIG not configured)"
+          else
+            echo "⚠️ Kubernetes deployment failed or was skipped"
+          fi
+        else
+          echo "❌ Build failed. Please check the logs."
+          exit 1
+        fi
