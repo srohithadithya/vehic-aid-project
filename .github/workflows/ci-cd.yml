@@ -147,21 +147,36 @@ jobs:
   deploy:
     needs: [backend-build, web-build]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.KUBE_CONFIG
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     continue-on-error: true
     
     steps:
+    - name: Check if Kubernetes is configured
+      id: check_kube
+      run: |
+        if [ -z "${{ secrets.KUBE_CONFIG }}" ]; then
+          echo "KUBE_CONFIG secret is not set. Skipping Kubernetes deployment."
+          echo "skip_deploy=true" >> $GITHUB_OUTPUT
+        else
+          echo "KUBE_CONFIG is configured. Proceeding with deployment."
+          echo "skip_deploy=false" >> $GITHUB_OUTPUT
+        fi
+    
     - uses: actions/checkout@v3
+      if: steps.check_kube.outputs.skip_deploy == 'false'
     
     - name: Set up kubectl
+      if: steps.check_kube.outputs.skip_deploy == 'false'
       uses: azure/setup-kubectl@v3
     
     - name: Configure kubectl
+      if: steps.check_kube.outputs.skip_deploy == 'false'
       run: |
         echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
         export KUBECONFIG=kubeconfig
     
     - name: Deploy to Kubernetes
+      if: steps.check_kube.outputs.skip_deploy == 'false'
       run: |
         kubectl apply -f infrastructure/k8s/
         kubectl rollout status deployment/vehicaid-backend
@@ -170,6 +185,7 @@ jobs:
         kubectl rollout status deployment/vehicaid-web-booker
     
     - name: Verify deployment
+      if: steps.check_kube.outputs.skip_deploy == 'false'
       run: |
         kubectl get pods
         kubectl get services
@@ -193,27 +209,32 @@ jobs:
         echo "  Deploy: $deploy_result"
         echo ""
         
-        # Check if builds succeeded or were skipped
-        if [[ "$backend_result" == "success" || "$backend_result" == "skipped" ]] && \
-           [[ "$web_result" == "success" || "$web_result" == "skipped" ]]; then
-          
-          if [[ "$backend_result" == "success" && "$web_result" == "success" ]]; then
-            echo "✅ Build completed successfully!"
-            echo "Backend and web applications built and pushed to registry."
-          fi
+        # Determine if this is a build run (main branch) or test-only run (PR/other)
+        build_attempted=false
+        if [[ "$backend_result" == "success" || "$web_result" == "success" ]]; then
+          build_attempted=true
+        fi
+        
+        # Check for failures
+        if [[ "$backend_result" == "failure" || "$web_result" == "failure" ]]; then
+          echo "❌ Build failed. Please check the logs."
+          exit 1
+        fi
+        
+        # Report success based on what ran
+        if [[ "$build_attempted" == "true" ]]; then
+          echo "✅ Build completed successfully!"
+          echo "Backend and web applications built and pushed to registry."
           
           if [[ "$deploy_result" == "success" ]]; then
             echo "🚀 Deployment to Kubernetes successful!"
           elif [[ "$deploy_result" == "skipped" ]]; then
-            echo "⏭️ Kubernetes deployment skipped (not on main branch or KUBE_CONFIG not configured)"
+            echo "⏭️ Kubernetes deployment skipped"
           elif [[ "$deploy_result" == "failure" ]]; then
-            echo "⚠️ Kubernetes deployment encountered an error (check logs if this was unexpected)"
-          fi
-          
-          if [[ "$backend_result" == "skipped" && "$web_result" == "skipped" ]]; then
-            echo "✅ Tests passed! (Builds skipped - not on main branch)"
+            echo "⚠️ Kubernetes deployment encountered an error"
+            echo "Note: Deployment is optional and did not fail the workflow"
           fi
         else
-          echo "❌ Build failed. Please check the logs."
-          exit 1
+          # Builds were skipped - this is expected for PRs and non-main branches
+          echo "✅ Tests passed! (Builds skipped - not running on main branch)"
         fi
