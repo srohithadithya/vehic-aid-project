@@ -1,7 +1,7 @@
 # 🚗 VehicAid - Groq-Powered AI Roadside Assistance
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-4.2-green.svg)](https://www.djangoproject.com/)
 [![React](https://img.shields.io/badge/react-18.0-blue.svg)](https://reactjs.org/)
 [![React Native](https://img.shields.io/badge/react--native-0.72-blue.svg)](https://reactnative.dev/)
