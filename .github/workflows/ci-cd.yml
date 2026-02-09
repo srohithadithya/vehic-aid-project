@@ -147,7 +147,7 @@ jobs:
   deploy:
     needs: [backend-build, web-build]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.KUBE_CONFIG != ''
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.KUBE_CONFIG
     continue-on-error: true
     
     steps:
@@ -183,12 +183,12 @@ jobs:
     steps:
     - name: Check workflow status
       run: |
-        if [ "${{ needs.backend-build.result }}" == "success" ] && [ "${{ needs.web-build.result }}" == "success" ]; then
+        if [[ "${{ needs.backend-build.result }}" == "success" && "${{ needs.web-build.result }}" == "success" ]]; then
           echo "✅ Build completed successfully!"
           echo "Backend and web applications built and pushed to registry."
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
+          if [[ "${{ needs.deploy.result }}" == "success" ]]; then
             echo "🚀 Deployment to Kubernetes successful!"
-          elif [ "${{ needs.deploy.result }}" == "skipped" ]; then
+          elif [[ "${{ needs.deploy.result }}" == "skipped" ]]; then
             echo "⏭️ Kubernetes deployment skipped (KUBE_CONFIG not configured)"
           else
             echo "⚠️ Kubernetes deployment failed or was skipped"
