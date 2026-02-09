@@ -183,15 +183,35 @@ jobs:
     steps:
     - name: Check workflow status
       run: |
-        if [[ "${{ needs.backend-build.result }}" == "success" && "${{ needs.web-build.result }}" == "success" ]]; then
-          echo "✅ Build completed successfully!"
-          echo "Backend and web applications built and pushed to registry."
-          if [[ "${{ needs.deploy.result }}" == "success" ]]; then
+        backend_result="${{ needs.backend-build.result }}"
+        web_result="${{ needs.web-build.result }}"
+        deploy_result="${{ needs.deploy.result }}"
+        
+        echo "Job Results:"
+        echo "  Backend Build: $backend_result"
+        echo "  Web Build: $web_result"
+        echo "  Deploy: $deploy_result"
+        echo ""
+        
+        # Check if builds succeeded or were skipped
+        if [[ "$backend_result" == "success" || "$backend_result" == "skipped" ]] && \
+           [[ "$web_result" == "success" || "$web_result" == "skipped" ]]; then
+          
+          if [[ "$backend_result" == "success" && "$web_result" == "success" ]]; then
+            echo "✅ Build completed successfully!"
+            echo "Backend and web applications built and pushed to registry."
+          fi
+          
+          if [[ "$deploy_result" == "success" ]]; then
             echo "🚀 Deployment to Kubernetes successful!"
-          elif [[ "${{ needs.deploy.result }}" == "skipped" ]]; then
-            echo "⏭️ Kubernetes deployment skipped (KUBE_CONFIG not configured)"
-          else
-            echo "⚠️ Kubernetes deployment failed or was skipped"
+          elif [[ "$deploy_result" == "skipped" ]]; then
+            echo "⏭️ Kubernetes deployment skipped (not on main branch or KUBE_CONFIG not configured)"
+          elif [[ "$deploy_result" == "failure" ]]; then
+            echo "⚠️ Kubernetes deployment encountered an error (check logs if this was unexpected)"
+          fi
+          
+          if [[ "$backend_result" == "skipped" && "$web_result" == "skipped" ]]; then
+            echo "✅ Tests passed! (Builds skipped - not on main branch)"
           fi
         else
           echo "❌ Build failed. Please check the logs."
