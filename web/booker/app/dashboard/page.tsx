@@ -30,7 +30,7 @@ export default function Dashboard() {
                 const iotResponse = await apiClient.get('/iot/status/');
                 setDeviceStatus(iotResponse.data);
             } catch (err) {
-                console.log("No IoT device linked or error fetching status.");
+                console.debug("No IoT device linked or error fetching status.");
                 setDeviceStatus(null);
             }
 

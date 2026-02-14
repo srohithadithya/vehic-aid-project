@@ -118,12 +118,12 @@ function RequestStatusContent() {
         socketRef.current = ws;
 
         ws.onopen = () => {
-            console.log("WebSocket Connected");
+            console.debug("WebSocket Connected");
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log("WS Message:", data);
+            console.debug("WS Message:", data);
 
             if (data.status) {
                 setRequest(prev => {
@@ -141,7 +141,7 @@ function RequestStatusContent() {
                 });
             }
             if (data.type === 'status_update' && data.message === 'location') {
-                console.log("Provider Location:", data.latitude, data.longitude);
+                console.debug("Provider Location:", data.latitude, data.longitude);
             }
         };
 

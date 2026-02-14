@@ -9,15 +9,21 @@ class CustomUser(AbstractUser):
     """
     Base user model using phone number/email for login.
     """
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('booker', 'Booker'),
+        ('provider', 'Provider'),
+    ]
 
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
     fcm_device_token = models.TextField(null=True, blank=True, help_text="Firebase Cloud Messaging Token for Push Notifications")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='booker')
 
     # We will use 'username' only for the admin panel, primarily using phone for login
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
 
-    # Custom roles based on user type
+    # Custom roles based on user type (Legacy flags kept for compatibility)
     is_service_booker = models.BooleanField(
         default=True, help_text="Designates this user as a customer."
     )
@@ -25,6 +31,16 @@ class CustomUser(AbstractUser):
         default=False,
         help_text="Designates this user as a professional service provider.",
     )
+
+    def save(self, *args, **kwargs):
+        # Synchronize boolean flags with role field
+        if self.is_superuser or self.is_staff:
+            self.role = 'admin'
+        elif self.is_service_provider:
+            self.role = 'provider'
+        elif self.is_service_booker:
+            self.role = 'booker'
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email or self.username
