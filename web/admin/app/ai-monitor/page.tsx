@@ -37,6 +37,7 @@ export default function AIMonitorPage() {
                 const res = await apiClient.get('/services/admin/ai-stats/');
                 setStats(res.data);
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error("AI Stats fetch failed", err);
             } finally {
                 setLoading(false);

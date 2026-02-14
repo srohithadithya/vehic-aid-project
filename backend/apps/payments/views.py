@@ -20,6 +20,9 @@ from apps.users.models import ServiceBooker, ServiceProvider
 from .models import Transaction
 from .serializers import RazorpayWebhookSerializer
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Platform commission rate (25%) - Provider receives 75% of service charges
 PLATFORM_COMMISSION_RATE = Decimal(
     getattr(settings, "PLATFORM_COMMISSION_RATE", "0.25")
@@ -45,6 +48,9 @@ class PaymentInitiationView(APIView):
 
         try:
             service_request = ServiceRequest.objects.get(id=service_request_id)
+            # RLS Check: Ensure booker only initiates for their own request
+            if service_request.booker != request.user:
+                 return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
         except ServiceRequest.DoesNotExist:
             return Response({'error': 'Service Request not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -82,8 +88,8 @@ class PaymentInitiationView(APIView):
             return Response(order, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"Error creating Razorpay order: {e}")
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.error(f"Error creating Razorpay order: {e}", exc_info=True)
+            return Response({'error': 'Failed to initiate payment. Details logged.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RazorpayWebhookView(APIView):
@@ -95,31 +101,25 @@ class RazorpayWebhookView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # 1. SECURITY: Verify the signature sent by Razorpay
+        # 1. SECURITY: Verify the signature sent by Razorpay using official SDK
         received_signature = request.headers.get("X-Razorpay-Signature")
         if not received_signature:
+            logger.warning("Missing Razorpay signature header.")
             return Response(
                 {"error": "Missing signature"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Hash the request body to compare with the signature
         webhook_secret = settings.RAZORPAY_WEBHOOK_SECRET
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-        # Ensure raw body is used for hashing
         try:
-            request_body = request.body.decode("utf-8")
-        except:
-            request_body = json.dumps(request.data)
-
-        # Create the expected HMAC signature
-        generated_signature = hmac.new(
-            webhook_secret.encode("utf-8"), request_body.encode("utf-8"), hashlib.sha256
-        ).hexdigest()
-
-        # Compare generated signature with the received signature
-        if generated_signature != received_signature:
-            # Log the security failure
-            print("SECURITY ALERT: Invalid Razorpay signature received.")
+            client.utility.verify_webhook_signature(
+                request.body.decode("utf-8"), 
+                received_signature, 
+                webhook_secret
+            )
+        except razorpay.errors.SignatureVerificationError as e:
+            logger.critical(f"SECURITY ALERT: Invalid Razorpay signature received. Payload tampering suspected. {e}")
             return Response(
                 {"error": "Invalid signature"}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -127,7 +127,8 @@ class RazorpayWebhookView(APIView):
         # 2. Validation and Processing
         serializer = RazorpayWebhookSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"Invalid webhook payload: {serializer.errors}")
+            return Response({"error": "Payload validation failed."}, status=status.HTTP_400_BAD_REQUEST)
 
         order_id = serializer.validated_data["extracted_order_id"]
         payment_id = serializer.validated_data["extracted_payment_id"]
@@ -165,7 +166,7 @@ class RazorpayWebhookView(APIView):
                         rewards, _ = RewardsProgram.objects.get_or_create(user=service_request.booker.servicebooker)
                         rewards.reward_for_service(service_request)
                     except Exception as e:
-                        print(f"Error adding rewards: {e}")
+                        logger.error(f"Error adding rewards: {e}", exc_info=True)
 
                 # Note: The daily settlement task will pick this transaction up later.
 
@@ -183,9 +184,9 @@ class RazorpayWebhookView(APIView):
                 )
             except Exception as e:
                 # Catch unexpected errors during processing
-                print(f"FATAL ERROR during payment processing: {e}")
+                logger.error(f"FATAL ERROR during payment processing: {e}", exc_info=True)
                 return Response(
-                    {"error": "Internal processing error."},
+                    {"error": "Internal processing error. Operation recorded for audit."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
@@ -217,7 +218,7 @@ class MockPaymentConfirmView(APIView):
                     rewards, _ = RewardsProgram.objects.get_or_create(user=service_request.booker.servicebooker)
                     rewards.reward_for_service(service_request)
                 except Exception as e:
-                    print(f"Error adding rewards: {e}")
+                    logger.error(f"Error adding rewards: {e}", exc_info=True)
 
                 # Ensure booker profile is used
                 booker_profile = None
@@ -274,10 +275,8 @@ class MockPaymentConfirmView(APIView):
                             status='ACTIVE'
                         )
                     except Exception as e:
-                        print(f"DEBUG ERROR creating subscription: {e}")
-                        import traceback
-                        traceback.print_exc()
-                        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        logger.error(f"DEBUG ERROR creating subscription: {e}", exc_info=True)
+                        return Response({"error": "Failed to create subscription record."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
                     # Log Transaction (Optional for now, but good for completeness)
                     # We'd need a Transaction model update to support non-service_request payments (nullable)

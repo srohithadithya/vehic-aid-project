@@ -26,9 +26,15 @@ urlpatterns = [
 ]
 
 # Serving Static and Media Files in Development
+from vehic_aid_backend.views import ProtectedMediaView
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', ProtectedMediaView.as_view(), name='protected_media'),
+]
+
 if settings.DEBUG:
     import debug_toolbar
-
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    # Note: In production (defined in the Canvas), static/media are served via AWS S3.
+    # static() is for non-protected static files (CSS/JS)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

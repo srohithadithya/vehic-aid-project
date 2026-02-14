@@ -41,7 +41,7 @@ export default function VehiclePlacementPage() {
             const sub = subRes.data;
             setHasSubscription(sub && sub.plan && sub.plan.name !== 'FREE');
         } catch (error) {
-            console.log('Placement fetch error:', error);
+            console.debug('Placement fetch error:', error);
         } finally {
             setLoading(false);
         }

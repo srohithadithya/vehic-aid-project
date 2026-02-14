@@ -29,7 +29,7 @@ export default function LoginPage() {
         setError('');
 
         try {
-            console.log('Attempting login with:', { username: email, password: password });
+            console.debug('Attempting login with:', { username: email, password: password });
             await login({
                 username: email,
                 password: password,

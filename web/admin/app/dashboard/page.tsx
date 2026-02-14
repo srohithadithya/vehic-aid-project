@@ -102,6 +102,7 @@ export default function DashboardPage() {
 
                 setError(null);
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.error('Error fetching dashboard data:', err);
                 if (loading) setError('Unable to connect to live system.');
             } finally {

@@ -71,7 +71,7 @@ export default function SignUpForm() {
                 router.push('/dashboard');
             }
         } catch (err: any) {
-            console.log("Registration error:", err);
+            console.debug("Registration error:", err);
             setError(err.response?.data?.detail || "Registration failed. Please try again.");
             // If error is an object (validation errors), show the first one
             if (err.response?.data && typeof err.response.data === 'object' && !err.response.data.detail) {

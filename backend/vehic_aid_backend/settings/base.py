@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # Third-Party Apps
     "rest_framework",  # Django REST Framework
     "rest_framework_simplejwt",  # JWT Authentication
+    "rest_framework_simplejwt.token_blacklist",
     "channels",  # Real-time WebSockets
     "django_filters",  # Advanced filtering for DRF
     "django_cleanup.apps.CleanupConfig",  # Cleans old files on model delete
@@ -196,8 +197,8 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 # --- JWT Authentication Settings ---
 from datetime import timedelta
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7), # Task: Set to 7 days
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "ALGORITHM": "HS256",
@@ -226,6 +227,7 @@ REST_FRAMEWORK = {
         "booking": "20/hour",  # Custom scope for booking security
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "vehic_aid_backend.security.generic_exception_handler",
 }
 
 SPECTACULAR_SETTINGS = {

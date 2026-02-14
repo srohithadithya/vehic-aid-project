@@ -1,7 +1,0 @@
-{
-  "include": ["apps/**/*.tsx", "apps/**/*.ts", "packages/**/*.tsx", "packages/**/*.ts"],
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "allowJs": true
-  }
-}

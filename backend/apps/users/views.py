@@ -143,6 +143,7 @@ class UserProfileView(APIView):
             "full_name": f"{user.first_name} {user.last_name}",
             "email": user.email,
             "phone": user.phone_number,
+            "role": user.role,
             "is_provider": user.is_service_provider,
         }
 

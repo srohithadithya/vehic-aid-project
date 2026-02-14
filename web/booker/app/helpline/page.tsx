@@ -49,7 +49,7 @@ export default function HelplinePage() {
             setSubscription(subRes.data);
             setCallHistory(callsRes.data.results || callsRes.data || []);
         } catch (error) {
-            console.log('Helpline fetch error:', error);
+            console.debug('Helpline fetch error:', error);
         } finally {
             setLoading(false);
         }
@@ -77,7 +77,7 @@ export default function HelplinePage() {
             window.location.href = `tel:${number.replace(/-/g, '')}`;
             fetchData();
         } catch (error) {
-            console.log('Call log error:', error);
+            console.debug('Call log error:', error);
         }
     };
 
