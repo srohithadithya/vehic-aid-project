@@ -1420,12 +1420,12 @@ psql vehicaid < backup.sql
 ## Support & Contact
 
 - **Documentation**: `/docs` directory
-- **API Reference**: `/docs/API_REFERENCE.md`
+- **API Reference**: `/docs/API_REFERENCE.md` (Updated v2.6)
 - **GitHub**: https://github.com/yourusername/vehic-aid-project
 - **Email**: support@vehicaid.com
 
 ---
 
-**Last Updated**: January 19, 2026
+**Last Updated**: February 14, 2026
 **Version**: 1.0.0
 **Maintained by**: VehicAid Development Team
