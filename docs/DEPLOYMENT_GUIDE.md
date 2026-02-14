@@ -183,5 +183,5 @@ NEXT_PUBLIC_WS_URL=wss://api.vehicaid.com/ws
 
 ---
 
-**Last Updated**: January 20, 2026  
+**Last Updated**: February 14, 2026  
 **Version**: 2.6.0

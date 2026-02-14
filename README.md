@@ -190,7 +190,7 @@ VehicAid provides comprehensive roadside assistance for **ALL vehicle types** wi
 - **Stack**: Expo Router, NativeWind, React Context (from web)
 - **Code Reuse**: ~70% (API services, contexts, business logic)
 
-> 📱 **Mobile Development Guide**: See [WEB_APPLICATIONS_FEATURES.md](docs/WEB_APPLICATIONS_FEATURES.md#mobile-app-readiness) for detailed feature parity analysis and development roadmap.
+> 📱 **Mobile Development Guide**: See [Web Features](docs/WEB_FEATURES.md#mobile-app-readiness) for detailed feature parity analysis and development roadmap.
 
 ### **Infrastructure**
 - **Containerization**: Docker
@@ -664,7 +664,7 @@ EXPO_PUBLIC_WS_URL=ws://localhost:8001/ws
 ## 📖 Documentation
 
 - **[Complete Documentation](docs/COMPLETE_DOCUMENTATION.md)** - Master reference guide
-- **[Web Applications Features](docs/WEB_APPLICATIONS_FEATURES.md)** - Detailed web app features & mobile readiness
+- **[Web Applications & Admin Features](docs/WEB_FEATURES.md)** - Detailed web app & admin panel features
 - **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Complete deployment instructions
 - **[SMTP Setup](docs/SMTP_SETUP.md)** - Email configuration guide
 - **[Free SMS Setup](docs/FREE_SMS_SETUP.md)** - SMS service configuration
@@ -719,4 +719,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Built with ❤️ by the VehicAid Team**
 
 **Version**: 2.6.0  
-**Last Updated**: January 20, 2026
+**Last Updated**: February 14, 2026
