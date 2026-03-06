@@ -46,8 +46,13 @@ export default function HealthPage() {
         </div>
     );
 
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push('/auth/login?redirect=/health');
+        }
+    }, [user, authLoading, router]);
+
     if (!user) {
-        router.push('/auth/login?redirect=/health');
         return null;
     }
 
