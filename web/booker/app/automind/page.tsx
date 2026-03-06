@@ -61,32 +61,6 @@ export default function AutoMindPage() {
         setInput('');
         setLoading(true);
 
-        // --- Logic: Determine if this is a Support Query or a Booking Request ---
-        const lowerText = textToSend.toLowerCase();
-
-        // 1. Check if it's a general question (Support)
-        if (lowerText.includes('how') || lowerText.includes('what') || lowerText.includes('cost') || lowerText.includes('price') || lowerText.includes('can i')) {
-            setTimeout(() => {
-                let response = "VehicAid provides 24/7 roadside assistance across India. Our pricing starts at just ₹49 for basic help. You can see all plans in the Subscriptions section.";
-
-                if (lowerText.includes('price') || lowerText.includes('cost')) {
-                    response = "Basic services start at ₹49. For premium members, most standard help (Jumpstarts, Fuel delivery, etc.) is included for free up to 5km!";
-                } else if (lowerText.includes('contact') || lowerText.includes('call')) {
-                    response = "You can call our emergency helpline at +91-1800-VEHICAID any time.";
-                }
-
-                setMessages(prev => [...prev, {
-                    id: (Date.now() + 1).toString(),
-                    role: 'assistant',
-                    content: response,
-                    type: 'info'
-                }]);
-                setLoading(false);
-            }, 1000);
-            return;
-        }
-
-        // 2. Otherwise, treat as an Agentic Booking (Executor)
         try {
             const res = await apiClient.post('/services/automind/', {
                 description: textToSend,
@@ -99,18 +73,11 @@ export default function AutoMindPage() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: aiResponse
+                content: aiResponse,
+                type: res.data.status === 'SUCCESS' ? 'action' : 'info',
+                actionData: res.data.status === 'SUCCESS' ? { requestId: res.data.request_id } : undefined
             }]);
 
-            if (res.data.status === 'SUCCESS') {
-                setMessages(prev => [...prev, {
-                    id: (Date.now() + 2).toString(),
-                    role: 'assistant',
-                    content: "✅ MISSION TRIGGERED: I have successfully dispatched a provider to your coordinates. You can track them in your dashboard.",
-                    type: 'action',
-                    actionData: { requestId: res.data.request_id }
-                }]);
-            }
         } catch (error) {
             console.error(error);
             setMessages(prev => [...prev, {

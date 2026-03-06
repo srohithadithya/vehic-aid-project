@@ -54,9 +54,13 @@ export default function Dashboard() {
         </div>
     );
 
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/auth/login?redirect=/dashboard');
+        }
+    }, [user, loading, router]);
+
     if (!user) {
-        // Only redirect if not loading to avoid race conditions
-        router.push('/auth/login?redirect=/dashboard');
         return null;
     }
 

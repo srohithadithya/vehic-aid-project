@@ -41,16 +41,23 @@ class AITriageService:
 
     def _get_prompt(self, description: str):
         return f"""
-        Analyze this car breakdown description for VehicAid India.
-        Description: "{description}"
+        Analyze this user message for VehicAid India (a roadside assistance app).
+        User Message: "{description}"
+        
         Rules:
-        - sug_type: 'TOWING', 'MECHANIC', 'FUEL_DELIVERY', 'BATTERY_JUMP', 'LOCKOUT', 'FLAT_TIRE'
-        - sug_priority: 'LOW', 'MEDIUM', 'HIGH', 'URGENT'
+        - intent: 'BOOK_SERVICE' if the user is explicitly asking for emergency help, towing, mechanic, or triggering a service.
+        - intent: 'DIAGNOSTICS' if the user is asking a question about a car issue.
+        - intent: 'SUPPORT' if the user is asking about VehicAid, pricing, coverage, or how it works.
+        - sug_type: If 'BOOK_SERVICE', choose 'TOWING', 'MECHANIC', 'FUEL_DELIVERY', 'BATTERY_JUMP', 'LOCKOUT', 'FLAT_TIRE'. Otherwise, 'NONE'.
+        - sug_priority: 'LOW', 'MEDIUM', 'HIGH', 'URGENT' or 'NONE'.
+        - diagnostic_advice: A helpful, friendly, conversational response directly answering the user's question or issue. If they ask for help, assure them help is on the way.
+        
         JSON Output ONLY:
         {{
+            "intent": "string",
             "suggested_type": "string",
             "suggested_priority": "string",
-            "diagnostic_advice": "short advice string",
+            "diagnostic_advice": "string",
             "confidence": float
         }}
         """
@@ -59,7 +66,7 @@ class AITriageService:
         try:
             clean_text = text.replace('```json', '').replace('```', '').strip()
             result = json.loads(clean_text)
-            logger.info(f"AutoMind {source} Triage: {result.get('suggested_type')}")
+            logger.info(f"AutoMind {source} Triage: {{result.get('suggested_type')}} with intent {{result.get('intent')}}")
             return result
         except:
             raise ValueError(f"Invalid JSON from {source}")
@@ -67,6 +74,16 @@ class AITriageService:
     def _fallback_analyze(self, description: str):
         """Rule-based backup if AI fails."""
         desc_lower = description.lower()
+        
+        if any(word in desc_lower for word in ['what', 'how', 'price', 'cost', 'works', 'vehicaid']):
+            return {
+                'intent': 'SUPPORT',
+                'suggested_type': 'NONE',
+                'suggested_priority': 'NONE',
+                'diagnostic_advice': "VehicAid provides 24/7 roadside assistance across India. Basic prices start at ₹49. For premium members, most standard help is included for free!",
+                'confidence': 0.8
+            }
+            
         KEYWORD_MAP = {
             'flat': {'type': 'FLAT_TIRE', 'priority': 'MEDIUM'},
             'puncture': {'type': 'FLAT_TIRE', 'priority': 'MEDIUM'},
@@ -92,8 +109,9 @@ class AITriageService:
                 break
         
         return {
+            'intent': 'BOOK_SERVICE',
             'suggested_type': suggested_type,
             'suggested_priority': suggested_priority,
-            'diagnostic_advice': "I've categorized your request based on keywords. A specialist will review it shortly.",
+            'diagnostic_advice': "I've categorized your request based on keywords. We're finding a specialist for you right now.",
             'confidence': 0.5
         }
