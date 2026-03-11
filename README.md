@@ -8,7 +8,7 @@
 
 > **⚠️ SECURITY NOTICE**: This documentation uses placeholder values for all sensitive credentials. Never commit real API keys, passwords, or secrets to version control. See [Security Best Practices](#security-best-practices) below.
 
-VehicAid is a comprehensive roadside assistance platform connecting customers with service providers in real-time. Built with Django, React, React Native, and deployed on Kubernetes with complete CI/CD automation.
+VehicAid is a comprehensive roadside assistance platform connecting customers with service providers in real-time. Built with Django, React, React Native, and deployed locally using docker.
 
 ---
 
