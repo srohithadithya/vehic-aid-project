@@ -4,6 +4,9 @@ from rest_framework.throttling import AnonRateThrottle
 from django.db.models import Avg
 from apps.users.models import ServiceBooker, ServiceProvider
 from .models import Review
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PublicStatsRateThrottle(AnonRateThrottle):
@@ -29,10 +32,15 @@ class PublicStatsView(APIView):
         display_providers = total_providers
 
         # 3. Satisfaction Rate (from Reviews)
-        avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg']
-        satisfaction_rate = int((avg_rating / 5) * 100) if avg_rating else 100 # Default to 100% if no reviews yet? Or 0? Let's say 100 for optimism or 0 for strictness. User wants REAL. 
-        # If no reviews, 0 is real.
-        satisfaction_rate = int((avg_rating / 5) * 100) if avg_rating else 0
+        try:
+            avg_rating = Review.objects.aggregate(avg=Avg('rating'))['avg']
+            if avg_rating is not None:
+                satisfaction_rate = int((float(avg_rating) / 5) * 100)
+            else:
+                satisfaction_rate = 0 # Default to 0 if no reviews
+        except Exception as e:
+            logger.error(f"Error calculating satisfaction rate: {e}")
+            satisfaction_rate = 0
 
         # 4. Avg Response Time (Mocked logic or real calc)
         # In a real app, this would be avg(arrival_time - dispatch_time)

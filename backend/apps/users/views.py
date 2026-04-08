@@ -172,19 +172,25 @@ class UserProfileView(APIView):
 
         # Add customer-specific data
         elif user.is_service_booker:
-            booker = ServiceBooker.objects.get(user=user)
-            from apps.services.models import UserSubscription
-            sub = UserSubscription.objects.filter(user=booker, is_active=True).first()
-            
-            response_data.update(
-                {
-                    "preferred_language": booker.preferred_language,
-                    "subscription_plan": sub.plan.name if sub else None,
-                    "vehicles": [
-                        v.license_plate for v in user.vehicles.all()
-                    ],
-                }
-            )
+            try:
+                booker = ServiceBooker.objects.get(user=user)
+                from apps.services.models import UserSubscription
+                sub = UserSubscription.objects.filter(user=booker, is_active=True).first()
+                
+                response_data.update(
+                    {
+                        "preferred_language": booker.preferred_language,
+                        "subscription_plan": sub.plan.name if sub and sub.plan else "Free Access",
+                        "vehicles": [
+                            v.license_plate for v in user.vehicles.all()
+                        ],
+                    }
+                )
+            except ServiceBooker.DoesNotExist:
+                response_data.update({
+                    "subscription_plan": "Free Access",
+                    "vehicles": []
+                })
 
         return Response({"user": response_data})
 

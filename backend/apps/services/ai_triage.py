@@ -44,6 +44,11 @@ class AITriageService:
         Analyze this user message for VehicAid India (a roadside assistance app).
         User Message: "{description}"
         
+        Strict Guardrails:
+        - You are the VehicAid AutoMind AI. 
+        - ONLY answer questions related to vehicle issues, roadside assistance, or VehicAid specifically.
+        - If the user asks something unrelated, politely decline and steer them back to automotive topics.
+        
         Rules:
         - intent: 'BOOK_SERVICE' if the user is explicitly asking for emergency help, towing, mechanic, or triggering a service.
         - intent: 'DIAGNOSTICS' if the user is asking a question about a car issue.

@@ -41,8 +41,8 @@ apiClient.interceptors.response.use(
                     ? '/vehic-aid-project/booker'
                     : '';
 
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = `${basePath}/login`;
+                if (!window.location.pathname.includes('/auth/login')) {
+                    window.location.href = `${basePath}/auth/login`;
                 }
             }
         }
