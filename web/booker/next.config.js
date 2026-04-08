@@ -1,10 +1,11 @@
-﻿const isGHPages = process.env.GH_PAGES === 'true';
+const isGHPages = process.env.GH_PAGES === 'true';
 
 const nextConfig = {
   output: isGHPages ? 'export' : 'standalone',
   basePath: isGHPages ? '/vehic-aid-project/booker' : '',
   images: {
-    unoptimized: true,
+    // Enabled optimization for major performance gains
+    unoptimized: isGHPages, 
   },
   eslint: {
     ignoreDuringBuilds: true,
