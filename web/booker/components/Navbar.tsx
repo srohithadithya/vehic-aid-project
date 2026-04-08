@@ -16,6 +16,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Logo component remains in codebase but we use the image as requested
+
 export function Navbar() {
     const { t } = useLanguage();
     const { user, logout } = useAuth();
@@ -24,7 +26,7 @@ export function Navbar() {
     return (
         <header className="border-b sticky top-0 z-50 bg-background/80 backdrop-blur-md">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center space-x-2">
+                <Link href="/" className="flex items-center space-x-2 active:scale-95 transition-all">
                     <img src="/logo.png" alt="VehicAid Logo" className="w-8 h-8 object-contain" />
                     <span className="text-xl font-bold bg-gradient-to-r from-primary to-teal-400 bg-clip-text text-transparent">
                         VehicAid
@@ -33,11 +35,11 @@ export function Navbar() {
 
                 <nav className="hidden lg:flex items-center space-x-8">
                     <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">{t('nav.book')}</Link>
-                    <Link href="/health" className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors">
+                    <Link href="/health" className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors active:opacity-70">
                         <LucideActivity size={16} />
                         <span>{t('nav.health')}</span>
                     </Link>
-                    <Link href="/automind" className="flex items-center space-x-1 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-colors">
+                    <Link href="/automind" className="flex items-center space-x-1 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600 active:opacity-70 transition-colors">
                         <BrainCircuit size={16} className="text-purple-600" />
                         <span>AutoMind</span>
                     </Link>
