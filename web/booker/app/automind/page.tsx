@@ -39,6 +39,27 @@ export default function AutoMindPage() {
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [userPlan, setUserPlan] = useState<string | null>(null);
+    const [isRealtime, setIsRealtime] = useState(false);
+
+    // Fetch real-time user profile for subscription data
+    useEffect(() => {
+        if (user) {
+            const fetchProfile = async () => {
+                try {
+                    const res = await apiClient.get('/users/profile/');
+                    setUserPlan(res.data.user.subscription_plan || 'Basic');
+                    setIsRealtime(true);
+                } catch (err) {
+                    console.error("Failed to fetch profile", err);
+                }
+            };
+            fetchProfile();
+        } else {
+            setUserPlan(null);
+            setIsRealtime(false);
+        }
+    }, [user]);
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -51,6 +72,23 @@ export default function AutoMindPage() {
     const handleSend = async (overrideInput?: string) => {
         const textToSend = overrideInput || input;
         if (!textToSend.trim()) return;
+
+        // Proactive auth check for senior UX
+        if (!user) {
+            const guestMsg: Message = {
+                id: Date.now().toString(),
+                role: 'user',
+                content: textToSend
+            };
+            setMessages(prev => [...prev, guestMsg, {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: "I've analyzed your request, but you need to be logged in to dispatch a provider or access personalized diagnostics. Redirecting you to the safe login portal...",
+                type: 'error'
+            }]);
+            setTimeout(() => router.push('/auth/login'), 2500);
+            return;
+        }
 
         const userMsg: Message = {
             id: Date.now().toString(),
@@ -114,7 +152,7 @@ export default function AutoMindPage() {
                     <div className="space-y-3">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold tracking-widest uppercase">
                             <Sparkles className="w-3 h-3" />
-                            Next-Gen Intelligence
+                            {isRealtime ? 'Live Intelligence Active' : 'Next-Gen Intelligence'}
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black tracking-tight">
                             Auto<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Mind</span>
@@ -159,8 +197,14 @@ export default function AutoMindPage() {
                                     <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
                                         <p className="text-xs text-slate-400 mb-1">Active Plan</p>
                                         <div className="flex items-center gap-2">
-                                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                            <p className="font-semibold text-emerald-400">Premium Elite</p>
+                                            {user ? (
+                                                <>
+                                                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                    <p className="font-semibold text-emerald-400">{userPlan || 'Loading...'}</p>
+                                                </>
+                                            ) : (
+                                                <p className="font-medium text-slate-500 italic">Login to view plan</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
