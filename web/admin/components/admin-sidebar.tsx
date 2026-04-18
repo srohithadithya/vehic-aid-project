@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Wrench, IndianRupee, Settings, LogOut, TrendingUp, Activity, Bot } from 'lucide-react';
+import { LayoutDashboard, Users, Wrench, IndianRupee, Settings, LogOut, TrendingUp, Activity, Bot, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { useLanguage } from '@/context/LanguageContext';
