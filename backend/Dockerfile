@@ -19,9 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
+# Using extra flags to be robust against network/DNS issues
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade --timeout 100 --retries 10 pip setuptools wheel && \
+    pip install --no-cache-dir --timeout 100 --retries 10 -r requirements.txt
 
 # Copy entrypoint and make it executable
 COPY entrypoint.sh .

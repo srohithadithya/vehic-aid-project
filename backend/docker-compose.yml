@@ -32,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: vehicaid_web
     entrypoint: [ "/bin/sh", "/app/entrypoint.sh" ]
     volumes:
@@ -67,6 +68,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     container_name: vehicaid_celery
     entrypoint: [ "/bin/sh", "/app/entrypoint.sh" ]
     command: celery -A vehic_aid_backend worker -l info

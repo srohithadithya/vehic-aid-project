@@ -177,10 +177,11 @@ class SubscriptionViewSet(viewsets.ViewSet):
     """CRUD-like endpoints for managing user subscriptions."""
 
     permission_classes = [IsAuthenticated]
-    queryset = UserSubscription.objects.all()
 
     def list(self, request):
         """List all subscriptions for the authenticated user."""
+        if not hasattr(request.user, 'servicebooker'):
+            return Response([], status=status.HTTP_200_OK)
         subs = UserSubscription.objects.filter(user=request.user.servicebooker)
         serializer = UserSubscriptionSerializer(subs, many=True)
         return Response(serializer.data)
@@ -229,13 +230,16 @@ class SubscriptionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"], url_path="current")
     def current(self, request):
         """Return the currently active subscription, if any."""
+        if not hasattr(request.user, 'servicebooker'):
+            return Response({"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
+            
         sub = UserSubscription.objects.filter(user=request.user.servicebooker, is_active=True).first()
         if not sub:
             return Response({"detail": "No active subscription."}, status=status.HTTP_404_NOT_FOUND)
         serializer = UserSubscriptionSerializer(sub)
         return Response(serializer.data)
 
-    @action(detail=False, methods=["get"], url_path="plans", permission_classes=[])
+    @action(detail=False, methods=["get"], url_path="plans", permission_classes=[AllowAny])
     def plans(self, request):
         """Return all available subscription plans."""
         plans = SubscriptionPlan.objects.all().order_by('price')
