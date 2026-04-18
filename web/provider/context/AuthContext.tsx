@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (token) {
                 try {
                     const response = await apiClient.get('/users/profile/');
-                    setUser(response.data);
+                    setUser(response.data.user);
                 } catch (error) {
                     localStorage.removeItem('provider_access_token');
                     setUser(null);
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('provider_refresh_token', refresh);
 
             const profileRes = await apiClient.get('/users/profile/');
-            setUser(profileRes.data);
+            setUser(profileRes.data.user);
 
             router.push('/dashboard');
         } catch (error) {

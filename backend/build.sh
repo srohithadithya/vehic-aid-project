@@ -3,10 +3,10 @@
 set -o errexit
 
 # Install dependencies
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 
 # Convert static asset files
-python backend/manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 
 # Apply any outstanding database migrations
-python backend/manage.py migrate
+python manage.py migrate

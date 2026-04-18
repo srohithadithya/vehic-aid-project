@@ -13,8 +13,7 @@ echo "🔍 Checking for django_redis module..."
 if python -c "import django_redis" 2>/dev/null; then
     echo "✅ django_redis is available."
 else
-    echo "❌ django_redis NOT FOUND! Attempting re-install..."
-    pip install django-redis==5.4.0
+    echo "⚠️ django_redis NOT FOUND! (It should have been installed during build)"
 fi
 
 # Run migrations
