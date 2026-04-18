@@ -135,8 +135,22 @@ export default function SettlementsPage() {
                                             {settlement.status.replace('_', ' ')}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-sm">
+                                    <td className="px-6 py-4 text-sm flex gap-3">
                                         <button className="text-blue-600 hover:text-blue-800 font-medium text-xs">View Details</button>
+                                        {settlement.status !== 'PAID' && (
+                                            <button 
+                                                onClick={() => {
+                                                    alert(`Initiating Gateway Transfer for ${settlement.id}... Simulation Successful.`);
+                                                    const newData = [...settlements];
+                                                    const idx = newData.findIndex(s => s.id === settlement.id);
+                                                    newData[idx].status = 'PAID';
+                                                    setSettlements(newData);
+                                                }}
+                                                className="text-emerald-600 hover:text-emerald-800 font-bold text-xs"
+                                            >
+                                                Release Funds
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

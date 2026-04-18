@@ -17,6 +17,7 @@ export function AdminSidebar() {
         { icon: Users, label: t('nav.users'), href: '/users' },
         { icon: Wrench, label: t('nav.bookings'), href: '/bookings' },
         { icon: IndianRupee, label: t('nav.payments'), href: '/payments' },
+        { icon: Zap, label: 'Simulator', href: '/payments/simulation' },
         { icon: Activity, label: t('nav.iot'), href: '/iot-fleet' },
         { icon: Bot, label: t('nav.ai'), href: '/ai-monitor' },
         { icon: TrendingUp, label: t('nav.analytics'), href: '/analytics' },
