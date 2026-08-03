@@ -95,7 +95,7 @@ def auto_escalate_stuck_requests():
     timeout = timezone.now() - timedelta(minutes=15)
     stuck_requests = ServiceRequest.objects.filter(
         status='DISPATCHED',
-        updated_at__lt=timeout
+        created_at__lt=timeout
     )
     
     count = 0

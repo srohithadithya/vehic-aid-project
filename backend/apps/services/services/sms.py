@@ -70,16 +70,24 @@ class SMSService:
                 "message": str(e),
                 "response": None
             }
+
+    def _resolve_booker_contact(self, user):
+        booker_user = getattr(user, "user", user)
+        phone_number = getattr(user, "phone_number", None) or getattr(booker_user, "phone_number", None)
+        username = getattr(booker_user, "username", "customer")
+        return booker_user, phone_number, username
     
     def send_subscription_expiry_alert(self, user, days_remaining):
         """Send alert when subscription is about to expire."""
-        message = f"Hi {user.user.username}, your Vehic-Aid {user.plan.name} plan expires in {days_remaining} days. Renew now to continue enjoying premium benefits!"
-        return self.send_sms(user.user.phone_number, message)
+        booker_user, phone_number, username = self._resolve_booker_contact(user)
+        message = f"Hi {username}, your Vehic-Aid {user.plan.name} plan expires in {days_remaining} days. Renew now to continue enjoying premium benefits!"
+        return self.send_sms(phone_number, message)
     
     def send_subscription_renewed(self, user):
         """Send confirmation when subscription is renewed."""
+        booker_user, phone_number, _ = self._resolve_booker_contact(user)
         message = f"Your Vehic-Aid {user.plan.name} plan has been renewed successfully. Thank you for choosing Vehic-Aid!"
-        return self.send_sms(user.user.phone_number, message)
+        return self.send_sms(phone_number, message)
     
     def send_service_request_confirmation(self, request):
         """Send confirmation when service request is created."""
