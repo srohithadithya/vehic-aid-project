@@ -16,12 +16,27 @@ const steps = [
 ];
 
 const PRICING_MAP: Record<string, Record<string, number>> = {
-    'TWO_WHEELER': { 'TOWING': 199, 'FUEL': 49, 'JUMPSTART': 149, 'LOCKOUT': 149, 'MECHANIC': 99 },
-    'THREE_WHEELER': { 'TOWING': 249, 'FUEL': 49, 'JUMPSTART': 199, 'LOCKOUT': 199, 'MECHANIC': 149 },
-    'FOUR_WHEELER': { 'TOWING': 249, 'FUEL': 49, 'JUMPSTART': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
-    'SUV': { 'TOWING': 299, 'FUEL': 49, 'JUMPSTART': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
-    'VAN': { 'TOWING': 349, 'FUEL': 49, 'JUMPSTART': 299, 'LOCKOUT': 299, 'MECHANIC': 399 },
-    'TRUCK': { 'TOWING': 499, 'FUEL': 69, 'JUMPSTART': 349, 'LOCKOUT': 299, 'MECHANIC': 399 },
+    'TWO_WHEELER': { 'TOWING': 199, 'FUEL_DELIVERY': 49, 'BATTERY_JUMP': 149, 'LOCKOUT': 149, 'MECHANIC': 99 },
+    'THREE_WHEELER': { 'TOWING': 249, 'FUEL_DELIVERY': 49, 'BATTERY_JUMP': 199, 'LOCKOUT': 199, 'MECHANIC': 149 },
+    'FOUR_WHEELER': { 'TOWING': 249, 'FUEL_DELIVERY': 49, 'BATTERY_JUMP': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
+    'SUV': { 'TOWING': 299, 'FUEL_DELIVERY': 49, 'BATTERY_JUMP': 249, 'LOCKOUT': 299, 'MECHANIC': 349 },
+    'VAN': { 'TOWING': 349, 'FUEL_DELIVERY': 49, 'BATTERY_JUMP': 299, 'LOCKOUT': 299, 'MECHANIC': 399 },
+    'TRUCK': { 'TOWING': 499, 'FUEL_DELIVERY': 69, 'BATTERY_JUMP': 349, 'LOCKOUT': 299, 'MECHANIC': 399 },
+};
+
+const SERVICE_TYPES = ['TOWING', 'FUEL_DELIVERY', 'BATTERY_JUMP', 'LOCKOUT', 'MECHANIC'];
+const SERVICE_LABELS: Record<string, string> = {
+    TOWING: 'Towing',
+    FUEL_DELIVERY: 'Fuel Delivery',
+    BATTERY_JUMP: 'Battery Jump',
+    LOCKOUT: 'Lockout',
+    MECHANIC: 'Mechanic',
+};
+
+const normalizeServiceType = (type: string | null) => {
+    if (type === 'FUEL') return 'FUEL_DELIVERY';
+    if (type === 'JUMPSTART') return 'BATTERY_JUMP';
+    return type && SERVICE_TYPES.includes(type) ? type : 'TOWING';
 };
 
 function ServiceRequestWizardContent() {
@@ -34,7 +49,7 @@ function ServiceRequestWizardContent() {
     const [vehicles, setVehicles] = useState([]);
 
     const [formData, setFormData] = useState({
-        serviceType: searchParams.get('type') || 'TOWING',
+        serviceType: normalizeServiceType(searchParams.get('type')),
         vehicleId: '',
         latitude: 12.9716, // Default to Bangalore for MVP
         longitude: 77.5946,
@@ -117,14 +132,14 @@ function ServiceRequestWizardContent() {
                                     <p className="text-gray-500 mt-2">Choose the assistance you need today.</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    {['TOWING', 'FUEL', 'JUMPSTART', 'LOCKOUT', 'MECHANIC'].map((type) => (
+                                    {SERVICE_TYPES.map((type) => (
                                         <button
                                             key={type}
                                             onClick={() => setFormData({ ...formData, serviceType: type })}
                                             className={`p-4 rounded-xl border-2 text-left transition ${formData.serviceType === type ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-gray-100 hover:border-gray-200'}`}
                                         >
                                             <div className="flex justify-between items-start mb-1">
-                                                <span className="font-bold block text-lg">{type}</span>
+                                                <span className="font-bold block text-lg">{SERVICE_LABELS[type]}</span>
                                                 <div className="text-right">
                                                     <span className="text-[10px] text-gray-400 block uppercase">Starts at</span>
                                                     <span className="text-sm font-bold text-primary">₹{PRICING_MAP['TWO_WHEELER'][type] || 99}</span>

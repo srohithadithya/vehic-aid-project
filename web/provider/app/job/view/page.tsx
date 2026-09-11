@@ -37,7 +37,7 @@ function JobContent() {
     const fetchJobDetails = useCallback(async () => {
         if (!id) return;
         try {
-            const response = await apiClient.get(`/provider/jobs/${id}/`);
+            const response = await apiClient.get(`/services/provider/jobs/${id}/`);
             setJob(response.data);
         } catch (error) {
             console.error('Failed to fetch job', error);
@@ -48,7 +48,7 @@ function JobContent() {
 
     const updateLocation = useCallback(async (lat: number, lng: number) => {
         try {
-            await apiClient.post('/provider/location-update/', {
+            await apiClient.post('/services/provider/location-update/', {
                 latitude: lat,
                 longitude: lng
             });
@@ -89,7 +89,7 @@ function JobContent() {
     const updateStatus = async (newStatus: string) => {
         setUpdating(true);
         try {
-            await apiClient.post(`/provider/update/${id}/`, {
+            await apiClient.post(`/services/provider/update/${id}/`, {
                 status: newStatus
             });
             if (job) setJob({ ...job, status: newStatus });
@@ -109,7 +109,7 @@ function JobContent() {
         setUpdating(true);
         try {
             // First, find the quote for this request
-            const quotesRes = await apiClient.get(`/quotes/?request_id=${id}`);
+            const quotesRes = await apiClient.get(`/services/quotes/?request_id=${id}`);
             const quoteId = quotesRes.data[0]?.id; // Simple assumption for MVP
 
             if (!quoteId) {
@@ -117,7 +117,7 @@ function JobContent() {
                 return;
             }
 
-            await apiClient.post(`/quotes/${quoteId}/finalize/`, {
+            await apiClient.post(`/services/quotes/${quoteId}/finalize/`, {
                 spare_parts: parts,
                 platform_fee: 25.00
             });

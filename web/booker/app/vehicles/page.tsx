@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Plus, Edit, Trash2, Car } from 'lucide-react';
+import { apiClient } from '@/lib/api';
 
 export default function VehiclesPage() {
     const [vehicles, setVehicles] = useState([]);
@@ -11,9 +12,8 @@ export default function VehiclesPage() {
     const [formData, setFormData] = useState({
         make: '',
         model: '',
-        year: '',
-        registration: '',
-        color: '',
+        license_plate: '',
+        fuel_type: 'PETROL',
         vehicle_type: 'FOUR_WHEELER'
     });
 
@@ -32,15 +32,8 @@ export default function VehiclesPage() {
 
     const fetchVehicles = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/vehicles/`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
-            if (response.ok) {
-                const data = await response.json();
-                setVehicles(data.vehicles || []);
-            }
+            const response = await apiClient.get('/services/vehicles/');
+            setVehicles(response.data);
         } catch (error) {
             console.error('Failed to fetch vehicles:', error);
         }
@@ -48,21 +41,10 @@ export default function VehiclesPage() {
 
     const saveVehicle = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-
-            if (response.ok) {
-                setShowForm(false);
-                setFormData({ make: '', model: '', year: '', registration: '', color: '', vehicle_type: 'FOUR_WHEELER' });
-                fetchVehicles();
-            }
+            await apiClient.post('/services/vehicles/', formData);
+            setShowForm(false);
+            setFormData({ make: '', model: '', license_plate: '', fuel_type: 'PETROL', vehicle_type: 'FOUR_WHEELER' });
+            fetchVehicles();
         } catch (error) {
             console.error('Failed to save vehicle:', error);
         }
@@ -72,15 +54,8 @@ export default function VehiclesPage() {
         if (!confirm('Are you sure you want to delete this vehicle?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vehicles/${id}/`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                fetchVehicles();
-            }
+            await apiClient.delete(`/services/vehicles/${id}/`);
+            fetchVehicles();
         } catch (error) {
             console.error('Failed to delete vehicle:', error);
         }
@@ -147,34 +122,26 @@ export default function VehiclesPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Year</label>
-                            <input
-                                type="number"
-                                value={formData.year}
-                                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                                placeholder="e.g., 2020"
-                                className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Registration Number</label>
+                            <label className="block text-sm font-medium mb-2">License Plate</label>
                             <input
                                 type="text"
-                                value={formData.registration}
-                                onChange={(e) => setFormData({ ...formData, registration: e.target.value })}
+                                value={formData.license_plate}
+                                onChange={(e) => setFormData({ ...formData, license_plate: e.target.value })}
                                 placeholder="e.g., MH01AB1234"
                                 className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2">Color</label>
-                            <input
-                                type="text"
-                                value={formData.color}
-                                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                                placeholder="e.g., Silver"
+                            <label className="block text-sm font-medium mb-2">Fuel Type</label>
+                            <select
+                                value={formData.fuel_type}
+                                onChange={(e) => setFormData({ ...formData, fuel_type: e.target.value })}
                                 className="w-full px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
-                            />
+                            >
+                                <option value="PETROL">Petrol</option>
+                                <option value="DIESEL">Diesel</option>
+                                <option value="EV">Electric Vehicle</option>
+                            </select>
                         </div>
                     </div>
                     <div className="flex gap-2 mt-4">
@@ -195,7 +162,7 @@ export default function VehiclesPage() {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-lg">{vehicle.make} {vehicle.model}</h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">{vehicle.year}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{getVehicleIcon(vehicle.vehicle_type)} {vehicle.vehicle_type?.replace(/_/g, ' ')}</p>
                                 </div>
                             </div>
                             <div className="flex gap-1">
@@ -214,12 +181,12 @@ export default function VehiclesPage() {
 
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">Registration:</span>
-                                <span className="font-medium">{vehicle.registration}</span>
+                                <span className="text-gray-600 dark:text-gray-400">License Plate:</span>
+                                <span className="font-medium">{vehicle.license_plate}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">Color:</span>
-                                <span className="font-medium">{vehicle.color}</span>
+                                <span className="text-gray-600 dark:text-gray-400">Fuel:</span>
+                                <span className="font-medium">{vehicle.fuel_type}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600 dark:text-gray-400">Service History:</span>

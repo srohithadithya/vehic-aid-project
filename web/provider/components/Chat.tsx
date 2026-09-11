@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Phone, Video, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { apiClient } from '@/lib/api';
 
 interface Message {
     id: number;
-    sender: 'customer' | 'provider';
+    sender: number;
+    is_me: boolean;
     message: string;
-    timestamp: string;
+    created_at: string;
 }
 
 export default function ChatComponent({ requestId }: { requestId: number }) {
@@ -19,17 +21,11 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
 
     const fetchMessages = useCallback(async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/chat/?request_id=${requestId}`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
-            if (response.ok) {
-                const data = await response.json();
-                setMessages(data.messages || []);
-            }
+            const response = await apiClient.get(`/services/chat/?request_id=${requestId}`);
+            setMessages(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Failed to fetch messages:', error);
+            setMessages([]);
         }
     }, [requestId]);
 
@@ -48,23 +44,12 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
 
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    request_id: requestId,
-                    message: newMessage
-                })
+            await apiClient.post('/services/chat/', {
+                request: requestId,
+                message: newMessage
             });
-
-            if (response.ok) {
-                setNewMessage('');
-                fetchMessages();
-            }
+            setNewMessage('');
+            fetchMessages();
         } catch (error) {
             console.error('Failed to send message:', error);
         } finally {
@@ -103,18 +88,18 @@ export default function ChatComponent({ requestId }: { requestId: number }) {
                 {messages.map((msg) => (
                     <div
                         key={msg.id}
-                        className={`flex ${msg.sender === 'provider' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${msg.is_me ? 'justify-end' : 'justify-start'}`}
                     >
                         <div
-                            className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.sender === 'provider'
+                            className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.is_me
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                                 }`}
                         >
                             <p>{msg.message}</p>
-                            <p className={`text-xs mt-1 ${msg.sender === 'provider' ? 'text-blue-100' : 'text-gray-500'
+                            <p className={`text-xs mt-1 ${msg.is_me ? 'text-blue-100' : 'text-gray-500'
                                 }`}>
-                                {new Date(msg.timestamp).toLocaleTimeString()}
+                                {new Date(msg.created_at).toLocaleTimeString()}
                             </p>
                         </div>
                     </div>

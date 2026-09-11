@@ -23,7 +23,7 @@ function FareBreakup({ id, onAccept }: { id: string; onAccept: () => void }) {
 
     useEffect(() => {
         const fetch = async () => {
-            const res = await apiClient.get(`/quotes/?request_id=${id}`);
+            const res = await apiClient.get(`/services/quotes/?request_id=${id}`);
             setQuote(res.data.find((q: any) => q.is_final));
         };
         fetch();
@@ -81,7 +81,7 @@ function RequestStatusContent() {
     const fetchRequestDetails = useCallback(async () => {
         if (!id) return;
         try {
-            const response = await apiClient.get(`/request/${id}/`);
+            const response = await apiClient.get(`/services/request/${id}/`);
             setRequest(response.data);
         } catch (error) {
             console.error("Error fetching request", error);
@@ -156,11 +156,11 @@ function RequestStatusContent() {
 
     const handleAcceptFinalFare = async () => {
         try {
-            const quotesRes = await apiClient.get(`/quotes/?request_id=${id}`);
+            const quotesRes = await apiClient.get(`/services/quotes/?request_id=${id}`);
             const quote = quotesRes.data.find((q: any) => q.is_final);
             if (!quote) return;
 
-            await apiClient.post(`/quotes/${quote.id}/accept/`);
+            await apiClient.post(`/services/quotes/${quote.id}/accept/`);
             success("Payment Successful", "Your service is complete. Thank you!");
             fetchRequestDetails();
         } catch (error) {

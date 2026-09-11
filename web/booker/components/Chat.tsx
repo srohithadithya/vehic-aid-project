@@ -28,10 +28,11 @@ export function Chat({ requestId }: ChatProps) {
 
     const fetchMessages = useCallback(async () => {
         try {
-            const response = await apiClient.get(`/chat/?request_id=${requestId}`);
-            setMessages(response.data);
+            const response = await apiClient.get(`/services/chat/?request_id=${requestId}`);
+            setMessages(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Failed to fetch messages', error);
+            setMessages([]);
         } finally {
             setLoading(false);
         }
@@ -57,7 +58,7 @@ export function Chat({ requestId }: ChatProps) {
 
         setSending(true);
         try {
-            await apiClient.post('/chat/', {
+            await apiClient.post('/services/chat/', {
                 request: requestId,
                 message: newMessage.trim()
             });

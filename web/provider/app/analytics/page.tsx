@@ -3,9 +3,19 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { TrendingUp, DollarSign, Clock, Star, Calendar } from 'lucide-react';
+import { apiClient } from '@/lib/api';
+
+interface AnalyticsStats {
+    totalEarnings: number;
+    completedJobs: number;
+    avgRating: number;
+    avgResponseTime: number;
+    weeklyEarnings: number[];
+    topServices: any[];
+}
 
 export default function AnalyticsPage() {
-    const [stats, setStats] = useState({
+    const [stats, setStats] = useState<AnalyticsStats>({
         totalEarnings: 0,
         completedJobs: 0,
         avgRating: 0,
@@ -20,19 +30,22 @@ export default function AnalyticsPage() {
 
     const fetchAnalytics = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/providers/analytics/`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
-            if (response.ok) {
-                const data = await response.json();
-                setStats(data);
-            }
+            const response = await apiClient.get('/payments/dashboard/provider/');
+            const data = response.data;
+            setStats({
+                totalEarnings: data.todays_earnings || 0,
+                completedJobs: data.jobs_completed || 0,
+                avgRating: data.rating || 0,
+                avgResponseTime: 0,
+                weeklyEarnings: data.weekly_chart?.values || [],
+                topServices: []
+            });
         } catch (error) {
             console.error('Failed to fetch analytics:', error);
         }
     };
+
+    const maxWeeklyEarning = Math.max(...stats.weeklyEarnings, 0);
 
     return (
         <div className="p-6 space-y-6">
@@ -95,7 +108,9 @@ export default function AnalyticsPage() {
                             <div key={day} className="flex-1 flex flex-col items-center">
                                 <div
                                     className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg"
-                                    style={{ height: `${Math.random() * 100}%` }}
+                                    style={{
+                                        height: `${Math.max(6, maxWeeklyEarning ? ((stats.weeklyEarnings[i] || 0) / maxWeeklyEarning) * 100 : 0)}%`
+                                    }}
                                 />
                                 <p className="text-xs mt-2 text-gray-600 dark:text-gray-400">{day}</p>
                             </div>

@@ -19,7 +19,7 @@ import { LocationPicker } from '@/components/LocationPicker';
 const SERVICE_TYPES = [
     { id: 'TOWING', label: 'Towing Service', icon: Truck, description: 'Includes 5km tow. Then ₹20/km.', price: 'Starts @ ₹199' },
     { id: 'MECHANIC', label: 'On-site Mechanic', icon: Wrench, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹79' },
-    { id: 'FUEL', label: 'Fuel Delivery', icon: Fuel, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹49' },
+    { id: 'FUEL_DELIVERY', label: 'Fuel Delivery', icon: Fuel, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹49' },
     { id: 'LOCKOUT', label: 'Lockout Service', icon: AlertTriangle, description: 'Includes 5km arrival. Then ₹15/km.', price: 'Starts @ ₹149' },
 ];
 
@@ -39,7 +39,7 @@ export default function BookServicePage() {
 
     const fetchVehicles = async () => {
         try {
-            const response = await apiClient.get('/vehicles/');
+            const response = await apiClient.get('/services/vehicles/');
             setVehicles(response.data);
             if (response.data.length > 0) {
                 setSelectedVehicle(response.data[0].id); // Default to first vehicle
@@ -60,7 +60,7 @@ export default function BookServicePage() {
 
         setSubmitting(true);
         try {
-            const response = await apiClient.post('/request/', {
+            const response = await apiClient.post('/services/request/', {
                 vehicle_id: selectedVehicle,
                 service_type: selectedService,
                 customer_notes: `${notes} [Loc: ${location.address}]`,
@@ -69,7 +69,7 @@ export default function BookServicePage() {
             });
 
             // Redirect to status page
-            router.push(`/request/${response.data.id}`);
+            router.push(`/request/view?id=${response.data.id}`);
         } catch (err) {
             console.error(err);
             alert("Failed to submit request. Please try again.");

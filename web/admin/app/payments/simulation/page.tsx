@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Zap, Activity, AlertCircle, CheckCircle2, Send, Loader2, IndianRupee, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,33 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import apiClient from '@/lib/api';
 
+const createSimulationIds = () => ({
+    order_id: `ord_${Math.random().toString(36).slice(2, 11)}`,
+    payment_id: `pay_${Math.random().toString(36).slice(2, 11)}`,
+});
+
 export default function PaymentSimulationPage() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'failed'>('idle');
+    const [isMounted, setIsMounted] = useState(false);
     const [payload, setPayload] = useState({
-        order_id: `ord_${Math.random().toString(36).substr(2, 9)}`,
-        payment_id: `pay_${Math.random().toString(36).substr(2, 9)}`,
+        order_id: 'ord_simulation',
+        payment_id: 'pay_simulation',
         amount: '1000',
         event: 'payment.captured'
     });
+
+    useEffect(() => {
+        setIsMounted(true);
+        setPayload((current) => ({
+            ...current,
+            ...createSimulationIds(),
+        }));
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
 
     const simulateWebhook = async (type: 'SUCCESS' | 'FAILED') => {
         setLoading(true);
@@ -29,7 +47,7 @@ export default function PaymentSimulationPage() {
                 amount: payload.amount,
                 status: type
             });
-            setStatus('success');
+            setStatus(type === 'SUCCESS' ? 'success' : 'failed');
         } catch (err) {
             console.error(err);
             setStatus('failed');
@@ -198,8 +216,8 @@ export default function PaymentSimulationPage() {
                                 >
                                     <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
                                     <div>
-                                        <p className="font-bold text-rose-400 uppercase tracking-widest text-xs">Response 400 Bad Request</p>
-                                        <p className="text-sm text-white/70 mt-1">Simulated error response received.</p>
+                                        <p className="font-bold text-rose-400 uppercase tracking-widest text-xs">Failure Signal Accepted</p>
+                                        <p className="text-sm text-white/70 mt-1">Backend marked the simulated payment as failed.</p>
                                     </div>
                                 </motion.div>
                             )}

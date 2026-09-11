@@ -44,6 +44,8 @@ const revenueData = [
     { name: 'Jul', total: 3490 },
 ];
 
+const fallbackLoadHeights = [22, 38, 31, 54, 42, 68, 49, 57, 35, 44, 61, 52, 47, 63, 58, 71, 66, 48, 39, 45, 33, 29, 24, 19];
+
 export default function DashboardPage() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [activity, setActivity] = useState<Activity[]>([]);
@@ -233,7 +235,7 @@ export default function DashboardPage() {
                         ) : (
                             // Mock visualization if empty
                             Array.from({ length: 24 }).map((_, i) => (
-                                <div key={i} className="flex-1 bg-white/5 rounded-t" style={{ height: `${Math.random() * 60 + 10}%` }}></div>
+                                <div key={i} className="flex-1 bg-white/5 rounded-t" style={{ height: `${fallbackLoadHeights[i]}%` }}></div>
                             ))
                         )}
                     </div>

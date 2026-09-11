@@ -236,7 +236,7 @@ export default function EarningsPage() {
                             <div className="relative h-56 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] duration-500 group">
                                 {/* Gradient Background */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-800" />
-                                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.16)_1px,transparent_0)] [background-size:18px_18px] opacity-20 mix-blend-overlay" />
 
                                 <div className="relative p-6 h-full flex flex-col justify-between text-white border border-white/10 rounded-3xl">
                                     <div className="flex justify-between items-start">

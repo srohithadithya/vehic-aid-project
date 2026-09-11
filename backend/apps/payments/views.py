@@ -201,16 +201,28 @@ class MockPaymentConfirmView(APIView):
     def post(self, request, *args, **kwargs):
         request_id = request.data.get('request_id')
         plan_id = request.data.get('plan_id')
+        order_id = request.data.get('order_id') or request.data.get('razorpay_order_id')
+        payment_id = request.data.get('payment_id') or request.data.get('razorpay_payment_id')
+        payment_status = request.data.get('status', 'SUCCESS')
         
-        if not request_id and not plan_id:
-             return Response({"error": "request_id or plan_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not request_id and not plan_id and not order_id:
+             return Response({"error": "request_id, plan_id, or order_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
             if request_id:
                 # Handle Service Request Payment
                 service_request = get_object_or_404(ServiceRequest, id=request_id)
-                service_request.status = 'COMPLETED'
-                service_request.save()
+
+                if payment_status == 'FAILED':
+                    tx = Transaction.objects.filter(service_request=service_request).first()
+                    if tx:
+                        tx.status = 'FAILED'
+                        tx.razorpay_payment_id = payment_id or tx.razorpay_payment_id
+                        tx.save(update_fields=['status', 'razorpay_payment_id'])
+                    return Response({"status": "Payment marked as failed."}, status=status.HTTP_200_OK)
+
+                if not service_request.provider or not hasattr(service_request.provider, 'serviceprovider'):
+                    return Response({"error": "Provider must be assigned before payment confirmation."}, status=status.HTTP_400_BAD_REQUEST)
 
                 # Add Reward Points
                 try:
@@ -231,19 +243,39 @@ class MockPaymentConfirmView(APIView):
                     provider_profile = service_request.provider.serviceprovider
 
                 # Create transaction
-                Transaction.objects.get_or_create(
+                amount = Decimal(str(request.data.get('amount', '500.00')))
+                commission = amount * PLATFORM_COMMISSION_RATE
+                payout = amount - commission
+                tx, created = Transaction.objects.get_or_create(
                     service_request=service_request,
                     defaults={
                         'booker': booker_profile,
                         'provider': provider_profile,
-                        'amount': Decimal(request.data.get('amount', '500.00')),
+                        'amount': amount,
                         'status': 'SUCCESS',
                         'payment_method': request.data.get('payment_method', 'RAZORPAY'),
-                        'razorpay_order_id': f"mock_order_{request_id}",
+                        'razorpay_order_id': order_id or f"mock_order_{request_id}",
+                        'razorpay_payment_id': payment_id,
+                        'platform_commission': commission,
+                        'provider_payout_amount': payout,
                     }
                 )
+                if not created:
+                    tx.status = 'SUCCESS'
+                    tx.amount = amount
+                    tx.razorpay_order_id = order_id or tx.razorpay_order_id
+                    tx.razorpay_payment_id = payment_id or tx.razorpay_payment_id
+                    tx.platform_commission = commission
+                    tx.provider_payout_amount = payout
+                    tx.save()
+
+                service_request.status = 'COMPLETED'
+                service_request.save()
             
             elif plan_id:
+                if payment_status == 'FAILED':
+                    return Response({"status": "Subscription payment marked as failed."}, status=status.HTTP_200_OK)
+
                 # Handle Subscription Payment
                 from apps.services.models import SubscriptionPlan, UserSubscription
                 from django.utils import timezone
@@ -254,7 +286,9 @@ class MockPaymentConfirmView(APIView):
                 plan = SubscriptionPlan.objects.filter(name__iexact=plan_id).first()
                 if not plan:
                     # Fallback if ID passed
-                    plan = SubscriptionPlan.objects.filter(id=plan_id).first()
+                    plan_id_text = str(plan_id)
+                    if plan_id_text.isdigit():
+                        plan = SubscriptionPlan.objects.filter(id=int(plan_id_text)).first()
                 
                 if plan:
                     # Explicitly get profile
@@ -281,6 +315,28 @@ class MockPaymentConfirmView(APIView):
                     # Log Transaction (Optional for now, but good for completeness)
                     # We'd need a Transaction model update to support non-service_request payments (nullable)
                     # For now just confirming success is enough for UI.
+
+                else:
+                    return Response({"error": f"Subscription plan '{plan_id}' not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            elif order_id:
+                tx = Transaction.objects.filter(razorpay_order_id=order_id).first()
+                if tx:
+                    tx.status = 'SUCCESS' if payment_status == 'SUCCESS' else 'FAILED'
+                    tx.razorpay_payment_id = payment_id or tx.razorpay_payment_id
+                    if tx.status == 'SUCCESS':
+                        tx.platform_commission = tx.amount * PLATFORM_COMMISSION_RATE
+                        tx.provider_payout_amount = tx.amount - tx.platform_commission
+                    tx.save()
+                    if tx.status == 'SUCCESS' and tx.service_request:
+                        tx.service_request.status = 'COMPLETED'
+                        tx.service_request.save()
+                    return Response({"status": "Payment simulation processed.", "transaction_id": tx.id}, status=status.HTTP_200_OK)
+
+                return Response(
+                    {"status": "Payment simulation accepted.", "order_id": order_id, "payment_id": payment_id},
+                    status=status.HTTP_200_OK,
+                )
 
             return Response({"status": "Payment confirmed and processed."}, status=status.HTTP_200_OK)
 

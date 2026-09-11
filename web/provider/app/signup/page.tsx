@@ -10,13 +10,26 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 
+interface ProviderSignupFormData {
+    fullName: string;
+    email: string;
+    phone: string;
+    password: string;
+    role: string;
+    vehiclePlate: string;
+    licenseNumber: string;
+    kycDoc: File | null;
+    mechanicCert: File | null;
+    driverLicense: File | null;
+}
+
 export default function ProviderSignupPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<ProviderSignupFormData>({
         fullName: '',
         email: '',
         phone: '',

@@ -48,17 +48,17 @@ export default function Dashboard() {
         }
     }, [user]);
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
-        </div>
-    );
-
     useEffect(() => {
         if (!loading && !user) {
             router.push('/auth/login?redirect=/dashboard');
         }
     }, [user, loading, router]);
+
+    if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+        </div>
+    );
 
     if (!user) {
         return null;
@@ -207,7 +207,7 @@ export default function Dashboard() {
                     >
                         {[
                             { title: 'Towing', icon: Wrench, color: 'text-blue-500', bg: 'bg-blue-500/10', desc: 'Recovery', link: '?type=TOWING' },
-                            { title: 'Fuel', icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-500/10', desc: 'Delivery', link: '?type=FUEL' },
+                            { title: 'Fuel', icon: Fuel, color: 'text-orange-500', bg: 'bg-orange-500/10', desc: 'Delivery', link: '?type=FUEL_DELIVERY' },
                             { title: 'Flat Tire', icon: Disc, color: 'text-slate-500', bg: 'bg-slate-500/10', desc: 'Repair', link: '?type=FLAT_TIRE' },
                             { title: 'Replacement', icon: ArrowLeftRight, color: 'text-purple-500', bg: 'bg-purple-500/10', desc: 'Temp Vehicle', link: '/exchange' },
                             { title: 'Placement', icon: Truck, color: 'text-green-500', bg: 'bg-green-500/10', desc: 'Move Vehicle', link: '/placement' },

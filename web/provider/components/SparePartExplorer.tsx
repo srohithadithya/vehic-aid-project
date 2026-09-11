@@ -36,7 +36,7 @@ export default function SparePartExplorer({ requestId, onFinalize }: SparePartEx
     const fetchStores = async () => {
         try {
             // In real app, pass current lat/lng
-            const response = await apiClient.get('/spare-parts/nearby/?lat=12.97&lng=77.59');
+            const response = await apiClient.get('/services/spare-parts/nearby/?lat=12.97&lng=77.59');
             setStores(response.data);
         } catch (error) {
             console.error("Failed to fetch stores", error);

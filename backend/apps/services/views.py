@@ -462,7 +462,7 @@ class VehicleExchangeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if hasattr(user, 'servicebooker'):
             return VehicleExchange.objects.filter(
-                request__booker=user.servicebooker
+                request__booker=user
             )
         return VehicleExchange.objects.all()
 
@@ -521,7 +521,7 @@ class ServiceQuoteViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
          user = self.request.user
          if hasattr(user, 'servicebooker'):
-             return ServiceQuote.objects.filter(request__booker=user.servicebooker)
+             return ServiceQuote.objects.filter(request__booker=user)
          if hasattr(user, 'serviceprovider'):
              return ServiceQuote.objects.filter(request__provider=user)
          return ServiceQuote.objects.none()
@@ -995,7 +995,7 @@ class VehiclePlacementViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if hasattr(user, 'servicebooker'):
-            return VehiclePlacement.objects.filter(request__booker=user.servicebooker)
+            return VehiclePlacement.objects.filter(request__booker=user)
         return VehiclePlacement.objects.all()
         
     def perform_create(self, serializer):

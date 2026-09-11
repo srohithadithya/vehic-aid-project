@@ -217,10 +217,7 @@ export default function ProviderDashboard() {
                                 ))}
                                 <div className="hidden md:block bg-black rounded-2xl min-h-[200px] border border-white/5 relative overflow-hidden group">
                                     {/* Map Background */}
-                                    <div
-                                        className="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-80 transition-opacity duration-700"
-                                        style={{ backgroundImage: 'url("/assets/dark_map_bg.png")' }}
-                                    ></div>
+                                    <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(88,28,135,0.35),rgba(15,23,42,0.9)),radial-gradient(circle_at_30%_30%,rgba(168,85,247,0.25),transparent_28%),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:100%_100%,100%_100%,24px_24px,24px_24px] opacity-80 group-hover:opacity-100 transition-opacity duration-700"></div>
 
                                     {/* Map UI Overlays */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
