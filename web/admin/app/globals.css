@@ -125,20 +125,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen;
     /* Cosmic Gradient Background */
     background-image: 
       radial-gradient(at 0% 0%, oklch(0.15 0.05 280 / 0.3) 0px, transparent 50%),
       radial-gradient(at 100% 100%, oklch(0.15 0.05 200 / 0.3) 0px, transparent 50%);
-    background-attachment: fixed;
+    /* Removed background-attachment: fixed to prevent severe repaints on interaction */
   }
 
   /* Glassmorphism Utilities */
   .glass {
     @apply bg-card/60 backdrop-blur-xl border border-white/10 shadow-xl;
+    will-change: transform, opacity;
   }
   
   .glass-card {
-     @apply bg-card backdrop-blur-md border border-white/5 shadow-lg transition-all duration-300 hover:bg-card/80 hover:border-primary/20 hover:shadow-primary/5;
+     @apply bg-card backdrop-blur-md border border-white/5 shadow-lg transition-colors duration-300 hover:bg-card/80 hover:border-primary/20 hover:shadow-primary/5;
+     will-change: transform, opacity;
   }
 }

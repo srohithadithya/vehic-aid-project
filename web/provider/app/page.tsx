@@ -11,7 +11,7 @@ export default function ProviderHome() {
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-hidden">
         {/* Background Effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[120px] -z-10"></div>
 
         <div className="text-center mb-16 max-w-2xl">
           <div className="mx-auto w-24 h-24 mb-8 relative">
